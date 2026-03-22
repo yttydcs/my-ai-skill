@@ -1,0 +1,4 @@
+interface:
+  display_name: "Docs Governor"
+  short_description: "Govern project docs and indexes"
+  default_prompt: "Use $docs-governor to route, write, or reorganize project documentation safely."

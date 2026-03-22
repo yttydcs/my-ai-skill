@@ -1,0 +1,16 @@
+{
+  "name": "docs-governor",
+  "version": "0.1.0",
+  "install_mode": "copy",
+  "source_dir": "skills/docs-governor",
+  "dist_dir": "dist/codex/docs-governor",
+  "codex_install_root": "%USERPROFILE%/.codex/skills",
+  "bootstrap_script": "scripts/bootstrap_docs_tree.py",
+  "categories": [
+    "requirements",
+    "specs",
+    "plan",
+    "change",
+    "lessons"
+  ]
+}
