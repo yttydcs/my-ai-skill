@@ -14,11 +14,13 @@ The skill is packaged as `skills/rigorous-execution` and kept intentionally smal
 
 ## Trigger Contract
 
-The skill is manual-invocation-only.
+The skill supports explicit invocation and does not forbid host-side implicit selection in its metadata.
 
-- Invoke it explicitly as `$rigorous-execution`.
-- `skills/rigorous-execution/agents/openai.yaml` must set:
+- Invoke it explicitly as `$rigorous-execution` when deterministic routing matters.
+- `skills/rigorous-execution/agents/openai.yaml` must not set:
   - `policy.allow_implicit_invocation: false`
+- `manifests/rigorous-execution.json` must not declare:
+  - `manual_invocation_only: true`
 
 ## Workflow Contract
 
@@ -90,3 +92,4 @@ The skill is manual-invocation-only.
 - [../change/2026-03-23_rigorous-execution-skill.md](../change/2026-03-23_rigorous-execution-skill.md)
 - [../change/2026-03-23_rigorous-execution-alignment.md](../change/2026-03-23_rigorous-execution-alignment.md)
 - [../change/2026-03-23_rigorous-execution-doc-priority.md](../change/2026-03-23_rigorous-execution-doc-priority.md)
+- [../change/2026-03-23_rigorous-execution-invocation-policy.md](../change/2026-03-23_rigorous-execution-invocation-policy.md)

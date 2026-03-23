@@ -1,6 +1,6 @@
 ---
 name: rigorous-execution
-description: Manual invocation only. Enforce a staged, auditable software execution workflow with worktree-first initialization, requirements analysis, architecture design, root plan.md gating, mandatory code review, docs/change archiving, explicit blocker handling, rollback traceability, and controlled sub-agent delegation. Use this skill only when explicitly invoked as $rigorous-execution for work that must follow strict engineering discipline rather than ad hoc coding.
+description: Enforce a staged, auditable software execution workflow with worktree-first initialization, requirements analysis, architecture design, root plan.md gating, mandatory code review, docs/change archiving, explicit blocker handling, rollback traceability, and controlled sub-agent delegation. Use this skill for work that must follow strict engineering discipline rather than ad hoc coding.
 ---
 
 # Rigorous Execution
@@ -11,7 +11,7 @@ Use this skill to execute implementation work under strict stage gates, explicit
 
 ## Quick Start
 
-- Invoke this skill explicitly as `$rigorous-execution`. Do not treat it as an implicitly injected helper.
+- Invoke this skill explicitly as `$rigorous-execution` when you want deterministic routing into this workflow.
 - If `docs/requirements` or `docs/specs` exists, prioritize them during stages `1` and `2` before falling back to code-only inference.
 - Read `references/initialization.md` before stage `1`.
 - Read `references/stages.md` to execute stages `1` through `4` and emit the required outputs.
@@ -22,7 +22,7 @@ Use this skill to execute implementation work under strict stage gates, explicit
 ## Workflow
 
 1. Start with initialization, not coding:
-   - run this skill only when explicitly invoked
+   - confirm the task actually requires strict staged workflow execution
    - read `guide.md` if it exists
    - confirm repo, base branch, and participating modules
    - require a dedicated branch and worktree under `D:\project\MyFlowHub3\worktrees\`

@@ -12,7 +12,7 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 
 ### Must
 
-- require explicit manual invocation via `$rigorous-execution`
+- support explicit invocation via `$rigorous-execution` when deterministic routing is needed
 - require worktree-first initialization
 - require stage order from requirements through archive
 - require only one active stage at a time
@@ -88,3 +88,4 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - [../change/2026-03-23_rigorous-execution-skill.md](../change/2026-03-23_rigorous-execution-skill.md)
 - [../change/2026-03-23_rigorous-execution-alignment.md](../change/2026-03-23_rigorous-execution-alignment.md)
 - [../change/2026-03-23_rigorous-execution-doc-priority.md](../change/2026-03-23_rigorous-execution-doc-priority.md)
+- [../change/2026-03-23_rigorous-execution-invocation-policy.md](../change/2026-03-23_rigorous-execution-invocation-policy.md)
