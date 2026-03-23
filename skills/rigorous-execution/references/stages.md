@@ -64,6 +64,7 @@ Requirements:
 - Include:
   - project goal and current state
   - repo, branch, base, worktree absolute path, and current stage
+  - related requirements, specs, and lessons when already known
   - executable checklist
   - task IDs
   - per-task goal, files, acceptance, tests, rollback
@@ -141,13 +142,21 @@ Requirements:
   - 具体变更内容
   - `Requirements impact: none | updated`
   - `Specs impact: none | updated`
+  - `Lessons impact: none | updated`
   - `Related requirements: ...`
   - `Related specs: ...`
+  - `Related lessons: ...`
   - 对应 `plan.md` 任务映射
+  - 经验 / 教训摘要
+  - 可复用排查线索（症状 / 触发条件 / 关键词 / 快速检查）
   - 关键设计决策与权衡
   - 测试与验证方式 / 结果
   - 潜在影响与回滚方案
   - 子Agent执行轨迹
+- If the debugging path was expensive, non-obvious, likely to recur, or exposed a rule worth remembering:
+  - create or update the corresponding `docs/lessons/<topic>.md`
+  - update `docs/lessons/README.md` and any affected indexes
+- Do not leave reusable troubleshooting knowledge only inside `docs/change`.
 - Ask whether to end the workflow after the archive is complete.
 
 ## Workflow End Confirmation
@@ -158,4 +167,5 @@ Requirements:
   - merge in the repo control-plane
   - merge the worktree `plan.md` into the global `plan.md`
   - move worktree `docs/change` files into the global `docs/change`
+  - move worktree `docs/lessons` files and affected lesson indexes into the global docs tree
   - remove and prune the worktree

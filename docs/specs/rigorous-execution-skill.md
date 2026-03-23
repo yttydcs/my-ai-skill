@@ -38,8 +38,11 @@ The skill supports explicit invocation and does not forbid host-side implicit se
 - Stage `2` prioritizes relevant docs under `docs/specs` when they exist.
 - Active workflow control stays in the worktree root as `plan.md` or `todo.md`.
 - `docs/change/YYYY-MM-DD_topic.md` is required before a workflow counts as complete.
+- Stage `4` must record `Lessons impact`, `Related lessons`, and searchable lesson cues in the archive.
+- Stage `4` must create or update `docs/lessons` when the workflow exposed reusable troubleshooting knowledge.
 - After stage `4`, the workflow must ask whether to end.
 - If the user confirms workflow end, merge and worktree cleanup happen from the repo control-plane only.
+- If stage `4` produced lessons docs or lesson-index updates, workflow end must carry them back into the global docs tree.
 - Merge and worktree cleanup are forbidden until the user confirms workflow end.
 
 ## Docs Integration Contract
@@ -47,6 +50,7 @@ The skill supports explicit invocation and does not forbid host-side implicit se
 - Stage `3.1` must explicitly use `$docs-governor`.
 - Stage `4` must explicitly use `$docs-governor`.
 - Requirement/spec impact must be recorded in planning and archive artifacts.
+- Lesson impact and related lesson paths must be recorded in archive artifacts.
 - The root-level active `plan.md` is a workflow-control exception and does not replace `docs/plan/` as an archive category.
 
 ## Sub-agent Contract
@@ -93,3 +97,4 @@ The skill supports explicit invocation and does not forbid host-side implicit se
 - [../change/2026-03-23_rigorous-execution-alignment.md](../change/2026-03-23_rigorous-execution-alignment.md)
 - [../change/2026-03-23_rigorous-execution-doc-priority.md](../change/2026-03-23_rigorous-execution-doc-priority.md)
 - [../change/2026-03-23_rigorous-execution-invocation-policy.md](../change/2026-03-23_rigorous-execution-invocation-policy.md)
+- [../change/2026-03-23_lessons-archive-lookup.md](../change/2026-03-23_lessons-archive-lookup.md)

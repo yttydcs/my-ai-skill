@@ -27,7 +27,7 @@ docs/
 - `change`
   - What did a specific workflow actually change, how was it verified, and how can it be rolled back?
 - `lessons`
-  - What recurring problem or failure pattern did we learn from, and how should we avoid it next time?
+  - What recurring problem or failure pattern did we learn from, how can we look it up by symptom, and how should we avoid it next time?
 
 ## Source-of-Truth Boundaries
 
@@ -72,7 +72,7 @@ Always record whether `requirements` or `specs` changed.
 
 ### lessons
 
-Put recurring issue patterns, root causes, debugging trails, and prevention guidance here.
+Put recurring issue patterns, lookup hints, root causes, debugging trails, and prevention guidance here.
 
 Do not use lessons as a substitute for updating a broken requirement or spec.
 
@@ -81,3 +81,4 @@ Do not use lessons as a substitute for updating a broken requirement or spec.
 - `plan` must reference the relevant `requirements` and `specs`.
 - `change` must reference the relevant `plan` and stable docs.
 - `lessons` should link back to the relevant `change` and any corrected `requirements` or `specs`.
+- `lessons` indexes should expose enough symptom or keyword context for later lookup.

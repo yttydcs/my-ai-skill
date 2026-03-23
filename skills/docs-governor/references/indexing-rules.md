@@ -31,6 +31,7 @@ Use this file when creating or updating `README.md` entry files.
 - explain what belongs in the category
 - link to leaf docs or module indexes
 - state naming and maintenance rules for the category
+- for `docs/lessons/README.md`, add a short symptom or keyword clue for each lesson when practical
 
 ### module README.md
 
@@ -46,6 +47,7 @@ Update the nearest index whenever you:
 - move a leaf doc across modules or categories
 - add a new module bucket
 - change the docs topology itself
+- change the discoverability cues for an existing lesson
 
 Update root `docs/README.md` only when:
 

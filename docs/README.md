@@ -7,6 +7,11 @@
 - Read change for completed workflow results and verification.
 - Read lessons for reusable prevention guidance.
 
+## Troubleshooting Order
+- Start with lessons when the request is about a symptom, outage, or repeated confusion.
+- Read change only when the lesson doc is missing or does not explain this workflow's detail.
+- Confirm stable truth in specs and requirements before changing behavior.
+
 ## Workflow Control Exception
 - Active workflow control files remain at the worktree root as `plan.md` or `todo.md` when a workflow requires them.
 - Treat `docs/plan/` as the archive layer for planning artifacts, not the active control surface.

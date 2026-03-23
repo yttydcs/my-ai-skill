@@ -57,6 +57,7 @@ Use these templates as concise defaults.
 ### Stage 3.1 - Planning
 #### Project Goal and Current State
 #### Docs Governance Routing Decision
+#### Related Requirements / Specs / Lessons
 #### Executable Task List
 #### Task Details
 #### Dependencies
@@ -89,12 +90,33 @@ Use these templates as concise defaults.
 ## 具体变更内容
 ## Requirements impact
 ## Specs impact
+## Lessons impact
 ## Related requirements
 ## Related specs
+## Related lessons
 ## 对应 plan.md 任务映射
+## 经验 / 教训摘要
+## 可复用排查线索
 ## 关键设计决策与权衡
 ## 测试与验证方式 / 结果
 ## 潜在影响
 ## 回滚方案
 ## 子Agent执行轨迹
+```
+
+## docs/lessons Skeleton
+
+```md
+# <lesson-topic>
+
+## Summary
+## Lookup Hints
+## Symptoms
+## Impact
+## Trigger Conditions
+## Root Cause
+## Investigation Trail
+## Resolution
+## Prevention / Guardrails
+## Related Docs
 ```

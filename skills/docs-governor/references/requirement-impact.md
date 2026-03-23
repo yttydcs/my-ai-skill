@@ -12,7 +12,8 @@ Use this file before editing `plan` or `change`.
    - clarifies an existing requirement or spec
    - adds a new requirement or spec
    - deprecates or removes an existing requirement or spec
-5. Record the conclusion explicitly in `plan` and `change`.
+5. Decide whether the work should create or update reusable `lessons`.
+6. Record the conclusion explicitly in `plan` and `change`.
 
 ## Required Rules
 
@@ -20,6 +21,7 @@ Use this file before editing `plan` or `change`.
 - Do not treat code as the only source of truth when stable docs should change.
 - If the requirement changed, update `requirements` before or alongside `change`.
 - If the technical contract changed, update `specs` before or alongside `change`.
+- If reusable troubleshooting knowledge emerged, record whether `lessons` changed and where it lives.
 
 ## Suggested Recording Language
 
@@ -29,13 +31,16 @@ Use this file before editing `plan` or `change`.
 - `Specs impact: none | clarify | add | deprecate`
 - `Related requirements: ...`
 - `Related specs: ...`
+- `Related lessons: ...` when already known
 
 ### In change
 
 - `Requirements impact: none | updated`
 - `Specs impact: none | updated`
+- `Lessons impact: none | updated`
 - `Related requirements: ...`
 - `Related specs: ...`
+- `Related lessons: ...`
 
 ## Escalation Conditions
 

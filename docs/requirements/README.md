@@ -24,4 +24,5 @@ Store long-lived capability intent, boundaries, and acceptance criteria for this
 
 ## Current Docs
 
+- [docs-governor-skill.md](docs-governor-skill.md)
 - [rigorous-execution-skill.md](rigorous-execution-skill.md)

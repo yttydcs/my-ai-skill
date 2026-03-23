@@ -22,6 +22,8 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - require rollback reason recording and document synchronization
 - require no silent assumptions about business, data, interface, environment, dependency version, acceptance, or preference
 - require explicit `$docs-governor` usage in stages `3.1` and `4`
+- require stage `4` to extract reusable experience / lessons and record searchable lookup hints
+- require stage `4` to either update `docs/lessons` or record why `Lessons impact: none`
 - require mandatory review and `docs/change` archive before completion
 - require controlled sub-agent usage only in allowed phases
 
@@ -42,6 +44,7 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - The user requires git worktree isolation before coding.
 - The user requires handoff-ready `plan.md` artifacts before any coding or delegation.
 - The user requires auditable sub-agent governance and a final `docs/change` archive.
+- The user wants future troubleshooting to start from reusable lessons instead of re-reading old archives.
 
 ## Functional Requirements
 
@@ -52,6 +55,8 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - The skill must emit stage outputs for requirements analysis and architecture design before planning.
 - The skill must ask for clarification instead of assuming missing requirements.
 - The skill must escalate uncertain best-practice choices instead of deciding silently.
+- The skill must record `Lessons impact` and `Related lessons` in the stage `4` archive.
+- The skill must capture searchable lesson cues when the workflow produced reusable debugging knowledge.
 - The skill must ask whether the workflow should end after stage `4`.
 
 ## Non-functional Requirements
@@ -77,6 +82,7 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - `rigorous-execution` exists as a valid skill package in this repository.
 - The skill enforces the user's staged workflow and blocker rules.
 - The skill integrates with `docs-governor` and repository copy-sync tooling.
+- The stage `4` archive can route reusable lessons into `docs/lessons` for later lookup.
 - The skill validates and syncs successfully.
 
 ## Related Specs
@@ -89,3 +95,4 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - [../change/2026-03-23_rigorous-execution-alignment.md](../change/2026-03-23_rigorous-execution-alignment.md)
 - [../change/2026-03-23_rigorous-execution-doc-priority.md](../change/2026-03-23_rigorous-execution-doc-priority.md)
 - [../change/2026-03-23_rigorous-execution-invocation-policy.md](../change/2026-03-23_rigorous-execution-invocation-policy.md)
+- [../change/2026-03-23_lessons-archive-lookup.md](../change/2026-03-23_lessons-archive-lookup.md)

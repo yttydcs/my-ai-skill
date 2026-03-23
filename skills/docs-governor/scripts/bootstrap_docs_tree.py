@@ -16,6 +16,11 @@ ROOT_README = """# Documentation
 - Read change for completed results and verification.
 - Read lessons for recurring issues and prevention guidance.
 
+## Troubleshooting Order
+- Start with lessons when the request is about a symptom, outage, or repeated confusion.
+- Read change only when the lesson doc is missing or insufficient.
+- Confirm stable truth in specs and requirements before changing behavior.
+
 ## Sections
 - [requirements/README.md](requirements/README.md)
 - [specs/README.md](specs/README.md)
@@ -66,6 +71,7 @@ Store completed workflow result documents here.
 - Prefer `YYYY-MM-DD_topic.md`.
 - Record related requirements and specs.
 - Record whether requirements or specs changed.
+- Promote reusable troubleshooting knowledge into `lessons` instead of leaving it only here.
 """
 
 
@@ -76,6 +82,7 @@ Store reusable lessons, root-cause analyses, and prevention guidance here.
 ## Rules
 - Use stable names without dates when the lesson is long-lived.
 - Group by module or domain when useful.
+- Capture lookup hints such as symptoms, trigger conditions, keywords, and quick checks.
 - Link lessons back to relevant requirements, specs, and changes.
 """
 
@@ -94,7 +101,7 @@ Store technical contracts and constraints for `{module}` here.
 
 MODULE_LESSONS = """# {module} Lessons
 
-Store recurring problems, postmortems, and prevention notes for `{module}` here.
+Store recurring problems, query-friendly troubleshooting notes, and prevention guidance for `{module}` here.
 """
 
 

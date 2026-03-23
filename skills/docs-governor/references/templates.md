@@ -14,6 +14,12 @@ Use these templates as concise defaults. Adjust to fit the project.
 - change
 - lessons
 
+## Troubleshooting Order
+- lessons
+- change
+- specs
+- requirements
+
 ## Sections
 - [requirements/README.md](requirements/README.md)
 - [specs/README.md](specs/README.md)
@@ -80,6 +86,9 @@ Use these templates as concise defaults. Adjust to fit the project.
 ## Related Plan
 ## Related Requirements
 ## Related Specs
+## Lessons Impact
+## Related Lessons
+## Searchable Lessons Summary
 ## Requirements Impact
 ## Specs Impact
 ## Validation
@@ -92,6 +101,7 @@ Use these templates as concise defaults. Adjust to fit the project.
 # <Lesson Topic>
 
 ## Summary
+## Lookup Hints
 ## Symptoms
 ## Impact
 ## Trigger Conditions

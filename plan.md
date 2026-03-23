@@ -3,19 +3,19 @@
 ## Workflow Information
 
 - Repo: `D:\project\my-ai-skills`
-- Branch: `feat/rigorous-execution-skill`
+- Branch: `feat/lessons-archive-lookup`
 - Base: `main`
-- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill`
-- Current Stage: `4 - Change Archive (Iteration 3)`
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
+- Current Stage: `4 - Change Archive (Iteration 4)`
 - Scope:
-  - Create a reusable `rigorous-execution` Codex skill from the user-provided AI workflow.
-  - Preserve the staged engineering discipline: initialization, requirements, architecture, planning, coding, review, and change archive.
-  - Integrate explicit `docs-governor` usage rules for `3.1` and `4`.
-  - Reuse the repository's existing validation and copy-sync pattern.
+  - Strengthen the coupling between `rigorous-execution` and `docs-governor` around archive and lessons handling.
+  - Make stage `4` promote reusable experience into `docs/lessons` with searchable lookup hints.
+  - Add stable requirements/specs coverage for `docs-governor`.
+  - Reuse the repository's existing validation and copy-sync pattern for both skills.
 - Non-goals:
+  - Do not weaken the staged workflow gates or rollback requirements.
+  - Do not invent a separate lessons-search skill outside the governed docs system.
   - Do not modify unrelated existing skills beyond required integration references.
-  - Do not change `D:\project\MyFlowHub3` runtime code or external project repositories.
-  - Do not introduce Claude-specific packaging in this workflow.
 
 ## Stage Records
 
@@ -1272,3 +1272,446 @@
 - Change archive document created:
   - `docs/change/2026-03-23_rigorous-execution-doc-priority.md`
 - Iteration 3 Stage 4 complete.
+
+## Iteration 4 - Searchable Lessons Capture
+
+### Initialization Refresh
+
+- `guide.md` check:
+  - `D:\project\my-ai-skills\guide.md` exists.
+  - Constraint captured: every modification round must end with an automatic commit, and the commit message must use the existing English-style format.
+- Confirmed skill source repo: `D:\project\my-ai-skills`
+- Confirmed base branch: `main`
+- Confirmed execution branch: `feat/lessons-archive-lookup`
+- Confirmed execution worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
+- Confirmed the main repo on `main` remains control-plane only; all implementation for this workflow occurs in the dedicated worktree.
+
+### Iteration 4 - Stage 1 - Requirements Analysis
+
+#### Goal
+
+- Improve how `rigorous-execution` and `docs-governor` collaborate around archive, lessons, and later troubleshooting lookup.
+
+#### Scope
+
+- Must:
+  - make stage `4` capture reusable lessons and searchable lookup hints
+  - route future troubleshooting requests through `docs/lessons`
+  - keep `requirements`, `specs`, `change`, and `lessons` responsibilities explicit
+  - add stable requirements/specs docs for `docs-governor`
+- Optional:
+  - add a reusable lesson example that demonstrates the intended format
+- Out of scope:
+  - adding separate tooling beyond the current docs tree and skill scripts
+  - relaxing any staged workflow gate
+
+#### Use Cases
+
+- A workflow finishes after a costly investigation and should preserve the key lesson.
+- A future request asks "have we seen this before?" and should start from `docs/lessons`.
+- A docs governance change now affects both the workflow controller and the docs router.
+
+#### Functional Requirements
+
+- `rigorous-execution` stage `4` must record `Lessons impact`, `Related lessons`, and query cues.
+- `rigorous-execution` must promote reusable lessons into `docs/lessons` instead of leaving them only in `docs/change`.
+- `docs-governor` must classify troubleshooting lookup as a `lessons`-first path.
+- `docs-governor` lessons rules and templates must require symptoms, keywords, trigger conditions, and quick checks.
+- Repository stable docs and indexes must reflect the new lessons flow.
+
+#### Non-functional Requirements
+
+- Keep the skill bodies concise and push detail into references.
+- Keep the docs chain query-friendly without duplicating stable truth into `lessons`.
+- Prefer the smallest consistent doc and script changes that make the workflow enforceable.
+
+#### Inputs / Outputs
+
+- Inputs:
+  - current `rigorous-execution` and `docs-governor` source packages
+  - existing repository docs tree
+  - user direction about improving lessons capture and lookup
+- Outputs:
+  - updated skill source and references
+  - updated stable docs and README indexes
+  - one reusable lesson doc
+  - one change archive for this workflow
+
+#### Edge Cases
+
+- `docs-governor` currently has no stable requirement/spec docs, so they must be created instead of inferred later from change history.
+- A workflow may improve lessons guidance without a concrete production incident; the lesson still needs a reusable pattern rather than an invented outage.
+- `change` and `lessons` must cross-link without turning `lessons` into the only source of truth.
+
+#### Acceptance Criteria
+
+- Both skills explicitly describe the lessons-capture and lookup behavior.
+- Stable docs and indexes expose the new docs-governor and lessons contracts.
+- A reusable lesson exists and is discoverable from `docs/lessons/README.md`.
+- Validation and sync pass for both skills.
+
+#### Risks
+
+- The main risk is updating only narrative text without changing templates, index rules, and bootstrap output.
+
+#### Issue List
+
+- None.
+
+### Iteration 4 - Stage 2 - Architecture Design
+
+#### Overall Solution
+
+- Strengthen the contract in three layers:
+  - workflow layer: `rigorous-execution` stage `4`
+  - docs governance layer: `docs-governor` routing, lessons rules, indexing, and templates
+  - repository truth layer: stable docs, README indexes, lesson example, and archive
+
+#### Alternatives Considered
+
+- Alternative: create a third skill dedicated to lessons lookup.
+  - Rejected because the gap is in archive governance and docs routing, not in missing skill count.
+- Alternative: update only `rigorous-execution`.
+  - Rejected because `docs-governor` owns the destination rules, templates, and lesson discoverability.
+
+#### Module Responsibilities
+
+- `skills/rigorous-execution/**`
+  - enforce stage `4` capture and handoff rules
+- `skills/docs-governor/**`
+  - own lessons lookup, templates, indexes, and bootstrap guidance
+- `docs/**`
+  - hold stable truth, indexes, reusable lesson, and change archive
+
+#### Data / Call Flow
+
+- Workflow reaches stage `4`.
+- `rigorous-execution` invokes `$docs-governor`.
+- `docs-governor` decides whether lessons must be created or updated and what indexes must change.
+- Archive writes `docs/change/...` and promotes reusable knowledge into `docs/lessons/...`.
+- Future troubleshooting starts from `docs/lessons/README.md`, then the leaf lesson, then `docs/change` if needed.
+
+#### Interface Drafts
+
+- Archive fields:
+  - `Lessons impact`
+  - `Related lessons`
+  - `经验 / 教训摘要`
+  - `可复用排查线索`
+- Lesson fields:
+  - summary
+  - lookup hints
+  - symptoms
+  - root cause
+  - resolution
+  - prevention / guardrails
+
+#### Error Handling and Safety
+
+- Do not treat `change` as the only home of reusable troubleshooting knowledge.
+- Do not write stable behavior only into lessons; requirements/specs still carry durable truth.
+- Do not leave docs-governor without stable docs once its behavior changes.
+
+#### Performance and Testing Strategy
+
+- Validate both skills structurally.
+- Sync both installed copies.
+- Run a bootstrap smoke test to confirm generated docs now expose troubleshooting guidance.
+
+#### Extensibility Design Points
+
+- The query-cue structure is reference-driven, so future repos can reuse it without changing the main skill bodies.
+- The reusable lesson example acts as a pattern for future lessons docs.
+
+#### Issue List
+
+- None.
+
+### Iteration 4 - Stage 3.1 - Planning
+
+#### Project Goal and Current State
+
+- Current state:
+  - `rigorous-execution` checks whether a lesson may be needed, but stage `4` does not require a structured lessons handoff
+  - `docs-governor` already has a `lessons` category, but direct troubleshooting lookup is not first-class in the workflow
+  - `docs-governor` lacks stable requirements/specs docs in this repo
+- Goal:
+  - make lessons capture and later lookup explicit, query-friendly, and governed end to end
+
+#### Docs Governance Routing Decision
+
+- Stable capability changes:
+  - `docs/requirements/`
+  - `docs/specs/`
+- Workflow result:
+  - `docs/change/2026-03-23_lessons-archive-lookup.md`
+- Reusable operational knowledge:
+  - `docs/lessons/searchable-lessons-capture.md`
+
+#### Related Requirements / Specs / Lessons
+
+- Related requirements:
+  - `docs/requirements/rigorous-execution-skill.md`
+  - `docs/requirements/docs-governor-skill.md`
+- Related specs:
+  - `docs/specs/rigorous-execution-skill.md`
+  - `docs/specs/docs-governor-skill.md`
+- Related lessons:
+  - `docs/lessons/searchable-lessons-capture.md`
+
+#### Executable Task List
+
+- [x] `LA-1` update `rigorous-execution` lessons-capture rules and templates
+- [x] `LA-2` update `docs-governor` lessons routing, lookup, indexing, and bootstrap guidance
+- [x] `LA-3` update stable docs, README indexes, and add the reusable lesson example
+- [x] `LA-4` validate and sync both skills, then run a bootstrap smoke test
+- [x] `LA-5` review and archive the workflow
+
+#### Task Details
+
+##### LA-1 - Update rigorous-execution archive and lessons contracts
+
+- Owner: Main Agent
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
+- Plan Path: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\plan.md`
+- Goal:
+  - make stage `4` enforce structured lessons capture and `docs/lessons` promotion
+- Files / Modules:
+  - `skills/rigorous-execution/SKILL.md`
+  - `skills/rigorous-execution/references/docs-governor-integration.md`
+  - `skills/rigorous-execution/references/stages.md`
+  - `skills/rigorous-execution/references/templates.md`
+  - `docs/requirements/rigorous-execution-skill.md`
+  - `docs/specs/rigorous-execution-skill.md`
+- Write Set:
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\rigorous-execution\SKILL.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\rigorous-execution\references\docs-governor-integration.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\rigorous-execution\references\stages.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\rigorous-execution\references\templates.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\requirements\rigorous-execution-skill.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\specs\rigorous-execution-skill.md`
+- Acceptance:
+  - stage `4` explicitly captures lessons impact, related lessons, and query cues
+- Test Points:
+  - wording is consistent across skill source, references, and stable docs
+- Rollback:
+  - revert the stage `4` lessons changes if the workflow is discarded
+
+##### LA-2 - Update docs-governor lessons routing and bootstrap behavior
+
+- Owner: Main Agent
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
+- Plan Path: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\plan.md`
+- Goal:
+  - make troubleshooting requests start from `lessons` and make bootstrap output teach the same rule
+- Files / Modules:
+  - `skills/docs-governor/SKILL.md`
+  - `skills/docs-governor/references/indexing-rules.md`
+  - `skills/docs-governor/references/lessons-rules.md`
+  - `skills/docs-governor/references/requirement-impact.md`
+  - `skills/docs-governor/references/routing-rules.md`
+  - `skills/docs-governor/references/taxonomy.md`
+  - `skills/docs-governor/references/templates.md`
+  - `skills/docs-governor/scripts/bootstrap_docs_tree.py`
+- Write Set:
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\docs-governor\SKILL.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\docs-governor\references\indexing-rules.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\docs-governor\references\lessons-rules.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\docs-governor\references\requirement-impact.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\docs-governor\references\routing-rules.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\docs-governor\references\taxonomy.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\docs-governor\references\templates.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\docs-governor\scripts\bootstrap_docs_tree.py`
+- Acceptance:
+  - docs-governor treats lessons lookup as a first-class route and bootstrap output reflects it
+- Test Points:
+  - routing, templates, index rules, and generated README guidance are aligned
+- Rollback:
+  - revert the docs-governor lessons-routing changes
+
+##### LA-3 - Add stable docs, indexes, and reusable lessons entry
+
+- Owner: Main Agent
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
+- Plan Path: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\plan.md`
+- Goal:
+  - make the new lessons flow visible in repository truth and navigation
+- Files / Modules:
+  - `docs/README.md`
+  - `docs/change/README.md`
+  - `docs/lessons/README.md`
+  - `docs/requirements/README.md`
+  - `docs/specs/README.md`
+  - `docs/requirements/docs-governor-skill.md`
+  - `docs/specs/docs-governor-skill.md`
+  - `docs/lessons/searchable-lessons-capture.md`
+- Write Set:
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\README.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\change\README.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\lessons\README.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\requirements\README.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\specs\README.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\requirements\docs-governor-skill.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\specs\docs-governor-skill.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\lessons\searchable-lessons-capture.md`
+- Acceptance:
+  - stable docs and indexes explain the lessons-query path and include docs-governor coverage
+- Test Points:
+  - indexes link to the new docs
+  - the lesson is discoverable from `docs/lessons/README.md`
+- Rollback:
+  - remove the new stable docs and lesson entry and revert the index changes
+
+##### LA-4 - Validate, sync, and smoke test
+
+- Owner: Main Agent
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
+- Plan Path: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\plan.md`
+- Goal:
+  - confirm the source edits remain valid and the generated/read-installed copies reflect them
+- Files / Modules:
+  - `dist/codex/rigorous-execution/**`
+  - `dist/codex/docs-governor/**`
+- Write Set:
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\dist\codex\rigorous-execution\**`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\dist\codex\docs-governor\**`
+- Acceptance:
+  - validation passes for both skills
+  - installed copies are refreshed
+  - bootstrap smoke output contains the new troubleshooting guidance
+- Test Points:
+  - `tools/validate-skills.ps1 -Skill rigorous-execution`
+  - `tools/validate-skills.ps1 -Skill docs-governor`
+  - `tools/sync-skills.ps1 -Skill rigorous-execution`
+  - `tools/sync-skills.ps1 -Skill docs-governor`
+  - bootstrap smoke test with a temporary target directory
+- Rollback:
+  - remove regenerated dist/install copies and revert source edits if needed
+
+##### LA-5 - Review and archive iteration 4
+
+- Owner: Main Agent
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
+- Plan Path: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\plan.md`
+- Goal:
+  - review the new lessons contract and archive the completed workflow
+- Files / Modules:
+  - `plan.md`
+  - `docs/change/2026-03-23_lessons-archive-lookup.md`
+  - `docs/change/README.md`
+- Write Set:
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\plan.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\change\2026-03-23_lessons-archive-lookup.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\change\README.md`
+- Acceptance:
+  - review and archive capture the lessons-query behavior and related docs changes
+- Test Points:
+  - archive exists and maps back to `LA-1` through `LA-5`
+- Rollback:
+  - revert the iteration `4` archive if the round is discarded
+
+#### Dependencies
+
+- `LA-1`, `LA-2`, and `LA-3` precede `LA-4`.
+- `LA-5` depends on `LA-1` through `LA-4`.
+
+#### Risks and Notes
+
+- The highest risk is inconsistent wording between the two skills and the repository truth layer.
+
+#### Parallelism Assessment
+
+- No sub-agent delegation is allowed in `3.1`.
+- The write set overlaps across both skills and the shared docs indexes, so the Main Agent keeps ownership.
+
+#### Issue List
+
+- None.
+- Blocked: No
+- Exit criteria met for Iteration 4 Stage 3.1.
+
+### Iteration 4 - Stage 3.2 - Implementation
+
+#### LA-1 - Update rigorous-execution archive and lessons contracts
+
+- Completed.
+- Updated `skills/rigorous-execution/SKILL.md` to bring `docs/lessons` into the explicit stage `4` archive contract.
+- Updated `skills/rigorous-execution/references/stages.md`, `docs-governor-integration.md`, and `templates.md` so archive output now records lessons impact, related lessons, and reusable lookup cues.
+- Updated stable docs for `rigorous-execution` so the new stage `4` behavior is part of repository truth.
+
+#### LA-2 - Update docs-governor lessons routing and bootstrap behavior
+
+- Completed.
+- Updated `skills/docs-governor/SKILL.md` and references so troubleshooting lookup starts from `lessons`.
+- Updated lessons rules, routing rules, taxonomy, indexing rules, requirement-impact guidance, and templates to make lessons query-friendly and discoverable.
+- Updated `skills/docs-governor/scripts/bootstrap_docs_tree.py` so generated docs now teach the troubleshooting-first path.
+
+#### LA-3 - Add stable docs, indexes, and reusable lessons entry
+
+- Completed.
+- Added stable requirements/specs docs for `docs-governor`.
+- Updated root and category README indexes to expose the new troubleshooting path and docs-governor docs.
+- Added `docs/lessons/searchable-lessons-capture.md` as the reusable lesson example for this pattern.
+
+#### LA-4 - Validate, sync, and smoke test
+
+- Completed.
+- Validation:
+  - `tools/validate-skills.ps1 -Skill rigorous-execution -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
+  - `tools/validate-skills.ps1 -Skill docs-governor -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
+- Sync:
+  - `tools/sync-skills.ps1 -Skill rigorous-execution`
+  - `tools/sync-skills.ps1 -Skill docs-governor`
+- Bootstrap smoke test:
+  - `C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe skills/docs-governor/scripts/bootstrap_docs_tree.py tmp\docs-governor-smoke --module api --force`
+
+### Iteration 4 - Stage 3.3 - Code Review
+
+#### Review Result
+
+- 需求覆盖：通过
+  - The workflow now captures reusable lessons in stage `4` and makes later lookup explicit.
+- 架构合理性：通过
+  - Responsibilities remain split cleanly between workflow control, docs governance, and repository truth.
+- 性能风险（N+1 / 重复计算 / 多余 I/O / 锁竞争）：通过
+  - The changes are doc and script level only and do not add avoidable repeated work beyond required archive capture.
+- 可读性与一致性：通过
+  - The new lessons language is aligned across skill source, references, stable docs, and indexes.
+- 可扩展性与配置化：通过
+  - Lessons lookup remains reference-driven and reusable across repositories bootstrapped by docs-governor.
+- 稳定性与安全：通过
+  - The docs chain now makes it harder to lose reusable troubleshooting knowledge in change archives alone.
+- 测试覆盖情况：通过
+  - Both skills validated and synced successfully.
+  - The bootstrap smoke test confirmed the generated guidance.
+- 子Agent治理与审计（任务映射、上下文完整性、文件所有权、结果复核、冲突处理、记录完整性）：通过
+  - No sub-agents were used in this iteration.
+- Conclusion: Passed
+  - No blocking review findings remain for iteration 4.
+
+### Iteration 4 - Stage 4 - Change Archive
+
+#### Docs Governance Check
+
+- Used `$docs-governor` before archive completion.
+- Requirements impact: updated
+  - updated `docs/requirements/rigorous-execution-skill.md`
+  - added `docs/requirements/docs-governor-skill.md`
+- Specs impact: updated
+  - updated `docs/specs/rigorous-execution-skill.md`
+  - added `docs/specs/docs-governor-skill.md`
+- Lessons impact: updated
+  - added `docs/lessons/searchable-lessons-capture.md`
+  - updated `docs/lessons/README.md`
+- Index updates required: yes
+  - `docs/README.md`
+  - `docs/change/README.md`
+  - `docs/lessons/README.md`
+  - `docs/requirements/README.md`
+  - `docs/specs/README.md`
+
+#### Archive Result
+
+- Change archive document created:
+  - `docs/change/2026-03-23_lessons-archive-lookup.md`
+- Iteration 4 Stage 4 complete.

@@ -25,4 +25,5 @@ Store technical contracts, integration rules, architecture constraints, and work
 
 ## Current Docs
 
+- [docs-governor-skill.md](docs-governor-skill.md)
 - [rigorous-execution-skill.md](rigorous-execution-skill.md)
