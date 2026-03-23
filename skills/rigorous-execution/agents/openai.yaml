@@ -1,0 +1,7 @@
+interface:
+  display_name: "Rigorous Execution"
+  short_description: "Run staged, auditable software workflows"
+  default_prompt: "Use $rigorous-execution to run this work with strict staged engineering discipline."
+
+policy:
+  allow_implicit_invocation: false
