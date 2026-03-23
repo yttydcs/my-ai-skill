@@ -1,0 +1,19 @@
+{
+  "name": "rigorous-execution",
+  "version": "0.1.0",
+  "install_mode": "copy",
+  "manual_invocation_only": true,
+  "source_dir": "skills/rigorous-execution",
+  "dist_dir": "dist/codex/rigorous-execution",
+  "codex_install_root": "%USERPROFILE%/.codex/skills",
+  "depends_on_skills": [
+    "docs-governor"
+  ],
+  "reference_files": [
+    "references/initialization.md",
+    "references/stages.md",
+    "references/docs-governor-integration.md",
+    "references/subagents.md",
+    "references/templates.md"
+  ]
+}
