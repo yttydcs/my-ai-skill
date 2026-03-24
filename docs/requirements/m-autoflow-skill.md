@@ -1,8 +1,8 @@
-# Rigorous Execution Skill
+# m:autoflow Skill
 
 ## Background
 
-This repository stores reusable Codex skills as Git-managed source packages. It needs a workflow skill that enforces disciplined delivery instead of allowing direct ad hoc coding.
+This repository stores reusable Codex skills as Git-managed source packages. It needs a workflow skill named `m-autoflow` that enforces disciplined delivery instead of allowing direct ad hoc coding.
 
 ## Goal
 
@@ -12,7 +12,7 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 
 ### Must
 
-- support explicit invocation via `$rigorous-execution` when deterministic routing is needed
+- support explicit invocation via `$m-autoflow` when deterministic routing is needed
 - require worktree-first initialization
 - require stage order from requirements through archive
 - require only one active stage at a time
@@ -21,7 +21,7 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - require explicit blocker handling with `问题清单` and `阻塞：是`
 - require rollback reason recording and document synchronization
 - require no silent assumptions about business, data, interface, environment, dependency version, acceptance, or preference
-- require explicit `$docs-governor` usage in stages `3.1` and `4`
+- require explicit `$m-docs` usage in stages `3.1` and `4`
 - require stage `4` to extract reusable experience / lessons and record searchable lookup hints
 - require stage `4` to either update `docs/lessons` or record why `Lessons impact: none`
 - require mandatory review and `docs/change` archive before completion
@@ -36,7 +36,7 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 
 - changing external project runtime logic
 - relaxing the user's stage gates or blocker rules
-- duplicating `docs-governor` as a separate implementation inside this skill
+- duplicating `m-docs` as a separate implementation inside this skill
 
 ## Scenarios
 
@@ -66,7 +66,7 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - Readability:
   - use the user's stage names and explicit blocker wording
 - Extensibility:
-  - keep docs-governor integration explicit instead of copying its full rule set
+  - keep m-docs integration explicit instead of copying its full rule set
 - Maintainability:
   - keep install output disposable and Git source authoritative
 
@@ -79,15 +79,15 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 
 ## Acceptance Criteria
 
-- `rigorous-execution` exists as a valid skill package in this repository.
+- `m-autoflow` exists as a valid skill package in this repository.
 - The skill enforces the user's staged workflow and blocker rules.
-- The skill integrates with `docs-governor` and repository copy-sync tooling.
+- The skill integrates with `m-docs` and repository copy-sync tooling.
 - The stage `4` archive can route reusable lessons into `docs/lessons` for later lookup.
 - The skill validates and syncs successfully.
 
 ## Related Specs
 
-- [../specs/rigorous-execution-skill.md](../specs/rigorous-execution-skill.md)
+- [../specs/m-autoflow-skill.md](../specs/m-autoflow-skill.md)
 
 ## Related Changes
 
@@ -96,3 +96,4 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - [../change/2026-03-23_rigorous-execution-doc-priority.md](../change/2026-03-23_rigorous-execution-doc-priority.md)
 - [../change/2026-03-23_rigorous-execution-invocation-policy.md](../change/2026-03-23_rigorous-execution-invocation-policy.md)
 - [../change/2026-03-23_lessons-archive-lookup.md](../change/2026-03-23_lessons-archive-lookup.md)
+- [../change/2026-03-24_skill-prefix-rename.md](../change/2026-03-24_skill-prefix-rename.md)

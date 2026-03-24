@@ -135,7 +135,7 @@ If any item fails, return to `3.2`.
 
 Requirements:
 
-- explicitly use `$docs-governor`
+- explicitly use `$m-docs`
 - Create `docs/change/YYYY-MM-DD_topic.md`.
 - Include:
   - 变更背景 / 目标

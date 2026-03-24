@@ -29,7 +29,7 @@ Promote reusable troubleshooting knowledge from `docs/change` into `docs/lessons
 ## Trigger Conditions
 
 - Stage `4` archive focuses only on shipped changes and verification.
-- `docs-governor` and `rigorous-execution` are both involved, but no explicit handoff exists for lesson promotion.
+- `m-docs` and `m-autoflow` are both involved, but no explicit handoff exists for lesson promotion.
 - The investigation revealed a structural pattern, a reusable guardrail, or a non-obvious diagnostic path.
 
 ## Root Cause
@@ -38,14 +38,14 @@ The documentation model separated `change` and `lessons`, but the archive workfl
 
 ## Investigation Trail
 
-- Compared `rigorous-execution` stage `4` requirements with `docs-governor` lessons rules.
+- Compared `m-autoflow` stage `4` requirements with `m-docs` lessons rules.
 - Checked repository indexes and found no direct troubleshooting entry path beyond generic lessons guidance.
-- Confirmed that stable docs existed for `rigorous-execution`, but `docs-governor` lacked stable requirement/spec coverage.
+- Confirmed that stable docs existed for `m-autoflow`, but `m-docs` lacked stable requirement/spec coverage.
 
 ## Resolution
 
-- Made `rigorous-execution` stage `4` record lessons impact, related lessons, and query cues.
-- Made `docs-governor` route troubleshooting lookup through `lessons` first.
+- Made `m-autoflow` stage `4` record lessons impact, related lessons, and query cues.
+- Made `m-docs` route troubleshooting lookup through `lessons` first.
 - Added stable docs and indexes so the lessons workflow is now governed instead of informal.
 
 ## Prevention / Guardrails
@@ -57,8 +57,8 @@ The documentation model separated `change` and `lessons`, but the archive workfl
 
 ## Related Docs
 
-- [../requirements/rigorous-execution-skill.md](../requirements/rigorous-execution-skill.md)
-- [../specs/rigorous-execution-skill.md](../specs/rigorous-execution-skill.md)
-- [../requirements/docs-governor-skill.md](../requirements/docs-governor-skill.md)
-- [../specs/docs-governor-skill.md](../specs/docs-governor-skill.md)
+- [../requirements/m-autoflow-skill.md](../requirements/m-autoflow-skill.md)
+- [../specs/m-autoflow-skill.md](../specs/m-autoflow-skill.md)
+- [../requirements/m-docs-skill.md](../requirements/m-docs-skill.md)
+- [../specs/m-docs-skill.md](../specs/m-docs-skill.md)
 - [../change/2026-03-23_lessons-archive-lookup.md](../change/2026-03-23_lessons-archive-lookup.md)

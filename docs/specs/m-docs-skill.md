@@ -1,16 +1,16 @@
-# Docs Governor Skill Spec
+# m:docs Skill Spec
 
 ## Architecture Overview
 
-The skill is packaged as `skills/docs-governor` and keeps the routing logic in small reference files so the main `SKILL.md` stays concise while the docs system remains governed and queryable.
+The skill is packaged as `skills/m-docs` and keeps the routing logic in small reference files so the main `SKILL.md` stays concise while the docs system remains governed and queryable.
 
 ## Package Contract
 
-- Source package: `skills/docs-governor`
-- UI metadata: `skills/docs-governor/agents/openai.yaml`
-- Install metadata: `manifests/docs-governor.json`
+- Source package: `skills/m-docs`
+- UI metadata: `skills/m-docs/agents/openai.yaml`
+- Install metadata: `manifests/m-docs.json`
 - Install flow:
-  - source -> `dist/codex/docs-governor` -> `C:\Users\HelloWorld\.codex\skills\docs-governor`
+  - source -> `dist/codex/m-docs` -> `C:\Users\HelloWorld\.codex\skills\m-docs`
 
 ## Workflow Contract
 
@@ -53,15 +53,15 @@ The skill is packaged as `skills/docs-governor` and keeps the routing logic in s
 
 ## Bootstrap Contract
 
-- `skills/docs-governor/scripts/bootstrap_docs_tree.py` must create the five core docs categories plus `docs/README.md`.
+- `skills/m-docs/scripts/bootstrap_docs_tree.py` must create the five core docs categories plus `docs/README.md`.
 - The generated root README must include both reading order and troubleshooting order guidance.
 - The generated `docs/change/README.md` must remind users to promote reusable troubleshooting knowledge into `lessons`.
 - The generated `docs/lessons/README.md` must require lookup hints.
 
 ## Validation Contract
 
-- The skill must pass `tools/validate-skills.ps1 -Skill docs-governor`.
-- The skill must sync through `tools/sync-skills.ps1 -Skill docs-governor`.
+- The skill must pass `tools/validate-skills.ps1 -Skill m-docs`.
+- The skill must sync through `tools/sync-skills.ps1 -Skill m-docs`.
 
 ## Safety and Stability
 
@@ -77,10 +77,11 @@ The skill is packaged as `skills/docs-governor` and keeps the routing logic in s
 
 ## Related Requirements
 
-- [../requirements/docs-governor-skill.md](../requirements/docs-governor-skill.md)
+- [../requirements/m-docs-skill.md](../requirements/m-docs-skill.md)
 
 ## Related Changes
 
 - [../change/2026-03-22_docs-governor-skill.md](../change/2026-03-22_docs-governor-skill.md)
 - [../change/2026-03-23_lessons-archive-lookup.md](../change/2026-03-23_lessons-archive-lookup.md)
 - [../change/2026-03-24_requirements-specs-responsibility-clarity.md](../change/2026-03-24_requirements-specs-responsibility-clarity.md)
+- [../change/2026-03-24_skill-prefix-rename.md](../change/2026-03-24_skill-prefix-rename.md)

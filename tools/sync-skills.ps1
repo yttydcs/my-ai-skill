@@ -1,5 +1,5 @@
 param(
-    [string]$Skill = "docs-governor",
+    [string]$Skill = "m-docs",
     [string]$InstallRoot = "$env:USERPROFILE/.codex/skills"
 )
 

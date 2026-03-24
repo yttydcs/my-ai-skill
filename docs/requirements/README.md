@@ -40,5 +40,5 @@ Store long-lived capability intent, boundaries, scenarios, and acceptance criter
 
 ## Current Docs
 
-- [docs-governor-skill.md](docs-governor-skill.md)
-- [rigorous-execution-skill.md](rigorous-execution-skill.md)
+- [m-docs-skill.md](m-docs-skill.md)
+- [m-autoflow-skill.md](m-autoflow-skill.md)

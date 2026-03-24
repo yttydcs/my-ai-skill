@@ -1,17 +1,17 @@
 {
-  "name": "rigorous-execution",
+  "name": "m-autoflow",
   "version": "0.1.0",
   "install_mode": "copy",
-  "source_dir": "skills/rigorous-execution",
-  "dist_dir": "dist/codex/rigorous-execution",
+  "source_dir": "skills/m-autoflow",
+  "dist_dir": "dist/codex/m-autoflow",
   "codex_install_root": "%USERPROFILE%/.codex/skills",
   "depends_on_skills": [
-    "docs-governor"
+    "m-docs"
   ],
   "reference_files": [
     "references/initialization.md",
     "references/stages.md",
-    "references/docs-governor-integration.md",
+    "references/m-docs-integration.md",
     "references/subagents.md",
     "references/templates.md"
   ]

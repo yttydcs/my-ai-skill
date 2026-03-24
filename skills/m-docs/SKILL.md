@@ -1,9 +1,9 @@
 ---
-name: docs-governor
+name: m-docs
 description: Govern project documentation structure, routing, indexing, and archival. Use when Codex must decide where documentation belongs, create or repair a docs tree, route content between requirements, specs, plan, change, and lessons, check whether requirements or specs changed before updating plans or change logs, or maintain indexes and protected generated sections.
 ---
 
-# Docs Governor
+# m:docs
 
 ## Overview
 

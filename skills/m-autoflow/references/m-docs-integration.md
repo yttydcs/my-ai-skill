@@ -1,4 +1,4 @@
-# Docs Governor Integration
+# m:docs Integration
 
 Use this file whenever the workflow touches planning, requirements, specs, change archives, lessons, or docs indexes.
 
@@ -7,14 +7,14 @@ Use this file whenever the workflow touches planning, requirements, specs, chang
 Do not rely on implicit skill triggering. State the invocation explicitly, for example:
 
 ```text
-使用 $docs-governor 校验计划文档路由、requirements/specs 影响和 lessons 查询入口。
+使用 $m-docs 校验计划文档路由、requirements/specs 影响和 lessons 查询入口。
 ```
 
 ## Stage 3.1 Requirements
 
 Before confirming `plan.md`:
 
-1. Use `$docs-governor`.
+1. Use `$m-docs`.
 2. Check whether the repository docs tree needs bootstrapping or repair.
 3. Check whether the relationship between plan, requirements, specs, change, and lessons is clear.
 4. Decide the canonical destination for:
@@ -40,7 +40,7 @@ This workflow keeps the active control document at the worktree root as `plan.md
 
 Before treating the archive as complete:
 
-1. Use `$docs-governor`.
+1. Use `$m-docs`.
 2. Confirm whether `requirements` changed.
 3. Confirm whether `specs` changed.
 4. Confirm whether a `lessons` document is needed and record why.

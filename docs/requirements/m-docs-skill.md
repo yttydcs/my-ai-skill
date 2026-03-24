@@ -1,8 +1,8 @@
-# Docs Governor Skill
+# m:docs Skill
 
 ## Background
 
-This repository needs a reusable documentation-governance skill that can keep stable truth, workflow archives, and lessons aligned instead of letting knowledge drift across ad hoc files.
+This repository needs a reusable documentation-governance skill named `m-docs` that can keep stable truth, workflow archives, and lessons aligned instead of letting knowledge drift across ad hoc files.
 
 ## Goal
 
@@ -36,7 +36,7 @@ The governed docs system must make the category split self-explanatory:
 
 ### Out of Scope
 
-- replacing `rigorous-execution` as the workflow controller
+- replacing `m-autoflow` as the workflow controller
 - storing the only copy of stable requirements or specs inside `lessons`
 - inventing repository-specific runtime rules that are not documented in the target repo
 
@@ -80,7 +80,7 @@ The governed docs system must make the category split self-explanatory:
 
 ## Acceptance Criteria
 
-- `docs-governor` exists as a valid reusable skill package in this repository.
+- `m-docs` exists as a valid reusable skill package in this repository.
 - The skill can classify docs work into the governed categories and explain why.
 - The stable docs explain the `requirements` versus `specs` split clearly enough that a future editor can route content without chat-only context.
 - The skill can record requirement/spec impact for plan and change work.
@@ -89,10 +89,11 @@ The governed docs system must make the category split self-explanatory:
 
 ## Related Specs
 
-- [../specs/docs-governor-skill.md](../specs/docs-governor-skill.md)
+- [../specs/m-docs-skill.md](../specs/m-docs-skill.md)
 
 ## Related Changes
 
 - [../change/2026-03-22_docs-governor-skill.md](../change/2026-03-22_docs-governor-skill.md)
 - [../change/2026-03-23_lessons-archive-lookup.md](../change/2026-03-23_lessons-archive-lookup.md)
 - [../change/2026-03-24_requirements-specs-responsibility-clarity.md](../change/2026-03-24_requirements-specs-responsibility-clarity.md)
+- [../change/2026-03-24_skill-prefix-rename.md](../change/2026-03-24_skill-prefix-rename.md)

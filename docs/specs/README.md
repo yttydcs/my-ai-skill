@@ -14,7 +14,7 @@ Store technical contracts, integration rules, architecture constraints, and work
 
 - skill package structure
 - trigger and invocation contracts
-- docs-governor integration rules
+- m-docs integration rules
 - validation and installation behavior
 - sub-agent governance contracts
 
@@ -39,5 +39,5 @@ Store technical contracts, integration rules, architecture constraints, and work
 
 ## Current Docs
 
-- [docs-governor-skill.md](docs-governor-skill.md)
-- [rigorous-execution-skill.md](rigorous-execution-skill.md)
+- [m-docs-skill.md](m-docs-skill.md)
+- [m-autoflow-skill.md](m-autoflow-skill.md)

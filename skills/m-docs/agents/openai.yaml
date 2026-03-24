@@ -1,0 +1,4 @@
+interface:
+  display_name: "m:docs"
+  short_description: "Govern project docs and indexes"
+  default_prompt: "Use $m-docs to route, write, or reorganize project documentation safely."

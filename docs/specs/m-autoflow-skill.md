@@ -1,25 +1,25 @@
-# Rigorous Execution Skill Spec
+# m:autoflow Skill Spec
 
 ## Architecture Overview
 
-The skill is packaged as `skills/rigorous-execution` and kept intentionally small. Detailed operational rules live in `references/` so the main `SKILL.md` remains trigger-friendly and efficient.
+The skill is packaged as `skills/m-autoflow` and kept intentionally small. Detailed operational rules live in `references/` so the main `SKILL.md` remains trigger-friendly and efficient.
 
 ## Package Contract
 
-- Source package: `skills/rigorous-execution`
-- UI metadata: `skills/rigorous-execution/agents/openai.yaml`
-- Install metadata: `manifests/rigorous-execution.json`
+- Source package: `skills/m-autoflow`
+- UI metadata: `skills/m-autoflow/agents/openai.yaml`
+- Install metadata: `manifests/m-autoflow.json`
 - Install flow:
-  - source -> `dist/codex/rigorous-execution` -> `C:\Users\HelloWorld\.codex\skills\rigorous-execution`
+  - source -> `dist/codex/m-autoflow` -> `C:\Users\HelloWorld\.codex\skills\m-autoflow`
 
 ## Trigger Contract
 
 The skill supports explicit invocation and does not forbid host-side implicit selection in its metadata.
 
-- Invoke it explicitly as `$rigorous-execution` when deterministic routing matters.
-- `skills/rigorous-execution/agents/openai.yaml` must not set:
+- Invoke it explicitly as `$m-autoflow` when deterministic routing matters.
+- `skills/m-autoflow/agents/openai.yaml` must not set:
   - `policy.allow_implicit_invocation: false`
-- `manifests/rigorous-execution.json` must not declare:
+- `manifests/m-autoflow.json` must not declare:
   - `manual_invocation_only: true`
 
 ## Workflow Contract
@@ -47,8 +47,8 @@ The skill supports explicit invocation and does not forbid host-side implicit se
 
 ## Docs Integration Contract
 
-- Stage `3.1` must explicitly use `$docs-governor`.
-- Stage `4` must explicitly use `$docs-governor`.
+- Stage `3.1` must explicitly use `$m-docs`.
+- Stage `4` must explicitly use `$m-docs`.
 - Requirement/spec impact must be recorded in planning and archive artifacts.
 - Lesson impact and related lesson paths must be recorded in archive artifacts.
 - The root-level active `plan.md` is a workflow-control exception and does not replace `docs/plan/` as an archive category.
@@ -64,8 +64,8 @@ The skill supports explicit invocation and does not forbid host-side implicit se
 
 ## Validation Contract
 
-- The skill must pass `tools/validate-skills.ps1 -Skill rigorous-execution`.
-- The skill must sync through `tools/sync-skills.ps1 -Skill rigorous-execution`.
+- The skill must pass `tools/validate-skills.ps1 -Skill m-autoflow`.
+- The skill must sync through `tools/sync-skills.ps1 -Skill m-autoflow`.
 - Validation must happen after the final skill content is written.
 
 ## Safety and Stability
@@ -89,7 +89,7 @@ The skill supports explicit invocation and does not forbid host-side implicit se
 
 ## Related Requirements
 
-- [../requirements/rigorous-execution-skill.md](../requirements/rigorous-execution-skill.md)
+- [../requirements/m-autoflow-skill.md](../requirements/m-autoflow-skill.md)
 
 ## Related Changes
 
@@ -98,3 +98,4 @@ The skill supports explicit invocation and does not forbid host-side implicit se
 - [../change/2026-03-23_rigorous-execution-doc-priority.md](../change/2026-03-23_rigorous-execution-doc-priority.md)
 - [../change/2026-03-23_rigorous-execution-invocation-policy.md](../change/2026-03-23_rigorous-execution-invocation-policy.md)
 - [../change/2026-03-23_lessons-archive-lookup.md](../change/2026-03-23_lessons-archive-lookup.md)
+- [../change/2026-03-24_skill-prefix-rename.md](../change/2026-03-24_skill-prefix-rename.md)

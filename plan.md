@@ -1,22 +1,20 @@
-# Plan - rigorous-execution
+# Plan - skill-prefix-rename
 
 ## Workflow Information
 
 - Repo: `D:\project\my-ai-skills`
-- Branch: `feat/lessons-archive-lookup`
+- Branch: `feat/skill-prefix-rename`
 - Base: `main`
-- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
-- Current Stage: `4 - Change Archive (Iteration 5)`
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-skill-prefix-rename`
+- Current Stage: `4 - Change Archive (Iteration 6)`
 - Scope:
-  - Strengthen the coupling between `rigorous-execution` and `docs-governor` around archive and lessons handling.
-  - Make stage `4` promote reusable experience into `docs/lessons` with searchable lookup hints.
-  - Add stable requirements/specs coverage for `docs-governor`.
-  - Make the `requirements` versus `specs` boundary self-explanatory in stable docs.
-  - Reuse the repository's existing validation and copy-sync pattern for both skills.
+  - Rename the grouped skills to `m-docs` and `m-autoflow`.
+  - Keep the invocation names, source directories, manifests, stable docs, and install paths consistent.
+  - Preserve docs routing, lessons handling, and validation/sync behavior under the new names.
 - Non-goals:
-  - Do not weaken the staged workflow gates or rollback requirements.
-  - Do not invent a separate lessons-search skill outside the governed docs system.
-  - Do not modify unrelated existing skills beyond required integration references.
+  - Do not use `:` in the real skill name, because the validator and Windows filesystem do not permit it.
+  - Do not rewrite historical archive filenames unless required for current navigation.
+  - Do not change unrelated skills.
 
 ## Stage Records
 
@@ -61,7 +59,7 @@
   - Force a blocking issue list when information is missing or ambiguous.
   - Force root-level `plan.md` or `todo.md` in the active worktree before coding.
   - Force explicit `docs/change/YYYY-MM-DD_topic.md` archive creation before a workflow is considered complete.
-  - Force explicit `$docs-governor` use in stages `3.1` and `4`.
+  - Force explicit `$m-docs` use in stages `3.1` and `4`.
   - Encode the sub-agent governance rules, dispatch template, and review obligations.
 - Optional:
   - Reuse existing generic tooling:
@@ -91,7 +89,7 @@
   - assumptions are unconfirmed
   - task ownership is ambiguous
   - required workflow artifacts are missing
-- The skill must require explicit `$docs-governor` usage:
+- The skill must require explicit `$m-docs` usage:
   - before maintaining the plan in stage `3.1`
   - before archiving change notes in stage `4`
 - The skill must require a parallelism assessment before `3.2` and `3.3`.
@@ -162,7 +160,7 @@
 
 #### Overall Solution
 
-- Add a new skill source package at `skills/rigorous-execution`.
+- Add a new skill source package at `skills/m-autoflow`.
 - Keep the main `SKILL.md` short and procedural.
 - Split detailed policy into focused references:
   - initialization and worktree rules
@@ -184,21 +182,21 @@
 
 #### Module Responsibilities
 
-- `skills/rigorous-execution/SKILL.md`
+- `skills/m-autoflow/SKILL.md`
   - Trigger metadata and the top-level workflow.
-- `skills/rigorous-execution/references/initialization.md`
+- `skills/m-autoflow/references/initialization.md`
   - Worktree, branch, repo, and `guide.md` rules.
-- `skills/rigorous-execution/references/stages.md`
+- `skills/m-autoflow/references/stages.md`
   - Outputs, blockers, and transitions for stages `1` through `4`.
-- `skills/rigorous-execution/references/docs-governor-integration.md`
-  - Explicit moments when `$docs-governor` must be used and how to record impact checks.
-- `skills/rigorous-execution/references/subagents.md`
+- `skills/m-autoflow/references/m-docs-integration.md`
+  - Explicit moments when `$m-docs` must be used and how to record impact checks.
+- `skills/m-autoflow/references/subagents.md`
   - Parallelism assessment, allowed phases, context package, audit requirements, and dispatch template.
-- `skills/rigorous-execution/references/templates.md`
+- `skills/m-autoflow/references/templates.md`
   - Compact `plan.md` and `docs/change` skeletons aligned with the workflow.
-- `skills/rigorous-execution/agents/openai.yaml`
+- `skills/m-autoflow/agents/openai.yaml`
   - UI metadata for skill discovery.
-- `manifests/rigorous-execution.json`
+- `manifests/m-autoflow.json`
   - Install and version metadata for copy-based sync.
 - `docs/requirements/*`, `docs/specs/*`, and index files
   - Stable repository-level documentation describing why this skill exists and how its packaging/integration works.
@@ -208,7 +206,7 @@
 1. User request triggers `rigorous-execution`.
 2. The skill checks `guide.md`, repo state, branch, and worktree prerequisites.
 3. The skill performs stage `1` requirements analysis and stage `2` architecture analysis in conversation.
-4. Before stage `3.1`, the skill explicitly uses `$docs-governor` to:
+4. Before stage `3.1`, the skill explicitly uses `$m-docs` to:
    - determine where planning and change artifacts belong
    - check repository docs topology
    - record requirement/spec impact
@@ -223,7 +221,7 @@
   - user asks for mandatory worktree / plan / review / archive discipline
 - Docs-governor integration:
   - explicit prompt form:
-    - `Use $docs-governor to route and verify plan/change docs`
+    - `Use $m-docs to route and verify plan/change docs`
 - Change archive naming:
   - `docs/change/YYYY-MM-DD_主题.md`
 
@@ -271,7 +269,7 @@
 
 #### Docs Governance Routing Decision
 
-- Used `$docs-governor` for routing and impact review.
+- Used `$m-docs` for routing and impact review.
 - Decision:
   - The active execution plan remains `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\plan.md` because the user's workflow mandates a root-level control document in the active worktree.
   - Repository-level stable documentation will be added under `docs/requirements/` and `docs/specs/` so requirement/spec impact can be recorded explicitly.
@@ -279,8 +277,8 @@
 - Requirement/spec impact:
   - Requirements impact: add
   - Specs impact: add
-  - Related requirements: `docs/requirements/rigorous-execution-skill.md` (to be created)
-  - Related specs: `docs/specs/rigorous-execution-skill.md` (to be created)
+  - Related requirements: `docs/requirements/m-autoflow-skill.md` (to be created)
+  - Related specs: `docs/specs/m-autoflow-skill.md` (to be created)
 
 #### Executable Task List
 
@@ -306,8 +304,8 @@
   - `docs/plan/README.md`
   - `docs/change/README.md`
   - `docs/lessons/README.md`
-  - `docs/requirements/rigorous-execution-skill.md`
-  - `docs/specs/rigorous-execution-skill.md`
+  - `docs/requirements/m-autoflow-skill.md`
+  - `docs/specs/m-autoflow-skill.md`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\docs\**`
 - Acceptance:
@@ -327,7 +325,7 @@
 - Goal:
   - Create the base skill package with official `skill-creator` tooling and deterministic UI metadata.
 - Files / Modules:
-  - `skills/rigorous-execution/**`
+  - `skills/m-autoflow/**`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\skills\rigorous-execution\**`
 - Acceptance:
@@ -346,13 +344,13 @@
 - Goal:
   - Encode the user's workflow into concise skill instructions plus auditable references.
 - Files / Modules:
-  - `skills/rigorous-execution/SKILL.md`
-  - `skills/rigorous-execution/references/initialization.md`
-  - `skills/rigorous-execution/references/stages.md`
-  - `skills/rigorous-execution/references/docs-governor-integration.md`
-  - `skills/rigorous-execution/references/subagents.md`
-  - `skills/rigorous-execution/references/templates.md`
-  - `skills/rigorous-execution/agents/openai.yaml`
+  - `skills/m-autoflow/SKILL.md`
+  - `skills/m-autoflow/references/initialization.md`
+  - `skills/m-autoflow/references/stages.md`
+  - `skills/m-autoflow/references/m-docs-integration.md`
+  - `skills/m-autoflow/references/subagents.md`
+  - `skills/m-autoflow/references/templates.md`
+  - `skills/m-autoflow/agents/openai.yaml`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\skills\rigorous-execution\**`
 - Acceptance:
@@ -372,17 +370,17 @@
 - Goal:
   - Add install metadata for the new skill and validate/copy it with the repository tooling.
 - Files / Modules:
-  - `manifests/rigorous-execution.json`
-  - `dist/codex/rigorous-execution/**`
+  - `manifests/m-autoflow.json`
+  - `dist/codex/m-autoflow/**`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\manifests\rigorous-execution.json`
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\dist\codex\rigorous-execution\**`
 - Acceptance:
   - Validation passes for the new skill.
-  - Sync copies the built package into `C:\Users\HelloWorld\.codex\skills\rigorous-execution`.
+  - Sync copies the built package into `C:\Users\HelloWorld\.codex\skills\m-autoflow`.
 - Test Points:
-  - `tools/validate-skills.ps1 -Skill rigorous-execution` passes.
-  - `tools/sync-skills.ps1 -Skill rigorous-execution` completes successfully.
+  - `tools/validate-skills.ps1 -Skill m-autoflow` passes.
+  - `tools/sync-skills.ps1 -Skill m-autoflow` completes successfully.
 - Rollback:
   - Remove the manifest and installed copy, then delete generated dist output.
 
@@ -442,7 +440,7 @@
 #### RE-1 - Bootstrap repository docs governance surface
 
 - Completed.
-- Used `$docs-governor` bootstrap tooling to create repository docs indexes:
+- Used `$m-docs` bootstrap tooling to create repository docs indexes:
   - `docs/README.md`
   - `docs/requirements/README.md`
   - `docs/specs/README.md`
@@ -450,18 +448,18 @@
   - `docs/change/README.md`
   - `docs/lessons/README.md`
 - Added stable repository docs for the new capability:
-  - `docs/requirements/rigorous-execution-skill.md`
-  - `docs/specs/rigorous-execution-skill.md`
+  - `docs/requirements/m-autoflow-skill.md`
+  - `docs/specs/m-autoflow-skill.md`
 
 #### RE-2 - Initialize the `rigorous-execution` skill scaffold
 
 - Completed.
 - Created the source package with the official `init_skill.py` script at:
-  - `skills/rigorous-execution`
+  - `skills/m-autoflow`
 - Generated:
-  - `skills/rigorous-execution/SKILL.md`
-  - `skills/rigorous-execution/agents/openai.yaml`
-  - `skills/rigorous-execution/references/`
+  - `skills/m-autoflow/SKILL.md`
+  - `skills/m-autoflow/agents/openai.yaml`
+  - `skills/m-autoflow/references/`
 
 #### RE-3 - Author the skill body and reference files
 
@@ -470,7 +468,7 @@
 - Added focused references:
   - `initialization.md`
   - `stages.md`
-  - `docs-governor-integration.md`
+  - `m-docs-integration.md`
   - `subagents.md`
   - `templates.md`
 - Corrected generated UI metadata after discovering PowerShell stripped the literal `$` from the default prompt during scaffold creation.
@@ -479,13 +477,13 @@
 
 - Completed.
 - Added install metadata:
-  - `manifests/rigorous-execution.json`
+  - `manifests/m-autoflow.json`
 - Validation:
-  - `tools/validate-skills.ps1 -Skill rigorous-execution -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
+  - `tools/validate-skills.ps1 -Skill m-autoflow -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
   - Result: passed, `Skill is valid!`
 - Sync:
-  - `tools/sync-skills.ps1 -Skill rigorous-execution`
-  - Result: built `dist/codex/rigorous-execution` and copied to `C:\Users\HelloWorld\.codex\skills\rigorous-execution`
+  - `tools/sync-skills.ps1 -Skill m-autoflow`
+  - Result: built `dist/codex/m-autoflow` and copied to `C:\Users\HelloWorld\.codex\skills\m-autoflow`
 - Residual template scan:
   - `rg` check for `TODO`, `Structuring This Skill`, and the broken `Use -execution` string returned no matches.
 
@@ -519,11 +517,11 @@
 
 #### Docs Governance Check
 
-- Used `$docs-governor` before archive completion.
+- Used `$m-docs` before archive completion.
 - Requirements impact: updated
-  - Added `docs/requirements/rigorous-execution-skill.md`
+  - Added `docs/requirements/m-autoflow-skill.md`
 - Specs impact: updated
-  - Added `docs/specs/rigorous-execution-skill.md`
+  - Added `docs/specs/m-autoflow-skill.md`
 - Lessons impact: none
   - No recurring failure pattern or costly investigation trail justified a lessons document in this workflow.
 - Index updates required: yes
@@ -575,7 +573,7 @@
 
 #### Use Cases
 
-- The user explicitly invokes `$rigorous-execution` for high-discipline implementation work.
+- The user explicitly invokes `$m-autoflow` for high-discipline implementation work.
 - The user wants the skill to behave like an enforceable engineering protocol instead of a summarized guideline.
 
 #### Functional Requirements
@@ -633,9 +631,9 @@
   - `initialization.md`
   - `stages.md`
   - `subagents.md`
-  - `docs-governor-integration.md`
-- Add manual invocation control in `skills/rigorous-execution/agents/openai.yaml` via policy metadata.
-- Update `docs/requirements/rigorous-execution-skill.md` and `docs/specs/rigorous-execution-skill.md` so the stable docs match the hardened behavior.
+  - `m-docs-integration.md`
+- Add manual invocation control in `skills/m-autoflow/agents/openai.yaml` via policy metadata.
+- Update `docs/requirements/m-autoflow-skill.md` and `docs/specs/m-autoflow-skill.md` so the stable docs match the hardened behavior.
 
 #### Alternatives Considered
 
@@ -646,27 +644,27 @@
 
 #### Module Responsibilities
 
-- `skills/rigorous-execution/SKILL.md`
+- `skills/m-autoflow/SKILL.md`
   - declare manual invocation and top-level workflow guarantees
-- `skills/rigorous-execution/references/initialization.md`
+- `skills/m-autoflow/references/initialization.md`
   - own initialization, repo/worktree, and control-plane rules
-- `skills/rigorous-execution/references/stages.md`
+- `skills/m-autoflow/references/stages.md`
   - own hard stage transitions, rollback, and implementation/review/archive detail
-- `skills/rigorous-execution/references/subagents.md`
+- `skills/m-autoflow/references/subagents.md`
   - own mandatory delegation conditions, forbidden outsourcing, inheritance, and audit rules
-- `skills/rigorous-execution/agents/openai.yaml`
+- `skills/m-autoflow/agents/openai.yaml`
   - disable implicit invocation
-- `docs/requirements/rigorous-execution-skill.md`
+- `docs/requirements/m-autoflow-skill.md`
   - describe the durable user-facing need and boundaries
-- `docs/specs/rigorous-execution-skill.md`
+- `docs/specs/m-autoflow-skill.md`
   - describe the technical contract, including manual invocation policy
 
 #### Data / Call Flow
 
-1. The user explicitly invokes `$rigorous-execution`.
+1. The user explicitly invokes `$m-autoflow`.
 2. The skill reads initialization rules and checks worktree prerequisites.
 3. The skill enforces staged execution with stronger blocker and rollback language.
-4. The skill uses `$docs-governor` explicitly in `3.1` and `4`.
+4. The skill uses `$m-docs` explicitly in `3.1` and `4`.
 5. Validation and sync remain unchanged.
 
 #### Interface Drafts
@@ -710,15 +708,15 @@
 
 #### Docs Governance Routing Decision
 
-- Used `$docs-governor` for routing and impact review for iteration 2.
+- Used `$m-docs` for routing and impact review for iteration 2.
 - Decision:
   - update the existing stable docs rather than creating new requirement/spec leaf docs
   - create a new change archive for iteration 2 under a distinct same-day topic
 - Requirement/spec impact:
   - Requirements impact: clarify
   - Specs impact: clarify
-  - Related requirements: `docs/requirements/rigorous-execution-skill.md`
-  - Related specs: `docs/specs/rigorous-execution-skill.md`
+  - Related requirements: `docs/requirements/m-autoflow-skill.md`
+  - Related specs: `docs/specs/m-autoflow-skill.md`
 
 #### Executable Task List
 
@@ -737,8 +735,8 @@
 - Goal:
   - update the stable requirement/spec docs to reflect manual invocation and the fuller governance contract
 - Files / Modules:
-  - `docs/requirements/rigorous-execution-skill.md`
-  - `docs/specs/rigorous-execution-skill.md`
+  - `docs/requirements/m-autoflow-skill.md`
+  - `docs/specs/m-autoflow-skill.md`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\docs\requirements\rigorous-execution-skill.md`
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\docs\specs\rigorous-execution-skill.md`
@@ -757,14 +755,14 @@
 - Goal:
   - add the missing hard workflow rules and disable implicit invocation
 - Files / Modules:
-  - `skills/rigorous-execution/SKILL.md`
-  - `skills/rigorous-execution/references/initialization.md`
-  - `skills/rigorous-execution/references/stages.md`
-  - `skills/rigorous-execution/references/docs-governor-integration.md`
-  - `skills/rigorous-execution/references/subagents.md`
-  - `skills/rigorous-execution/references/templates.md`
-  - `skills/rigorous-execution/agents/openai.yaml`
-  - `manifests/rigorous-execution.json`
+  - `skills/m-autoflow/SKILL.md`
+  - `skills/m-autoflow/references/initialization.md`
+  - `skills/m-autoflow/references/stages.md`
+  - `skills/m-autoflow/references/m-docs-integration.md`
+  - `skills/m-autoflow/references/subagents.md`
+  - `skills/m-autoflow/references/templates.md`
+  - `skills/m-autoflow/agents/openai.yaml`
+  - `manifests/m-autoflow.json`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\skills\rigorous-execution\**`
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\manifests\rigorous-execution.json`
@@ -785,7 +783,7 @@
 - Goal:
   - verify the hardened skill and update the installed copy
 - Files / Modules:
-  - `dist/codex/rigorous-execution/**`
+  - `dist/codex/m-autoflow/**`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\dist\codex\rigorous-execution\**`
 - Acceptance:
@@ -845,40 +843,40 @@
 #### RF-1 - Harden the stable requirement/spec contract
 
 - Completed.
-- Updated `docs/requirements/rigorous-execution-skill.md` to require:
+- Updated `docs/requirements/m-autoflow-skill.md` to require:
   - explicit manual invocation
   - one active stage at a time
   - rollback reason recording and document synchronization
   - no silent assumptions
   - escalation when best practice is uncertain
-- Updated `docs/specs/rigorous-execution-skill.md` to encode:
+- Updated `docs/specs/m-autoflow-skill.md` to encode:
   - `policy.allow_implicit_invocation: false`
   - stronger stage, rollback, and sub-agent contract wording
 
 #### RF-2 - Harden skill sources and disable implicit invocation
 
 - Completed.
-- Updated `skills/rigorous-execution/SKILL.md` to state manual invocation explicitly and strengthen guardrails.
+- Updated `skills/m-autoflow/SKILL.md` to state manual invocation explicitly and strengthen guardrails.
 - Updated references:
   - `initialization.md`
   - `stages.md`
-  - `docs-governor-integration.md`
+  - `m-docs-integration.md`
   - `subagents.md`
   - `templates.md`
-- Updated `skills/rigorous-execution/agents/openai.yaml`:
+- Updated `skills/m-autoflow/agents/openai.yaml`:
   - added `policy.allow_implicit_invocation: false`
-- Updated `manifests/rigorous-execution.json`:
+- Updated `manifests/m-autoflow.json`:
   - added `manual_invocation_only: true`
 
 #### RF-3 - Validate and re-sync the manual-only skill
 
 - Completed.
 - Validation:
-  - `tools/validate-skills.ps1 -Skill rigorous-execution -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
+  - `tools/validate-skills.ps1 -Skill m-autoflow -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
   - Result: passed
 - Sync:
-  - `tools/sync-skills.ps1 -Skill rigorous-execution`
-  - Result: updated both `dist/codex/rigorous-execution` and `C:\Users\HelloWorld\.codex\skills\rigorous-execution`
+  - `tools/sync-skills.ps1 -Skill m-autoflow`
+  - Result: updated both `dist/codex/m-autoflow` and `C:\Users\HelloWorld\.codex\skills\m-autoflow`
 - Manual-trigger verification:
   - source and installed `agents/openai.yaml` now both contain `policy.allow_implicit_invocation: false`
 
@@ -911,11 +909,11 @@
 
 #### Docs Governance Check
 
-- Used `$docs-governor` before archive completion.
+- Used `$m-docs` before archive completion.
 - Requirements impact: updated
-  - clarified `docs/requirements/rigorous-execution-skill.md`
+  - clarified `docs/requirements/m-autoflow-skill.md`
 - Specs impact: updated
-  - clarified `docs/specs/rigorous-execution-skill.md`
+  - clarified `docs/specs/m-autoflow-skill.md`
 - Lessons impact: none
   - this round tightened policy wording but did not reveal a reusable incident pattern that warrants a lessons entry
 - Index updates required: yes
@@ -939,7 +937,7 @@
 
 #### Goal
 
-- Ensure that when `$rigorous-execution` is explicitly invoked, stages `1` and `2` prioritize stable docs under `docs/requirements` and `docs/specs`.
+- Ensure that when `$m-autoflow` is explicitly invoked, stages `1` and `2` prioritize stable docs under `docs/requirements` and `docs/specs`.
 
 #### Scope
 
@@ -956,7 +954,7 @@
 
 #### Use Cases
 
-- The user explicitly invokes `$rigorous-execution` on a repository that already has governed docs.
+- The user explicitly invokes `$m-autoflow` on a repository that already has governed docs.
 - The user wants stage `1` and `2` to anchor on written requirements/specs instead of reconstructing everything from code.
 
 #### Functional Requirements
@@ -977,7 +975,7 @@
 #### Inputs / Outputs
 
 - Inputs:
-  - the explicit `$rigorous-execution` invocation
+  - the explicit `$m-autoflow` invocation
   - repository docs structure
   - relevant requirement/spec docs
 - Outputs:
@@ -1022,18 +1020,18 @@
 
 #### Module Responsibilities
 
-- `skills/rigorous-execution/SKILL.md`
+- `skills/m-autoflow/SKILL.md`
   - surface the new early-docs expectation prominently
-- `skills/rigorous-execution/references/stages.md`
+- `skills/m-autoflow/references/stages.md`
   - make stage `1`/`2` stable-doc reads explicit
-- `docs/requirements/rigorous-execution-skill.md`
+- `docs/requirements/m-autoflow-skill.md`
   - record the durable user-facing requirement
-- `docs/specs/rigorous-execution-skill.md`
+- `docs/specs/m-autoflow-skill.md`
   - record the technical contract for early docs reads
 
 #### Data / Call Flow
 
-1. User explicitly invokes `$rigorous-execution`.
+1. User explicitly invokes `$m-autoflow`.
 2. The skill checks initialization prerequisites.
 3. Before stage `1` output, the skill checks `docs/requirements` first when available.
 4. Before stage `2` output, the skill checks `docs/specs` first when available.
@@ -1077,15 +1075,15 @@
 
 #### Docs Governance Routing Decision
 
-- Used `$docs-governor` for routing and impact review for iteration 3.
+- Used `$m-docs` for routing and impact review for iteration 3.
 - Decision:
   - update the existing stable requirement/spec docs
   - create a new same-day change archive for iteration 3
 - Requirement/spec impact:
   - Requirements impact: clarify
   - Specs impact: clarify
-  - Related requirements: `docs/requirements/rigorous-execution-skill.md`
-  - Related specs: `docs/specs/rigorous-execution-skill.md`
+  - Related requirements: `docs/requirements/m-autoflow-skill.md`
+  - Related specs: `docs/specs/m-autoflow-skill.md`
 
 #### Executable Task List
 
@@ -1104,8 +1102,8 @@
 - Goal:
   - clarify in stable docs that stages `1` and `2` prioritize requirement/spec reads
 - Files / Modules:
-  - `docs/requirements/rigorous-execution-skill.md`
-  - `docs/specs/rigorous-execution-skill.md`
+  - `docs/requirements/m-autoflow-skill.md`
+  - `docs/specs/m-autoflow-skill.md`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\docs\requirements\rigorous-execution-skill.md`
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\docs\specs\rigorous-execution-skill.md`
@@ -1124,8 +1122,8 @@
 - Goal:
   - make the early-docs behavior explicit in the skill and stage rules
 - Files / Modules:
-  - `skills/rigorous-execution/SKILL.md`
-  - `skills/rigorous-execution/references/stages.md`
+  - `skills/m-autoflow/SKILL.md`
+  - `skills/m-autoflow/references/stages.md`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\skills\rigorous-execution\SKILL.md`
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\skills\rigorous-execution\references\stages.md`
@@ -1144,7 +1142,7 @@
 - Goal:
   - verify the new wording and update the installed copy
 - Files / Modules:
-  - `dist/codex/rigorous-execution/**`
+  - `dist/codex/m-autoflow/**`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-rigorous-execution-skill\dist\codex\rigorous-execution\**`
 - Acceptance:
@@ -1202,17 +1200,17 @@
 #### RP-1 - Clarify stable docs for stage 1/2 priority reads
 
 - Completed.
-- Updated `docs/requirements/rigorous-execution-skill.md` to require stage `1` to prioritize `docs/requirements`.
-- Updated `docs/specs/rigorous-execution-skill.md` to require stage `1` and `2` to prioritize stable requirement/spec docs when present.
+- Updated `docs/requirements/m-autoflow-skill.md` to require stage `1` to prioritize `docs/requirements`.
+- Updated `docs/specs/m-autoflow-skill.md` to require stage `1` and `2` to prioritize stable requirement/spec docs when present.
 
 #### RP-2 - Update skill workflow and stage references
 
 - Completed.
-- Updated `skills/rigorous-execution/SKILL.md`:
+- Updated `skills/m-autoflow/SKILL.md`:
   - quick start now calls out stage `1`/`2` stable-doc priority
   - workflow now states that stage `1` prioritizes `docs/requirements`
   - workflow now states that stage `2` prioritizes `docs/specs`
-- Updated `skills/rigorous-execution/references/stages.md`:
+- Updated `skills/m-autoflow/references/stages.md`:
   - stage `1` now explicitly reads `docs/requirements` first when available
   - stage `2` now explicitly reads `docs/specs` first when available
   - both stages now treat stable docs as higher-priority context than code-only inference
@@ -1221,11 +1219,11 @@
 
 - Completed.
 - Validation:
-  - `tools/validate-skills.ps1 -Skill rigorous-execution -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
+  - `tools/validate-skills.ps1 -Skill m-autoflow -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
   - Result: passed
 - Sync:
-  - `tools/sync-skills.ps1 -Skill rigorous-execution`
-  - Result: updated `dist/codex/rigorous-execution` and `C:\Users\HelloWorld\.codex\skills\rigorous-execution`
+  - `tools/sync-skills.ps1 -Skill m-autoflow`
+  - Result: updated `dist/codex/m-autoflow` and `C:\Users\HelloWorld\.codex\skills\m-autoflow`
 - Install verification:
   - installed `SKILL.md` contains the new stage `1`/`2` docs-priority wording
   - installed `references/stages.md` contains the new stable-doc entry behavior
@@ -1258,11 +1256,11 @@
 
 #### Docs Governance Check
 
-- Used `$docs-governor` before archive completion.
+- Used `$m-docs` before archive completion.
 - Requirements impact: updated
-  - clarified `docs/requirements/rigorous-execution-skill.md`
+  - clarified `docs/requirements/m-autoflow-skill.md`
 - Specs impact: updated
-  - clarified `docs/specs/rigorous-execution-skill.md`
+  - clarified `docs/specs/m-autoflow-skill.md`
 - Lessons impact: none
   - this iteration refined reading order but did not reveal a reusable incident pattern
 - Index updates required: yes
@@ -1377,9 +1375,9 @@
 
 #### Module Responsibilities
 
-- `skills/rigorous-execution/**`
+- `skills/m-autoflow/**`
   - enforce stage `4` capture and handoff rules
-- `skills/docs-governor/**`
+- `skills/m-docs/**`
   - own lessons lookup, templates, indexes, and bootstrap guidance
 - `docs/**`
   - hold stable truth, indexes, reusable lesson, and change archive
@@ -1387,7 +1385,7 @@
 #### Data / Call Flow
 
 - Workflow reaches stage `4`.
-- `rigorous-execution` invokes `$docs-governor`.
+- `rigorous-execution` invokes `$m-docs`.
 - `docs-governor` decides whether lessons must be created or updated and what indexes must change.
 - Archive writes `docs/change/...` and promotes reusable knowledge into `docs/lessons/...`.
 - Future troubleshooting starts from `docs/lessons/README.md`, then the leaf lesson, then `docs/change` if needed.
@@ -1452,11 +1450,11 @@
 #### Related Requirements / Specs / Lessons
 
 - Related requirements:
-  - `docs/requirements/rigorous-execution-skill.md`
-  - `docs/requirements/docs-governor-skill.md`
+  - `docs/requirements/m-autoflow-skill.md`
+  - `docs/requirements/m-docs-skill.md`
 - Related specs:
-  - `docs/specs/rigorous-execution-skill.md`
-  - `docs/specs/docs-governor-skill.md`
+  - `docs/specs/m-autoflow-skill.md`
+  - `docs/specs/m-docs-skill.md`
 - Related lessons:
   - `docs/lessons/searchable-lessons-capture.md`
 
@@ -1478,15 +1476,15 @@
 - Goal:
   - make stage `4` enforce structured lessons capture and `docs/lessons` promotion
 - Files / Modules:
-  - `skills/rigorous-execution/SKILL.md`
-  - `skills/rigorous-execution/references/docs-governor-integration.md`
-  - `skills/rigorous-execution/references/stages.md`
-  - `skills/rigorous-execution/references/templates.md`
-  - `docs/requirements/rigorous-execution-skill.md`
-  - `docs/specs/rigorous-execution-skill.md`
+  - `skills/m-autoflow/SKILL.md`
+  - `skills/m-autoflow/references/m-docs-integration.md`
+  - `skills/m-autoflow/references/stages.md`
+  - `skills/m-autoflow/references/templates.md`
+  - `docs/requirements/m-autoflow-skill.md`
+  - `docs/specs/m-autoflow-skill.md`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\rigorous-execution\SKILL.md`
-  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\rigorous-execution\references\docs-governor-integration.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\rigorous-execution\references\m-docs-integration.md`
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\rigorous-execution\references\stages.md`
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\rigorous-execution\references\templates.md`
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\requirements\rigorous-execution-skill.md`
@@ -1506,14 +1504,14 @@
 - Goal:
   - make troubleshooting requests start from `lessons` and make bootstrap output teach the same rule
 - Files / Modules:
-  - `skills/docs-governor/SKILL.md`
-  - `skills/docs-governor/references/indexing-rules.md`
-  - `skills/docs-governor/references/lessons-rules.md`
-  - `skills/docs-governor/references/requirement-impact.md`
-  - `skills/docs-governor/references/routing-rules.md`
-  - `skills/docs-governor/references/taxonomy.md`
-  - `skills/docs-governor/references/templates.md`
-  - `skills/docs-governor/scripts/bootstrap_docs_tree.py`
+  - `skills/m-docs/SKILL.md`
+  - `skills/m-docs/references/indexing-rules.md`
+  - `skills/m-docs/references/lessons-rules.md`
+  - `skills/m-docs/references/requirement-impact.md`
+  - `skills/m-docs/references/routing-rules.md`
+  - `skills/m-docs/references/taxonomy.md`
+  - `skills/m-docs/references/templates.md`
+  - `skills/m-docs/scripts/bootstrap_docs_tree.py`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\docs-governor\SKILL.md`
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\skills\docs-governor\references\indexing-rules.md`
@@ -1543,8 +1541,8 @@
   - `docs/lessons/README.md`
   - `docs/requirements/README.md`
   - `docs/specs/README.md`
-  - `docs/requirements/docs-governor-skill.md`
-  - `docs/specs/docs-governor-skill.md`
+  - `docs/requirements/m-docs-skill.md`
+  - `docs/specs/m-docs-skill.md`
   - `docs/lessons/searchable-lessons-capture.md`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\README.md`
@@ -1571,8 +1569,8 @@
 - Goal:
   - confirm the source edits remain valid and the generated/read-installed copies reflect them
 - Files / Modules:
-  - `dist/codex/rigorous-execution/**`
-  - `dist/codex/docs-governor/**`
+  - `dist/codex/m-autoflow/**`
+  - `dist/codex/m-docs/**`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\dist\codex\rigorous-execution\**`
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\dist\codex\docs-governor\**`
@@ -1581,10 +1579,10 @@
   - installed copies are refreshed
   - bootstrap smoke output contains the new troubleshooting guidance
 - Test Points:
-  - `tools/validate-skills.ps1 -Skill rigorous-execution`
-  - `tools/validate-skills.ps1 -Skill docs-governor`
-  - `tools/sync-skills.ps1 -Skill rigorous-execution`
-  - `tools/sync-skills.ps1 -Skill docs-governor`
+  - `tools/validate-skills.ps1 -Skill m-autoflow`
+  - `tools/validate-skills.ps1 -Skill m-docs`
+  - `tools/sync-skills.ps1 -Skill m-autoflow`
+  - `tools/sync-skills.ps1 -Skill m-docs`
   - bootstrap smoke test with a temporary target directory
 - Rollback:
   - remove regenerated dist/install copies and revert source edits if needed
@@ -1636,16 +1634,16 @@
 #### LA-1 - Update rigorous-execution archive and lessons contracts
 
 - Completed.
-- Updated `skills/rigorous-execution/SKILL.md` to bring `docs/lessons` into the explicit stage `4` archive contract.
-- Updated `skills/rigorous-execution/references/stages.md`, `docs-governor-integration.md`, and `templates.md` so archive output now records lessons impact, related lessons, and reusable lookup cues.
+- Updated `skills/m-autoflow/SKILL.md` to bring `docs/lessons` into the explicit stage `4` archive contract.
+- Updated `skills/m-autoflow/references/stages.md`, `m-docs-integration.md`, and `templates.md` so archive output now records lessons impact, related lessons, and reusable lookup cues.
 - Updated stable docs for `rigorous-execution` so the new stage `4` behavior is part of repository truth.
 
 #### LA-2 - Update docs-governor lessons routing and bootstrap behavior
 
 - Completed.
-- Updated `skills/docs-governor/SKILL.md` and references so troubleshooting lookup starts from `lessons`.
+- Updated `skills/m-docs/SKILL.md` and references so troubleshooting lookup starts from `lessons`.
 - Updated lessons rules, routing rules, taxonomy, indexing rules, requirement-impact guidance, and templates to make lessons query-friendly and discoverable.
-- Updated `skills/docs-governor/scripts/bootstrap_docs_tree.py` so generated docs now teach the troubleshooting-first path.
+- Updated `skills/m-docs/scripts/bootstrap_docs_tree.py` so generated docs now teach the troubleshooting-first path.
 
 #### LA-3 - Add stable docs, indexes, and reusable lessons entry
 
@@ -1658,13 +1656,13 @@
 
 - Completed.
 - Validation:
-  - `tools/validate-skills.ps1 -Skill rigorous-execution -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
-  - `tools/validate-skills.ps1 -Skill docs-governor -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
+  - `tools/validate-skills.ps1 -Skill m-autoflow -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
+  - `tools/validate-skills.ps1 -Skill m-docs -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
 - Sync:
-  - `tools/sync-skills.ps1 -Skill rigorous-execution`
-  - `tools/sync-skills.ps1 -Skill docs-governor`
+  - `tools/sync-skills.ps1 -Skill m-autoflow`
+  - `tools/sync-skills.ps1 -Skill m-docs`
 - Bootstrap smoke test:
-  - `C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe skills/docs-governor/scripts/bootstrap_docs_tree.py tmp\docs-governor-smoke --module api --force`
+  - `C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe skills/m-docs/scripts/bootstrap_docs_tree.py tmp\docs-governor-smoke --module api --force`
 
 ### Iteration 4 - Stage 3.3 - Code Review
 
@@ -1694,13 +1692,13 @@
 
 #### Docs Governance Check
 
-- Used `$docs-governor` before archive completion.
+- Used `$m-docs` before archive completion.
 - Requirements impact: updated
-  - updated `docs/requirements/rigorous-execution-skill.md`
-  - added `docs/requirements/docs-governor-skill.md`
+  - updated `docs/requirements/m-autoflow-skill.md`
+  - added `docs/requirements/m-docs-skill.md`
 - Specs impact: updated
-  - updated `docs/specs/rigorous-execution-skill.md`
-  - added `docs/specs/docs-governor-skill.md`
+  - updated `docs/specs/m-autoflow-skill.md`
+  - added `docs/specs/m-docs-skill.md`
 - Lessons impact: updated
   - added `docs/lessons/searchable-lessons-capture.md`
   - updated `docs/lessons/README.md`
@@ -1776,8 +1774,8 @@
 - Inputs:
   - current `docs/requirements/README.md`
   - current `docs/specs/README.md`
-  - current `docs/requirements/docs-governor-skill.md`
-  - current `docs/specs/docs-governor-skill.md`
+  - current `docs/requirements/m-docs-skill.md`
+  - current `docs/specs/m-docs-skill.md`
 - Outputs:
   - clarified README guidance
   - clarified stable requirement/spec docs
@@ -1824,9 +1822,9 @@
   - quick entry guidance for `requirements`
 - `docs/specs/README.md`
   - quick entry guidance for `specs`
-- `docs/requirements/docs-governor-skill.md`
+- `docs/requirements/m-docs-skill.md`
   - stable requirement that the docs system remains self-explanatory
-- `docs/specs/docs-governor-skill.md`
+- `docs/specs/m-docs-skill.md`
   - stable contract for the `requirements` versus `specs` split
 
 #### Data / Call Flow
@@ -1876,17 +1874,17 @@
 - Stable truth:
   - `docs/requirements/README.md`
   - `docs/specs/README.md`
-  - `docs/requirements/docs-governor-skill.md`
-  - `docs/specs/docs-governor-skill.md`
+  - `docs/requirements/m-docs-skill.md`
+  - `docs/specs/m-docs-skill.md`
 - Workflow result:
   - `docs/change/2026-03-24_requirements-specs-responsibility-clarity.md`
 
 #### Related Requirements / Specs / Lessons
 
 - Related requirements:
-  - `docs/requirements/docs-governor-skill.md`
+  - `docs/requirements/m-docs-skill.md`
 - Related specs:
-  - `docs/specs/docs-governor-skill.md`
+  - `docs/specs/m-docs-skill.md`
 - Related lessons:
   - none
 
@@ -1907,7 +1905,7 @@
   - explain what belongs in `requirements` and why that rule is durable
 - Files / Modules:
   - `docs/requirements/README.md`
-  - `docs/requirements/docs-governor-skill.md`
+  - `docs/requirements/m-docs-skill.md`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\requirements\README.md`
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\requirements\docs-governor-skill.md`
@@ -1927,7 +1925,7 @@
   - explain what belongs in `specs`, how it differs from `requirements`, and what update order applies
 - Files / Modules:
   - `docs/specs/README.md`
-  - `docs/specs/docs-governor-skill.md`
+  - `docs/specs/m-docs-skill.md`
 - Write Set:
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\specs\README.md`
   - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\specs\docs-governor-skill.md`
@@ -1985,13 +1983,13 @@
 
 - Completed.
 - Updated `docs/requirements/README.md` with a quick classifier for when `requirements` should be used and how it differs from `specs`.
-- Updated `docs/requirements/docs-governor-skill.md` so self-explanatory category boundaries are now a stable requirement.
+- Updated `docs/requirements/m-docs-skill.md` so self-explanatory category boundaries are now a stable requirement.
 
 #### RS-2 - Clarify specs responsibility and boundary
 
 - Completed.
 - Updated `docs/specs/README.md` with a quick classifier for when `specs` should be used and how it differs from `requirements`.
-- Updated `docs/specs/docs-governor-skill.md` so the `requirements` versus `specs` split and update order are now explicit technical contracts.
+- Updated `docs/specs/m-docs-skill.md` so the `requirements` versus `specs` split and update order are now explicit technical contracts.
 
 ### Iteration 5 - Stage 3.3 - Code Review
 
@@ -2021,13 +2019,13 @@
 
 #### Docs Governance Check
 
-- Used `$docs-governor` before archive completion.
+- Used `$m-docs` before archive completion.
 - Requirements impact: updated
   - updated `docs/requirements/README.md`
-  - updated `docs/requirements/docs-governor-skill.md`
+  - updated `docs/requirements/m-docs-skill.md`
 - Specs impact: updated
   - updated `docs/specs/README.md`
-  - updated `docs/specs/docs-governor-skill.md`
+  - updated `docs/specs/m-docs-skill.md`
 - Lessons impact: none
   - this iteration clarified stable category boundaries but did not introduce a new reusable troubleshooting pattern
 - Index updates required: yes
@@ -2038,3 +2036,398 @@
 - Change archive document created:
   - `docs/change/2026-03-24_requirements-specs-responsibility-clarity.md`
 - Iteration 5 Stage 4 complete.
+
+## Iteration 6 - Skill Prefix Rename
+
+### Initialization Refresh
+
+- `guide.md` check:
+  - `D:\project\my-ai-skills\guide.md` exists.
+  - Constraint remains active: each modification round must end with an automatic commit using the established English commit-message format.
+- Confirmed skill source repo: `D:\project\my-ai-skills`
+- Confirmed base branch: `main`
+- Confirmed execution branch: `feat/skill-prefix-rename`
+- Confirmed execution worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-skill-prefix-rename`
+- Confirmed the main repo on `main` remains control-plane only; all implementation for this workflow occurs in the dedicated worktree.
+- Constraint discovered during initialization:
+  - real skill names cannot contain `:` because the validator only allows hyphen-case and Windows forbids `:` in directory/file names
+  - chosen mapping:
+    - display intent `m:docs` -> real skill name `m-docs`
+    - display intent `m:autoflow` -> real skill name `m-autoflow`
+
+### Iteration 6 - Stage 1 - Requirements Analysis
+
+#### Goal
+
+- Rename the two related skills under a shared `m-` prefix while keeping the repository, docs, validation flow, and local installation coherent.
+
+#### Scope
+
+- Must:
+  - rename `docs-governor` to `m-docs`
+  - rename `rigorous-execution` to `m-autoflow`
+  - update explicit invocation text to `$m-docs` and `$m-autoflow`
+  - update source directories, manifests, stable docs, README indexes, and install paths
+  - remove stale local installed copies under the old names after syncing the new ones
+- Optional:
+  - use `m:docs` and `m:autoflow` as display names in agent metadata
+- Out of scope:
+  - changing unrelated archive filenames
+  - changing skill behavior beyond what the rename requires
+
+#### Use Cases
+
+- The user wants this skill pair to read as one grouped system.
+- A future editor should see the grouped naming directly in source and docs.
+- Local installation should expose only the new skill names.
+
+#### Functional Requirements
+
+- The repository must expose the docs skill as `m-docs`.
+- The repository must expose the workflow skill as `m-autoflow`.
+- `m-autoflow` must depend on `m-docs`.
+- Validation and sync commands must work with the new names.
+- Stable requirements/specs docs must use the new names and link structure.
+- The local Codex skill install directory must contain the new names and not rely on the old names.
+
+#### Non-functional Requirements
+
+- Keep the rename mechanically consistent across path names, frontmatter, manifests, and prompts.
+- Preserve historical archives as archives; only update what is needed for current navigation or current truth.
+- Prefer the smallest safe rename that keeps the toolchain valid on Windows.
+
+#### Inputs / Outputs
+
+- Inputs:
+  - current skill source packages and manifests
+  - current stable requirements/specs docs
+  - local Codex install root at `C:\Users\HelloWorld\.codex\skills`
+- Outputs:
+  - renamed source packages
+  - updated manifests and docs
+  - validated and synced installs under the new names
+  - one archive for the rename workflow
+
+#### Edge Cases
+
+- `:` cannot be used in the real name or on-disk directory layout.
+- Historical archives already contain old names and should not all be force-renamed.
+- Syncing new names does not automatically remove old installed directories.
+
+#### Acceptance Criteria
+
+- `m-docs` and `m-autoflow` both validate successfully.
+- Both install successfully to `C:\Users\HelloWorld\.codex\skills\m-docs` and `C:\Users\HelloWorld\.codex\skills\m-autoflow`.
+- Old installed directories `docs-governor` and `rigorous-execution` are removed.
+- Stable docs and indexes reflect the new names.
+
+#### Risks
+
+- The main risk is renaming only the visible labels while leaving manifests, dependency names, or install paths inconsistent.
+
+#### Issue List
+
+- None.
+
+### Iteration 6 - Stage 2 - Architecture Design
+
+#### Overall Solution
+
+- Apply the rename in four layers:
+  - source packages and manifests
+  - stable requirement/spec docs and indexes
+  - validation and sync tool defaults
+  - local installed skill directories
+
+#### Alternatives Considered
+
+- Alternative: keep the real names unchanged and only change display names.
+  - Rejected because the user asked for an actual grouped rename.
+- Alternative: use `m:docs` and `m:autoflow` as real names.
+  - Rejected because the validator and Windows filesystem do not allow it.
+
+#### Module Responsibilities
+
+- `skills/m-docs/**`
+  - docs routing skill under the new canonical name
+- `skills/m-autoflow/**`
+  - workflow skill under the new canonical name, depending on `m-docs`
+- `manifests/*.json`
+  - installation and dependency metadata for the new names
+- `docs/**`
+  - stable truth, indexes, and change archive for the rename
+- `tools/*.ps1`
+  - validation and sync entry points with a valid default skill name
+
+#### Data / Call Flow
+
+- User invokes `$m-autoflow`.
+- `m-autoflow` explicitly invokes `$m-docs` during planning and archive.
+- Validation runs against `skills/m-docs` and `skills/m-autoflow`.
+- Sync copies those packages to `dist/codex/m-docs`, `dist/codex/m-autoflow`, and the matching local install directories.
+- Old installed directories are then removed to avoid ambiguous local state.
+
+#### Interface Drafts
+
+- Real skill names:
+  - `m-docs`
+  - `m-autoflow`
+- Display names:
+  - `m:docs`
+  - `m:autoflow`
+
+#### Error Handling and Safety
+
+- Do not leave `depends_on_skills` pointing at the old docs skill name.
+- Do not keep tool defaults pointing at a deleted skill directory.
+- Do not leave both old and new installed directories side by side after sync.
+
+#### Performance and Testing Strategy
+
+- Run structural validation for both renamed skills.
+- Sync both renamed skills.
+- Check the local install root after cleanup.
+
+#### Extensibility Design Points
+
+- The `m-` prefix creates space for more grouped skills without changing the docs model again.
+
+#### Issue List
+
+- None.
+
+### Iteration 6 - Stage 3.1 - Planning
+
+#### Project Goal and Current State
+
+- Current state:
+  - the repository still exposes the pair as `docs-governor` and `rigorous-execution`
+  - local installs still exist under the old names
+- Goal:
+  - move the pair to `m-docs` and `m-autoflow` without breaking validation, sync, docs routing, or local installation
+
+#### Docs Governance Routing Decision
+
+- Stable truth:
+  - `docs/requirements/m-docs-skill.md`
+  - `docs/specs/m-docs-skill.md`
+  - `docs/requirements/m-autoflow-skill.md`
+  - `docs/specs/m-autoflow-skill.md`
+- Workflow result:
+  - `docs/change/2026-03-24_skill-prefix-rename.md`
+- Reusable knowledge:
+  - update `docs/lessons/searchable-lessons-capture.md` so it uses current names
+
+#### Related Requirements / Specs / Lessons
+
+- Related requirements:
+  - `docs/requirements/m-docs-skill.md`
+  - `docs/requirements/m-autoflow-skill.md`
+- Related specs:
+  - `docs/specs/m-docs-skill.md`
+  - `docs/specs/m-autoflow-skill.md`
+- Related lessons:
+  - `docs/lessons/searchable-lessons-capture.md`
+
+#### Executable Task List
+
+- [x] `RN-1` rename source directories, manifests, and stable doc filenames
+- [x] `RN-2` update frontmatter, prompts, dependencies, references, and indexes
+- [x] `RN-3` validate, sync, and clean old local installs
+- [x] `RN-4` review and archive the workflow
+
+#### Task Details
+
+##### RN-1 - Rename source directories, manifests, and stable doc filenames
+
+- Owner: Main Agent
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-skill-prefix-rename`
+- Plan Path: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-skill-prefix-rename\plan.md`
+- Goal:
+  - align the repository layout with the new skill names
+- Files / Modules:
+  - `skills/m-docs/**`
+  - `skills/m-autoflow/**`
+  - `manifests/m-docs.json`
+  - `manifests/m-autoflow.json`
+  - `docs/requirements/m-docs-skill.md`
+  - `docs/specs/m-docs-skill.md`
+  - `docs/requirements/m-autoflow-skill.md`
+  - `docs/specs/m-autoflow-skill.md`
+- Acceptance:
+  - the repository no longer depends on the old source directory names for current truth
+- Test Points:
+  - the renamed files exist at the new paths
+- Rollback:
+  - move the renamed files back to the old names
+
+##### RN-2 - Update names, invocations, dependencies, and indexes
+
+- Owner: Main Agent
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-skill-prefix-rename`
+- Plan Path: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-skill-prefix-rename\plan.md`
+- Goal:
+  - make the new skill names authoritative in current source, prompts, stable docs, and tooling
+- Files / Modules:
+  - `skills/m-docs/SKILL.md`
+  - `skills/m-docs/agents/openai.yaml`
+  - `skills/m-autoflow/SKILL.md`
+  - `skills/m-autoflow/agents/openai.yaml`
+  - `skills/m-autoflow/references/m-docs-integration.md`
+  - `tools/validate-skills.ps1`
+  - `tools/sync-skills.ps1`
+  - `docs/requirements/README.md`
+  - `docs/specs/README.md`
+  - `docs/lessons/searchable-lessons-capture.md`
+- Acceptance:
+  - current prompts, dependency metadata, and stable docs all use `m-docs` / `m-autoflow`
+- Test Points:
+  - no current source or stable-doc references require the old names to function
+- Rollback:
+  - revert the naming edits
+
+##### RN-3 - Validate, sync, and clean old local installs
+
+- Owner: Main Agent
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-skill-prefix-rename`
+- Plan Path: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-skill-prefix-rename\plan.md`
+- Goal:
+  - prove the renamed skills work end to end on this machine
+- Files / Modules:
+  - `dist/codex/m-docs/**`
+  - `dist/codex/m-autoflow/**`
+  - `C:\Users\HelloWorld\.codex\skills\m-docs`
+  - `C:\Users\HelloWorld\.codex\skills\m-autoflow`
+- Acceptance:
+  - both renamed skills validate and sync
+  - old installed directories are removed
+- Test Points:
+  - `tools/validate-skills.ps1 -Skill m-docs`
+  - `tools/validate-skills.ps1 -Skill m-autoflow`
+  - `tools/sync-skills.ps1 -Skill m-docs`
+  - `tools/sync-skills.ps1 -Skill m-autoflow`
+  - install-root directory listing after cleanup
+- Rollback:
+  - restore the old installs from the old names if the renamed skills fail
+
+##### RN-4 - Review and archive the rename
+
+- Owner: Main Agent
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-skill-prefix-rename`
+- Plan Path: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-skill-prefix-rename\plan.md`
+- Goal:
+  - review the rename and archive it
+- Files / Modules:
+  - `plan.md`
+  - `docs/change/README.md`
+  - `docs/change/2026-03-24_skill-prefix-rename.md`
+- Acceptance:
+  - archive explains the naming decision, install cleanup, and migration impact
+- Test Points:
+  - archive exists and maps back to `RN-1` through `RN-4`
+- Rollback:
+  - revert the rename archive if this round is discarded
+
+#### Dependencies
+
+- `RN-1` and `RN-2` precede `RN-3`.
+- `RN-4` depends on `RN-1` through `RN-3`.
+
+#### Risks and Notes
+
+- The highest risk is leaving the local machine with both old and new installed skill names.
+
+#### Parallelism Assessment
+
+- No sub-agent delegation is allowed in `3.1`.
+- The write set crosses source, manifests, docs, and local install expectations, so the Main Agent keeps ownership.
+
+#### Issue List
+
+- None.
+- Blocked: No
+- Exit criteria met for Iteration 6 Stage 3.1.
+
+### Iteration 6 - Stage 3.2 - Implementation
+
+#### RN-1 - Rename source directories, manifests, and stable doc filenames
+
+- Completed.
+- Renamed the source package directories to `skills/m-docs` and `skills/m-autoflow`.
+- Renamed the manifest files to `manifests/m-docs.json` and `manifests/m-autoflow.json`.
+- Renamed the stable requirement/spec docs to `m-docs-skill.md` and `m-autoflow-skill.md`.
+
+#### RN-2 - Update names, invocations, dependencies, and indexes
+
+- Completed.
+- Updated current skill frontmatter names to `m-docs` and `m-autoflow`.
+- Updated agent display names to `m:docs` and `m:autoflow`.
+- Updated current invocation text to `$m-docs` and `$m-autoflow`.
+- Updated `m-autoflow` integration references from `docs-governor-integration.md` to `m-docs-integration.md`.
+- Updated current README indexes and stable docs to point at the renamed requirement/spec files.
+
+#### RN-3 - Validate, sync, and clean old local installs
+
+- Completed.
+- Validation:
+  - `tools/validate-skills.ps1 -Skill m-docs -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
+  - `tools/validate-skills.ps1 -Skill m-autoflow -PythonExe C:\Users\HelloWorld\.conda\envs\ai_envs\python.exe`
+- Sync:
+  - `tools/sync-skills.ps1 -Skill m-docs`
+  - `tools/sync-skills.ps1 -Skill m-autoflow`
+- Local install cleanup:
+  - removed `C:\Users\HelloWorld\.codex\skills\docs-governor`
+  - removed `C:\Users\HelloWorld\.codex\skills\rigorous-execution`
+- Post-cleanup local install root contains the new names:
+  - `m-docs`
+  - `m-autoflow`
+
+### Iteration 6 - Stage 3.3 - Code Review
+
+#### Review Result
+
+- 需求覆盖：通过
+  - The pair now has the requested grouped names in source, manifests, stable docs, and local installation.
+- 架构合理性：通过
+  - The rename preserves the original skill split while creating a coherent `m-` group.
+- 性能风险（N+1 / 重复计算 / 多余 I/O / 锁竞争）：通过
+  - This round is metadata, docs, and installation work only.
+- 可读性与一致性：通过
+  - Current source, prompts, manifests, and stable docs now use one canonical naming scheme.
+- 可扩展性与配置化：通过
+  - The `m-` prefix leaves room for additional grouped skills later.
+- 稳定性与安全：通过
+  - The chosen real names remain valid under both the validator and Windows filesystem rules.
+- 测试覆盖情况：通过
+  - Both renamed skills validated and synced successfully.
+  - The old local install directories were removed after sync.
+- 子Agent治理与审计（任务映射、上下文完整性、文件所有权、结果复核、冲突处理、记录完整性）：通过
+  - No sub-agents were used in this iteration.
+- Conclusion: Passed
+  - No blocking review findings remain for iteration 6.
+
+### Iteration 6 - Stage 4 - Change Archive
+
+#### Docs Governance Check
+
+- Used `$m-docs` before archive completion.
+- Requirements impact: updated
+  - renamed and updated `docs/requirements/m-docs-skill.md`
+  - renamed and updated `docs/requirements/m-autoflow-skill.md`
+  - updated `docs/requirements/README.md`
+- Specs impact: updated
+  - renamed and updated `docs/specs/m-docs-skill.md`
+  - renamed and updated `docs/specs/m-autoflow-skill.md`
+  - updated `docs/specs/README.md`
+- Lessons impact: updated
+  - updated `docs/lessons/searchable-lessons-capture.md` to use the current skill names
+- Index updates required: yes
+  - `docs/change/README.md`
+  - `docs/requirements/README.md`
+  - `docs/specs/README.md`
+
+#### Archive Result
+
+- Change archive document created:
+  - `docs/change/2026-03-24_skill-prefix-rename.md`
+- Iteration 6 Stage 4 complete.

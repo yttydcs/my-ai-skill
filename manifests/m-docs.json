@@ -1,9 +1,9 @@
 {
-  "name": "docs-governor",
+  "name": "m-docs",
   "version": "0.1.0",
   "install_mode": "copy",
-  "source_dir": "skills/docs-governor",
-  "dist_dir": "dist/codex/docs-governor",
+  "source_dir": "skills/m-docs",
+  "dist_dir": "dist/codex/m-docs",
   "codex_install_root": "%USERPROFILE%/.codex/skills",
   "bootstrap_script": "scripts/bootstrap_docs_tree.py",
   "categories": [
