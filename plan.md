@@ -6,11 +6,12 @@
 - Branch: `feat/lessons-archive-lookup`
 - Base: `main`
 - Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
-- Current Stage: `4 - Change Archive (Iteration 4)`
+- Current Stage: `4 - Change Archive (Iteration 5)`
 - Scope:
   - Strengthen the coupling between `rigorous-execution` and `docs-governor` around archive and lessons handling.
   - Make stage `4` promote reusable experience into `docs/lessons` with searchable lookup hints.
   - Add stable requirements/specs coverage for `docs-governor`.
+  - Make the `requirements` versus `specs` boundary self-explanatory in stable docs.
   - Reuse the repository's existing validation and copy-sync pattern for both skills.
 - Non-goals:
   - Do not weaken the staged workflow gates or rollback requirements.
@@ -1715,3 +1716,325 @@
 - Change archive document created:
   - `docs/change/2026-03-23_lessons-archive-lookup.md`
 - Iteration 4 Stage 4 complete.
+
+## Iteration 5 - Requirements And Specs Responsibility Clarity
+
+### Initialization Refresh
+
+- `guide.md` check:
+  - `D:\project\my-ai-skills\guide.md` exists.
+  - Constraint remains active: each modification round must end with an automatic commit using the established English commit-message format.
+- Confirmed skill source repo: `D:\project\my-ai-skills`
+- Confirmed base branch: `main`
+- Confirmed execution branch: `feat/lessons-archive-lookup`
+- Confirmed execution worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
+- Confirmed the main repo on `main` remains control-plane only; documentation edits for this round stay in the dedicated worktree.
+
+### Iteration 5 - Stage 1 - Requirements Analysis
+
+#### Goal
+
+- Make the `requirements` and `specs` responsibility split explicit enough in stable docs that the documentation system remains self-explanatory.
+
+#### Scope
+
+- Must:
+  - explain what `requirements` own
+  - explain what `specs` own
+  - explain the update order when both change
+  - place the durable rule in stable requirement/spec docs, not only in indexes or chat context
+- Optional:
+  - tighten category README wording to match the stable docs
+- Out of scope:
+  - changing skill source or routing references unless the stable docs prove insufficient
+  - changing the lessons workflow from iteration 4
+
+#### Use Cases
+
+- A future editor needs to decide whether a new document belongs in `requirements` or `specs`.
+- A workflow needs to record requirement/spec impact without relying on prior conversation context.
+- A reader wants to understand the category split from the stable docs alone.
+
+#### Functional Requirements
+
+- The repository docs must define `requirements` as the home of long-lived intent, scope, scenarios, and acceptance criteria.
+- The repository docs must define `specs` as the home of technical contracts, structures, constraints, and guardrails.
+- The docs must explain that when both change, `requirements` update first and `specs` follow.
+- The docs must make clear that `plan`, `change`, and `lessons` do not replace stable truth.
+
+#### Non-functional Requirements
+
+- Readability:
+  - a reader should understand the split without needing taxonomy or chat history first
+- Maintainability:
+  - the same responsibility rule should not drift across README and stable docs
+- Minimality:
+  - prefer stable-doc clarification over skill-source changes
+
+#### Inputs / Outputs
+
+- Inputs:
+  - current `docs/requirements/README.md`
+  - current `docs/specs/README.md`
+  - current `docs/requirements/docs-governor-skill.md`
+  - current `docs/specs/docs-governor-skill.md`
+- Outputs:
+  - clarified README guidance
+  - clarified stable requirement/spec docs
+  - one change archive entry for this iteration
+
+#### Edge Cases
+
+- README files can summarize the split, but must not become the only durable source of the rule.
+- The stable docs must stay aligned with the existing taxonomy and requirement-impact rules.
+
+#### Acceptance Criteria
+
+- The category README files explain the quick decision boundary.
+- The `docs-governor` stable requirement/spec docs explain the durable responsibility split and update order.
+- A future editor can route a document correctly by reading the stable docs without chat-only context.
+
+#### Risks
+
+- The main risk is over-relying on README wording while leaving the stable docs too thin.
+
+#### Issue List
+
+- None.
+
+### Iteration 5 - Stage 2 - Architecture Design
+
+#### Overall Solution
+
+- Keep the change at the repository truth layer:
+  - category README files give the quick classifier
+  - `docs-governor` requirement doc states the need for self-explanatory boundaries
+  - `docs-governor` spec doc states the durable technical contract for the split
+
+#### Alternatives Considered
+
+- Alternative: update only README files.
+  - Rejected because README is navigation, not enough as the only durable truth.
+- Alternative: update only the spec doc.
+  - Rejected because the need for self-explanation is itself a long-lived requirement, not just a technical contract.
+
+#### Module Responsibilities
+
+- `docs/requirements/README.md`
+  - quick entry guidance for `requirements`
+- `docs/specs/README.md`
+  - quick entry guidance for `specs`
+- `docs/requirements/docs-governor-skill.md`
+  - stable requirement that the docs system remains self-explanatory
+- `docs/specs/docs-governor-skill.md`
+  - stable contract for the `requirements` versus `specs` split
+
+#### Data / Call Flow
+
+- Reader starts with category README or stable docs.
+- README gives the short classifier.
+- Stable requirement/spec docs provide the durable explanation and sequencing rule.
+- Future impact checks use those stable docs instead of chat memory.
+
+#### Interface Drafts
+
+- `requirements` shorthand:
+  - `why / what / scope / acceptance`
+- `specs` shorthand:
+  - `how / contract / constraints / guardrails`
+
+#### Error Handling and Safety
+
+- Do not move the only copy of the boundary into README files.
+- Do not redefine the split in a way that conflicts with taxonomy or requirement-impact guidance.
+
+#### Performance and Testing Strategy
+
+- Use doc consistency checks only.
+- No skill validation run is required if no skill source package changes.
+
+#### Extensibility Design Points
+
+- Future taxonomy changes can now update a small, explicit set of stable docs instead of leaving the rule implicit.
+
+#### Issue List
+
+- None.
+
+### Iteration 5 - Stage 3.1 - Planning
+
+#### Project Goal and Current State
+
+- Current state:
+  - category README files explain the split only briefly
+  - `docs-governor` stable requirement/spec docs mention routing responsibilities but do not fully spell out the `requirements` versus `specs` boundary
+- Goal:
+  - make the durable docs themselves explain the boundary and update order
+
+#### Docs Governance Routing Decision
+
+- Stable truth:
+  - `docs/requirements/README.md`
+  - `docs/specs/README.md`
+  - `docs/requirements/docs-governor-skill.md`
+  - `docs/specs/docs-governor-skill.md`
+- Workflow result:
+  - `docs/change/2026-03-24_requirements-specs-responsibility-clarity.md`
+
+#### Related Requirements / Specs / Lessons
+
+- Related requirements:
+  - `docs/requirements/docs-governor-skill.md`
+- Related specs:
+  - `docs/specs/docs-governor-skill.md`
+- Related lessons:
+  - none
+
+#### Executable Task List
+
+- [x] `RS-1` clarify `requirements` responsibility in stable docs
+- [x] `RS-2` clarify `specs` responsibility in stable docs
+- [x] `RS-3` review and archive the iteration
+
+#### Task Details
+
+##### RS-1 - Clarify requirements responsibility and boundary
+
+- Owner: Main Agent
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
+- Plan Path: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\plan.md`
+- Goal:
+  - explain what belongs in `requirements` and why that rule is durable
+- Files / Modules:
+  - `docs/requirements/README.md`
+  - `docs/requirements/docs-governor-skill.md`
+- Write Set:
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\requirements\README.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\requirements\docs-governor-skill.md`
+- Acceptance:
+  - the docs define `requirements` as long-lived intent, scope, scenarios, and acceptance
+- Test Points:
+  - the short README guidance and stable requirement doc do not conflict
+- Rollback:
+  - revert the `requirements` clarification changes
+
+##### RS-2 - Clarify specs responsibility and boundary
+
+- Owner: Main Agent
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
+- Plan Path: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\plan.md`
+- Goal:
+  - explain what belongs in `specs`, how it differs from `requirements`, and what update order applies
+- Files / Modules:
+  - `docs/specs/README.md`
+  - `docs/specs/docs-governor-skill.md`
+- Write Set:
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\specs\README.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\specs\docs-governor-skill.md`
+- Acceptance:
+  - the docs define `specs` as long-lived technical contract and explain sequencing when both categories change
+- Test Points:
+  - the short README guidance and stable spec doc do not conflict
+- Rollback:
+  - revert the `specs` clarification changes
+
+##### RS-3 - Review and archive iteration 5
+
+- Owner: Main Agent
+- Worktree: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup`
+- Plan Path: `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\plan.md`
+- Goal:
+  - review the clarification round and archive it
+- Files / Modules:
+  - `plan.md`
+  - `docs/change/README.md`
+  - `docs/change/2026-03-24_requirements-specs-responsibility-clarity.md`
+- Write Set:
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\plan.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\change\README.md`
+  - `D:\project\MyFlowHub3\worktrees\my-ai-skills_feat-lessons-archive-lookup\docs\change\2026-03-24_requirements-specs-responsibility-clarity.md`
+- Acceptance:
+  - archive explains the new self-explanatory boundary and maps back to `RS-1` through `RS-3`
+- Test Points:
+  - archive exists and the reverse-chronological change index is updated
+- Rollback:
+  - revert the iteration 5 archive if the round is discarded
+
+#### Dependencies
+
+- `RS-1` and `RS-2` precede `RS-3`.
+
+#### Risks and Notes
+
+- The highest risk is leaving the stable docs too abstract while the README wording becomes the only practical explanation.
+
+#### Parallelism Assessment
+
+- No sub-agent delegation is allowed in `3.1`.
+- The write set is small and tightly coupled, so the Main Agent keeps ownership.
+
+#### Issue List
+
+- None.
+- Blocked: No
+- Exit criteria met for Iteration 5 Stage 3.1.
+
+### Iteration 5 - Stage 3.2 - Implementation
+
+#### RS-1 - Clarify requirements responsibility and boundary
+
+- Completed.
+- Updated `docs/requirements/README.md` with a quick classifier for when `requirements` should be used and how it differs from `specs`.
+- Updated `docs/requirements/docs-governor-skill.md` so self-explanatory category boundaries are now a stable requirement.
+
+#### RS-2 - Clarify specs responsibility and boundary
+
+- Completed.
+- Updated `docs/specs/README.md` with a quick classifier for when `specs` should be used and how it differs from `requirements`.
+- Updated `docs/specs/docs-governor-skill.md` so the `requirements` versus `specs` split and update order are now explicit technical contracts.
+
+### Iteration 5 - Stage 3.3 - Code Review
+
+#### Review Result
+
+- 需求覆盖：通过
+  - The stable docs now state both the user-facing need for self-explanation and the technical contract for the split.
+- 架构合理性：通过
+  - The change stays at the stable-doc layer and does not expand unnecessarily into skill source.
+- 性能风险（N+1 / 重复计算 / 多余 I/O / 锁竞争）：通过
+  - This round is documentation-only and adds no runtime or tool overhead.
+- 可读性与一致性：通过
+  - README files and stable docs now use the same `why / what` versus `how / contract` framing.
+- 可扩展性与配置化：通过
+  - Future taxonomy changes now have a clear stable-doc surface to update.
+- 稳定性与安全：通过
+  - The category split is less likely to drift into chat-only context or archives.
+- 测试覆盖情况：通过
+  - `git diff --check` passed.
+  - The changed docs were re-read to confirm alignment.
+- 子Agent治理与审计（任务映射、上下文完整性、文件所有权、结果复核、冲突处理、记录完整性）：通过
+  - No sub-agents were used in this iteration.
+- Conclusion: Passed
+  - No blocking review findings remain for iteration 5.
+
+### Iteration 5 - Stage 4 - Change Archive
+
+#### Docs Governance Check
+
+- Used `$docs-governor` before archive completion.
+- Requirements impact: updated
+  - updated `docs/requirements/README.md`
+  - updated `docs/requirements/docs-governor-skill.md`
+- Specs impact: updated
+  - updated `docs/specs/README.md`
+  - updated `docs/specs/docs-governor-skill.md`
+- Lessons impact: none
+  - this iteration clarified stable category boundaries but did not introduce a new reusable troubleshooting pattern
+- Index updates required: yes
+  - `docs/change/README.md`
+
+#### Archive Result
+
+- Change archive document created:
+  - `docs/change/2026-03-24_requirements-specs-responsibility-clarity.md`
+- Iteration 5 Stage 4 complete.

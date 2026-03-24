@@ -21,6 +21,28 @@ The skill is packaged as `skills/docs-governor` and keeps the routing logic in s
 - The skill must run requirement/spec impact checks before editing `plan` or `change`.
 - The skill must update the minimum consistent set of leaf docs and indexes for each change.
 
+## Requirements And Specs Responsibility Contract
+
+- `requirements` own long-lived capability intent:
+  - why the capability exists
+  - what behavior is required
+  - who or what it serves
+  - what is in scope or out of scope
+  - what acceptance criteria define success
+- `specs` own long-lived technical truth:
+  - package or module structure
+  - interfaces, routing rules, and integration contracts
+  - technical constraints, workflow-control exceptions, and guardrails
+  - validation, sync, and bootstrap behavior
+- `plan`, `change`, and `lessons` may reference the boundary but must not replace it.
+- If a workflow changes both intent and implementation contract, update `requirements` first, then `specs`, then write `plan` and `change`.
+
+## Self-Explanation Contract
+
+- The stable requirement and spec docs must be detailed enough that a future editor can classify new content without relying on chat history.
+- Category README files may summarize the boundary, but the stable requirement/spec docs must carry the durable rule set.
+- The boundary must remain explicit when lessons, change archives, or workflow plans are updated.
+
 ## Lessons Lookup Contract
 
 - Troubleshooting or "have we seen this before?" requests start from `docs/lessons/README.md` and matching lesson docs when available.
@@ -46,6 +68,7 @@ The skill is packaged as `skills/docs-governor` and keeps the routing logic in s
 - Do not duplicate stable truth across categories.
 - Do not hand-edit protected generated sections unless the target repo explicitly allows it.
 - Do not use `lessons` as the only home for requirement or spec corrections.
+- Do not let `change` or `plan` become the only place where the `requirements` versus `specs` split is explained.
 
 ## Performance Considerations
 
@@ -60,3 +83,4 @@ The skill is packaged as `skills/docs-governor` and keeps the routing logic in s
 
 - [../change/2026-03-22_docs-governor-skill.md](../change/2026-03-22_docs-governor-skill.md)
 - [../change/2026-03-23_lessons-archive-lookup.md](../change/2026-03-23_lessons-archive-lookup.md)
+- [../change/2026-03-24_requirements-specs-responsibility-clarity.md](../change/2026-03-24_requirements-specs-responsibility-clarity.md)
