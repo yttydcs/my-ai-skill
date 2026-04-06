@@ -1,9 +1,9 @@
 ---
-name: thesis-aigc-revision
+name: m-thesis-aigc-revision
 description: Revise thesis passages that read overly generic, repetitive, or template-like, especially when an AIGC report highlights suspicious sections. Use this skill to map flagged report segments back to the source draft, ground claims in real project evidence, replace summary-style boilerplate with concrete implementation detail, vary sentence rhythm, and preserve undergraduate academic accuracy without fabricating facts, data, or references.
 ---
 
-# Thesis AIGC Revision
+# m:thesis-aigc-revision
 
 ## Overview
 

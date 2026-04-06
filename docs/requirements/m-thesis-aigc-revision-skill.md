@@ -1,4 +1,4 @@
-# Thesis AIGC Revision Skill
+# m:thesis-aigc-revision Skill
 
 ## Background
 
@@ -50,4 +50,4 @@ Provide a reusable skill that helps Codex revise flagged thesis passages into mo
 
 ## Related Specs
 
-- [../specs/thesis-aigc-revision-skill.md](../specs/thesis-aigc-revision-skill.md)
+- [../specs/m-thesis-aigc-revision-skill.md](../specs/m-thesis-aigc-revision-skill.md)

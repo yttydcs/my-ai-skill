@@ -1,16 +1,16 @@
-# Thesis AIGC Revision Skill Spec
+# m:thesis-aigc-revision Skill Spec
 
 ## Architecture Overview
 
-The capability is packaged as `skills/thesis-aigc-revision` with one small reference file and one deterministic helper script. The main `SKILL.md` stays trigger-friendly and describes the end-to-end revision workflow.
+The capability is packaged as `skills/m-thesis-aigc-revision` with one small reference file and one deterministic helper script. The main `SKILL.md` stays trigger-friendly and describes the end-to-end revision workflow.
 
 ## Package Contract
 
-- Source package: `skills/thesis-aigc-revision`
-- UI metadata: `skills/thesis-aigc-revision/agents/openai.yaml`
-- Install metadata: `manifests/thesis-aigc-revision.json`
+- Source package: `skills/m-thesis-aigc-revision`
+- UI metadata: `skills/m-thesis-aigc-revision/agents/openai.yaml`
+- Install metadata: `manifests/m-thesis-aigc-revision.json`
 - Install flow:
-  - source -> `dist/codex/thesis-aigc-revision` -> `C:\Users\HelloWorld\.codex\skills\thesis-aigc-revision`
+  - source -> `dist/codex/m-thesis-aigc-revision` -> `C:\Users\HelloWorld\.codex\skills\m-thesis-aigc-revision`
 
 ## Trigger Contract
 
@@ -54,9 +54,9 @@ The skill workflow must require these steps:
 
 ## Validation Contract
 
-- The skill must pass `tools/validate-skills.ps1 -Skill thesis-aigc-revision`.
-- The skill must sync through `tools/sync-skills.ps1 -Skill thesis-aigc-revision`.
+- The skill must pass `tools/validate-skills.ps1 -Skill m-thesis-aigc-revision`.
+- The skill must sync through `tools/sync-skills.ps1 -Skill m-thesis-aigc-revision`.
 
 ## Related Requirements
 
-- [../requirements/thesis-aigc-revision-skill.md](../requirements/thesis-aigc-revision-skill.md)
+- [../requirements/m-thesis-aigc-revision-skill.md](../requirements/m-thesis-aigc-revision-skill.md)

@@ -1,9 +1,9 @@
 {
-  "name": "thesis-aigc-revision",
+  "name": "m-thesis-aigc-revision",
   "version": "0.1.0",
   "install_mode": "copy",
-  "source_dir": "skills/thesis-aigc-revision",
-  "dist_dir": "dist/codex/thesis-aigc-revision",
+  "source_dir": "skills/m-thesis-aigc-revision",
+  "dist_dir": "dist/codex/m-thesis-aigc-revision",
   "codex_install_root": "%USERPROFILE%/.codex/skills",
   "reference_files": [
     "references/revision-patterns.md"

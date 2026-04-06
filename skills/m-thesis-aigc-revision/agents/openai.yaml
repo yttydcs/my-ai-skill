@@ -1,0 +1,4 @@
+interface:
+  display_name: "m:thesis-aigc-revision"
+  short_description: "Revise thesis prose that reads too templated"
+  default_prompt: "Use $m-thesis-aigc-revision to revise thesis passages flagged as overly generic or template-like and ground them in real project evidence."
