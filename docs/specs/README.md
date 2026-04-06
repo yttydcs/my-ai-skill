@@ -41,3 +41,4 @@ Store technical contracts, integration rules, architecture constraints, and work
 
 - [m-docs-skill.md](m-docs-skill.md)
 - [m-autoflow-skill.md](m-autoflow-skill.md)
+- [thesis-aigc-revision-skill.md](thesis-aigc-revision-skill.md)
