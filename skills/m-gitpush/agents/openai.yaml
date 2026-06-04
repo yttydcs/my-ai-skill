@@ -1,0 +1,4 @@
+interface:
+  display_name: "M Git Push"
+  short_description: "Git push with temporary local proxy fallback"
+  default_prompt: "Use $m-gitpush to push the current branch, retrying through the local 7897 proxy only if direct GitHub access fails."
