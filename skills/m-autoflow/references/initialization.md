@@ -14,7 +14,7 @@ Use this file before stage `1`.
 3. Ensure every participating repo has:
    - a dedicated semantic branch
    - a dedicated git worktree
-4. Require worktrees under `D:\project\MyFlowHub3\worktrees\`.
+4. Require worktrees under the current project root's own `worktrees\` directory (`<project-root>\worktrees\`).
 5. Select one active execution worktree and keep all implementation there.
 
 ## Cross-repo Rule

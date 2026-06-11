@@ -25,7 +25,7 @@ Use this skill to execute implementation work under strict stage gates, explicit
    - confirm the task actually requires strict staged workflow execution
    - read `guide.md` if it exists
    - confirm repo, base branch, and participating modules
-   - require a dedicated branch and worktree under `D:\project\MyFlowHub3\worktrees\`
+   - require a dedicated branch and worktree under the current project root's own `worktrees\` directory (`<project-root>\worktrees\`)
    - refuse implementation in the main repo path
 2. Run stage `1` requirements analysis and prioritize `docs/requirements` when it exists before relying on code or chat context alone.
 3. Run stage `2` architecture analysis and prioritize `docs/specs` when it exists before relying on code or chat context alone.
