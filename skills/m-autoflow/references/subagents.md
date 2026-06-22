@@ -5,6 +5,8 @@ Use this file only in stages `3.2` and `3.3`.
 ## Phase Boundary
 
 - Sub-agents are forbidden in stages `1`, `2`, `3.1`, and `4`.
+- Exception: `$m-autoflow-research` may use read-only research sub-agents before or during planning when the user explicitly asks for web research and host policy permits delegation.
+- The research exception does not allow code edits, worktree changes, plan confirmation, implementation, validation, archive, merge, or cleanup delegation.
 
 ## Mandatory Parallelism Assessment
 
@@ -24,6 +26,8 @@ If sub-agents are not used, state why, such as:
 - insufficient context separation
 - host policy or user-authorization limits
 
+For `$m-autoflow-research`, assess whether the research can be split into independent read-only lanes. Use parallel research sub-agents only when this split is clear, and record the lanes plus synthesis responsibility.
+
 ## Hard Preconditions
 
 Do not delegate unless all of these are true:
@@ -35,6 +39,16 @@ Do not delegate unless all of these are true:
 - host platform policy allows delegation
 - user authorization exists when the host requires it
 
+For research-only delegation, the active plan may be absent, but all of these must be true:
+
+- the user explicitly requested web research
+- each lane is read-only
+- each lane has a bounded research question
+- source quality expectations are specified
+- the main agent will review sources and synthesize findings
+- host platform policy allows delegation
+- user authorization exists when the host requires it
+
 ## Non-delegable Responsibilities
 
 The main agent must retain responsibility for:
@@ -42,6 +56,7 @@ The main agent must retain responsibility for:
 - worktree creation
 - `plan.md` or `todo.md` generation and confirmation
 - requirements and architecture decisions
+- research synthesis and final source trust decisions
 - file ownership definition
 - conflict handling
 - code integration

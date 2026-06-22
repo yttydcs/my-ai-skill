@@ -12,7 +12,14 @@ Use this skill to execute implementation work under strict stage gates, explicit
 ## Quick Start
 
 - Invoke this skill explicitly as `$m-autoflow` when you want deterministic routing into this workflow.
+- Keep this skill as the umbrella workflow entry. For split-phase execution, route to:
+  - `$m-autoflow-research` for optional web research only when the user explicitly asks for online/current/source-backed research.
+  - `$m-autoflow-plan` for initialization, requirements, architecture, and `plan.md` / `todo.md` gating.
+  - `$m-autoflow-execute` for approved implementation mapped to confirmed Task IDs, including light syntax/static/focused checks.
+  - `$m-autoflow-test` for optional heavy workflow validation, integration testing, usability review, security review, and performance review.
+  - `$m-autoflow-archive` for `docs/change`, lessons, workflow-end confirmation, merge, and cleanup.
 - If `docs/requirements` or `docs/specs` exists, prioritize them during stages `1` and `2` before falling back to code-only inference.
+- Do not run web research by default. Use `$m-autoflow-research` before or during planning only when the user explicitly asks for web search, online research, latest/current external facts, or source-backed investigation.
 - Read `references/initialization.md` before stage `1`.
 - Read `references/stages.md` to execute stages `1` through `4` and emit the required outputs.
 - Read `references/m-docs-integration.md` before editing `plan.md`, `docs/requirements`, `docs/specs`, `docs/change`, or `docs/lessons`.
@@ -21,19 +28,30 @@ Use this skill to execute implementation work under strict stage gates, explicit
 
 ## Workflow
 
-1. Start with initialization, not coding:
+1. If the user explicitly requests online research, run `$m-autoflow-research` as a read-only planning aid and feed only verified findings into planning docs.
+2. Start with initialization, not coding:
    - confirm the task actually requires strict staged workflow execution
    - read `guide.md` if it exists
    - confirm repo, base branch, and participating modules
    - require a dedicated branch and worktree under the current project root's own `worktrees\` directory (`<project-root>\worktrees\`)
    - refuse implementation in the main repo path
-2. Run stage `1` requirements analysis and prioritize `docs/requirements` when it exists before relying on code or chat context alone.
-3. Run stage `2` architecture analysis and prioritize `docs/specs` when it exists before relying on code or chat context alone.
-4. In stage `3.1`, explicitly use `$m-docs`, record requirements/specs impact plus any already-known related lessons, and confirm the active worktree-root `plan.md` or `todo.md`.
-5. In stage `3.2`, map every implementation change to a confirmed Task ID. Perform a parallelism assessment, but only use sub-agents when both the workflow rules and host platform policy allow it.
-6. In stage `3.3`, review against the required checklist and return to `3.2` if any item fails.
-7. In stage `4`, explicitly use `$m-docs`, archive the workflow in `docs/change/YYYY-MM-DD_topic.md`, extract reusable experience / lessons plus lookup hints, update `docs/lessons` when needed, and then ask whether the workflow should end.
-8. If the user ends the workflow, perform the required merge and worktree cleanup steps. If not, restart from stage `1` for the next iteration.
+3. Run stage `1` requirements analysis and prioritize `docs/requirements` when it exists before relying on code or chat context alone.
+4. Run stage `2` architecture analysis and prioritize `docs/specs` when it exists before relying on code or chat context alone.
+5. In stage `3.1`, explicitly use `$m-docs`, record requirements/specs impact plus any already-known related lessons, and confirm the active worktree-root `plan.md` or `todo.md`.
+6. In stage `3.2`, map every implementation change to a confirmed Task ID. Perform a parallelism assessment, but only use sub-agents when both the workflow rules and host platform policy allow it.
+7. In stage `3.3`, decide whether heavy testing/review is needed. Skip it for low-risk small changes when execution checks are sufficient and the reason is recorded; otherwise review integration flow, usability, security, and performance, then return to `3.2` if any item fails.
+8. In stage `4`, explicitly use `$m-docs`, archive the workflow in `docs/change/YYYY-MM-DD_topic.md`, extract reusable experience / lessons plus lookup hints, update `docs/lessons` when needed, and then ask whether the workflow should end.
+9. If the user ends the workflow, perform the required merge and worktree cleanup steps. If not, restart from stage `1` for the next iteration.
+
+## Split Phase Mapping
+
+- Plan: use `$m-autoflow-plan` for initialization plus stages `1`, `2`, and `3.1`.
+- Research: use `$m-autoflow-research` as an optional read-only planning aid only on explicit user request.
+- Execute: use `$m-autoflow-execute` for stage `3.2`.
+- Test: use `$m-autoflow-test` for optional heavy validation and stage `3.3`.
+- Archive: use `$m-autoflow-archive` for stage `4` and workflow-end closeout.
+
+The split skills are companion entry points. Do not remove or bypass this original skill when a user explicitly asks for the full `$m-autoflow` workflow.
 
 ## Guardrails
 
@@ -59,3 +77,13 @@ Use this skill to execute implementation work under strict stage gates, explicit
   - parallelism assessment, delegation gates, and audit requirements
 - `references/templates.md`
   - compact templates for `plan.md`, blocker output, `docs/change`, and `docs/lessons`
+- `../m-autoflow-research/SKILL.md`
+  - optional web research entry point
+- `../m-autoflow-plan/SKILL.md`
+  - split planning entry point
+- `../m-autoflow-execute/SKILL.md`
+  - split execution entry point
+- `../m-autoflow-test/SKILL.md`
+  - split validation and review entry point
+- `../m-autoflow-archive/SKILL.md`
+  - split archive and closeout entry point

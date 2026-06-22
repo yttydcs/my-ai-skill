@@ -1,0 +1,4 @@
+interface:
+  display_name: "m:autoflow research"
+  short_description: "Optional web research for planning"
+  default_prompt: "Use $m-autoflow-research to run optional web research before planning."

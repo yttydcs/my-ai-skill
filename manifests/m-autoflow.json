@@ -6,7 +6,12 @@
   "dist_dir": "dist/codex/m-autoflow",
   "codex_install_root": "%USERPROFILE%/.codex/skills",
   "depends_on_skills": [
-    "m-docs"
+    "m-docs",
+    "m-autoflow-plan",
+    "m-autoflow-execute",
+    "m-autoflow-test",
+    "m-autoflow-archive",
+    "m-autoflow-research"
   ],
   "reference_files": [
     "references/initialization.md",

@@ -5,6 +5,8 @@ Use this file to execute stages `1` through `4`.
 ## Global Rules
 
 - Only one stage may be active at a time.
+- Optional `$m-autoflow-research` may run as a read-only planning aid before or during stages `1` and `2` only when the user explicitly asks for web research, online investigation, or current external facts.
+- Do not run web research by default during normal planning.
 - A workflow may iterate or roll back, but every rollback must:
   - state the reason
   - update the affected plan or archive docs before proceeding
@@ -115,18 +117,39 @@ Rules:
 - Do not introduce plan-external changes; if required, return to `3.1` and update the plan first.
 - After parallel work completes, the main agent must integrate results, resolve conflicts, and run regression verification.
 - Return to `3.1` if the work expands beyond the confirmed plan.
+- Run lightweight implementation validation before leaving this stage when practical:
+  - syntax checks
+  - type checks
+  - formatting checks scoped to touched files
+  - lint checks scoped to touched files
+  - focused unit tests for changed logic
+  - `git diff --check`
+- If a lightweight check is not practical, record why and carry the residual risk into stage `3.3` or the archive.
 
 ## Stage 3.3 - Code Review
 
-Review each item and mark `通过` or `不通过`:
+First decide whether heavy testing / review is needed. This stage may be skipped for low-risk small changes when stage `3.2` lightweight validation is sufficient.
+
+If skipped, record:
+
+- skip reason
+- stage `3.2` checks that passed
+- residual risk
+- why integration, usability, security, and performance review are not required
+
+If not skipped, review each item and mark `通过` or `不通过`:
 
 - 需求覆盖
 - 架构合理性
 - 性能风险（N+1 / 重复计算 / 多余 I/O / 锁竞争）
+- 性能指标或可接受阈值
+- 可用性 / 用户路径
 - 可读性与一致性
 - 可扩展性与配置化
 - 稳定性与安全
+- 安全边界 / 权限 / 输入输出暴露
 - 测试覆盖情况
+- 整体流程 / 联调验证
 - 子Agent治理与审计（任务映射、上下文完整性、文件所有权、结果复核、冲突处理、记录完整性）
 
 If any item fails, return to `3.2`.

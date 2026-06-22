@@ -1,0 +1,15 @@
+{
+  "name": "m-autoflow-research",
+  "version": "0.1.0",
+  "install_mode": "copy",
+  "source_dir": "skills/m-autoflow-research",
+  "dist_dir": "dist/codex/m-autoflow-research",
+  "codex_install_root": "%USERPROFILE%/.codex/skills",
+  "depends_on_skills": [
+    "m-autoflow",
+    "m-docs"
+  ],
+  "reference_files": [
+    "references/research.md"
+  ]
+}
