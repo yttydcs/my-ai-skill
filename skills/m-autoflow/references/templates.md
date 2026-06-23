@@ -59,6 +59,11 @@ Use these templates as concise defaults.
 #### Docs Governance Routing Decision
 #### Related Requirements / Specs / Lessons
 #### Executable Task List
+#### Execution Scope After Approval
+##### Will Execute
+- <Task IDs approved for the next execution phase>
+##### Will Not Execute Now
+- <Task IDs plus reason: blocked / out of scope / deferred / research-only / separate approval required>
 #### Task Details
 #### Dependencies
 #### Risks and Notes

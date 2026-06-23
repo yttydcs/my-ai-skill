@@ -18,6 +18,7 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - require only one active stage at a time
 - require stage `1` to prioritize `docs/requirements` when relevant stable docs exist
 - require `plan.md` or `todo.md` in the active worktree before implementation
+- require planning artifacts to explicitly separate tasks that will execute after approval from tasks that will not execute in the next execution phase, with a reason for every non-executed task
 - require explicit blocker handling with `问题清单` and `阻塞：是`
 - require rollback reason recording and document synchronization
 - require no silent assumptions about business, data, interface, environment, dependency version, acceptance, or preference
@@ -61,6 +62,7 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - The skill must block if the active workflow lacks `plan.md` or `todo.md` before `3.2`.
 - The skill must read relevant requirement docs first in stage `1` when `docs/requirements` exists.
 - The skill must emit stage outputs for requirements analysis and architecture design before planning.
+- The plan phase must place every known Task ID in exactly one execution-scope group: tasks to execute after approval, or tasks not to execute now with the blocking, deferral, out-of-scope, research-only, or separate-approval reason.
 - The skill must ask for clarification instead of assuming missing requirements.
 - The skill must escalate uncertain best-practice choices instead of deciding silently.
 - The skill must record `Lessons impact` and `Related lessons` in the stage `4` archive.
@@ -99,6 +101,7 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - `m-autoflow` exists as a valid skill package in this repository.
 - `m-autoflow-plan`, `m-autoflow-execute`, `m-autoflow-test`, `m-autoflow-archive`, and `m-autoflow-research` exist as valid companion skill packages in this repository.
 - The skill enforces the user's staged workflow and blocker rules.
+- The plan artifact clearly states which Task IDs will execute after approval and which Task IDs will not execute in the next execution phase.
 - The umbrella skill routes to the companion skills without removing the original `$m-autoflow` entry point.
 - The skill integrates with `m-docs` and repository copy-sync tooling.
 - Optional online research is explicit-request-only, supports read-only parallel research lanes, and requires source verification and citations.
@@ -119,3 +122,4 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - [../change/2026-03-23_lessons-archive-lookup.md](../change/2026-03-23_lessons-archive-lookup.md)
 - [../change/2026-03-24_skill-prefix-rename.md](../change/2026-03-24_skill-prefix-rename.md)
 - [../change/2026-06-22_autoflow-phase-split-research.md](../change/2026-06-22_autoflow-phase-split-research.md)
+- [../change/2026-06-23_autoflow-plan-execution-scope.md](../change/2026-06-23_autoflow-plan-execution-scope.md)

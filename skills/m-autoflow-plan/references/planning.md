@@ -27,6 +27,10 @@ Use this reference for the plan phase of `m-autoflow`.
 - repo, branch, base, worktree absolute path, and phase
 - related requirements, specs, and lessons
 - task IDs and executable checklist
+- execution scope split:
+  - tasks to execute after user approval
+  - tasks not to execute in the next execution phase, with reasons such as blocked, out of scope, deferred, research-only, or waiting for separate approval
+  - every known task appears in exactly one of these two groups
 - per-task goal, files/modules, write set, acceptance, tests, and rollback
 - dependencies, risks, and open questions
 - parallelism assessment and any allowed sub-agent context package

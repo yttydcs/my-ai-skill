@@ -33,12 +33,17 @@ Use this skill to run the planning side of `m-autoflow`: initialization, require
    - record solution, alternatives, module responsibilities, data/call flow, interfaces, errors, safety, performance, tests, and extension points
 7. Explicitly use `$m-docs` before confirming the plan.
 8. Create or confirm root `plan.md` or `todo.md` in the active worktree. Include task IDs, file/module scope, acceptance, tests, rollback points, dependencies, risks, and parallelism notes.
+9. Explicitly separate tasks that will be executed after approval from tasks that will not be executed in the next execution phase. Every known task must appear in exactly one section, with the reason for any deferred, blocked, out-of-scope, or research-only task.
 
 ## Exit Gate
 
 Before implementation, output a clear plan status:
 
 ```md
+Execution scope after approval:
+- Will execute: <Task IDs>
+- Will not execute now: <Task IDs and reasons>
+
 Blocked: yes
 Do not enter execution
 Do not dispatch implementation sub-agents
@@ -47,6 +52,10 @@ Do not dispatch implementation sub-agents
 After the user confirms the plan:
 
 ```md
+Execution scope after approval:
+- Will execute: <Task IDs>
+- Will not execute now: <Task IDs and reasons>
+
 Blocked: no
 Enter execution
 ```

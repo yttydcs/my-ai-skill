@@ -25,6 +25,7 @@ Store completed workflow result documents for this repository.
 
 ## Current Docs
 
+- [2026-06-23_autoflow-plan-execution-scope.md](2026-06-23_autoflow-plan-execution-scope.md)
 - [2026-06-22_autoflow-phase-split-research.md](2026-06-22_autoflow-phase-split-research.md)
 - [2026-03-24_skill-prefix-rename.md](2026-03-24_skill-prefix-rename.md)
 - [2026-03-24_requirements-specs-responsibility-clarity.md](2026-03-24_requirements-specs-responsibility-clarity.md)

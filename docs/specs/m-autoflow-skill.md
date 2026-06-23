@@ -59,6 +59,7 @@ The skill supports explicit invocation and does not forbid host-side implicit se
 - Stage `2` prioritizes relevant docs under `docs/specs` when they exist.
 - Optional research is read-only and may feed only verified, cited findings into requirements, architecture, `plan.md`, or stable docs.
 - Active workflow control stays in the worktree root as `plan.md` or `todo.md`.
+- Stage `3.1` plan artifacts must include an execution scope split with `Will Execute` and `Will Not Execute Now` groups. Every known Task ID must appear in exactly one group, and non-executed tasks must include the reason.
 - Stage `3.2` owns lightweight local validation such as syntax checks, type checks, focused lint, touched-file formatting checks, focused unit tests, and `git diff --check`.
 - Stage `3.3` is optional heavy validation. It may be skipped for low-risk small changes when execution-stage validation is sufficient and the skip reason plus residual risk are recorded.
 - When stage `3.3` runs, it must cover integration or end-to-end flow, usability, security boundaries, and performance indicators when applicable.
@@ -134,3 +135,4 @@ The skill supports explicit invocation and does not forbid host-side implicit se
 - [../change/2026-03-23_lessons-archive-lookup.md](../change/2026-03-23_lessons-archive-lookup.md)
 - [../change/2026-03-24_skill-prefix-rename.md](../change/2026-03-24_skill-prefix-rename.md)
 - [../change/2026-06-22_autoflow-phase-split-research.md](../change/2026-06-22_autoflow-phase-split-research.md)
+- [../change/2026-06-23_autoflow-plan-execution-scope.md](../change/2026-06-23_autoflow-plan-execution-scope.md)
