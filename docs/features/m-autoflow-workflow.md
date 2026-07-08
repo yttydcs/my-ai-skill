@@ -107,6 +107,7 @@ Given a low-risk small change passes execution checks, when heavy testing is unn
 
 ## Related Changes
 
+- [../change/2026-07-08_m-archive-default-closeout.md](../change/2026-07-08_m-archive-default-closeout.md)
 - [../change/2026-07-08_m-skill-phase-rename.md](../change/2026-07-08_m-skill-phase-rename.md)
 
 ## Related Lessons

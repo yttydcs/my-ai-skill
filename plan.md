@@ -8,7 +8,7 @@
 - Docs Root: `D:\project\my-ai-skills\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-archive-default-closeout`
-- Current Stage: `3.1 - Planning complete; ready for execution`
+- Current Stage: `4 - Archive complete; default closeout pending`
 
 ## Stage Records
 
@@ -178,3 +178,39 @@ Patch the source-of-truth instructions in `skills/m-archive`, `skills/m-autoflow
 #### Issue List
 - 阻塞：否
 - 进入 3.2
+
+### Stage 3.2 - Implementation
+- `MAC-1`: completed. Updated archive and umbrella skill rules to make `$m-archive` default to closeout with explicit archive-only override.
+- `MAC-2`: completed. Updated stable feature, requirement, and spec docs; added intake evidence and index entry.
+- `MAC-3`: partially completed. Validation and install sync completed before archive.
+- Lightweight validation:
+  - `tools\validate-skills.ps1 -Skill m-autoflow`: passed.
+  - `tools\validate-skills.ps1 -Skill m-archive`: passed.
+  - `git diff --check`: passed with expected CRLF conversion warnings only.
+  - `tools\sync-skills.ps1 -Skill m-autoflow`: completed.
+  - `tools\sync-skills.ps1 -Skill m-archive`: completed.
+- Implementation commit: `7e3dfc1 fix: make archive close workflows by default`
+- 阻塞：否
+
+### Stage 3.3 - Review Decision
+- Heavy `$m-test`: skipped.
+- Skip reason: low-risk instruction/docs correction with no runtime code, data, auth, storage, or UI behavior.
+- Residual risk: wording mismatch could recur if future docs reintroduce second-confirmation language; mitigated by targeted `rg` checks and stable-doc updates.
+- 阻塞：否
+
+### Stage 4 - Change Archive
+- `$m-docs` usage: applied to route intake, stable-doc impact, change archive, and index updates.
+- Change archive: `docs/change/2026-07-08_m-archive-default-closeout.md`
+- Intake impact: updated
+- Feature impact: updated
+- Requirements impact: updated
+- Specs impact: updated
+- Decision impact: none
+- Lessons impact: none
+- Related intake: `docs/intake/2026-07-08_m-archive-default-closeout.md`
+- Related features: `docs/features/m-autoflow-workflow.md`
+- Related requirements: `docs/requirements/m-autoflow-skill.md`
+- Related specs: `docs/specs/m-autoflow-skill.md`
+- Related decisions: none
+- Related lessons: none
+- Default closeout: enabled by the corrected `$m-archive` semantics.
