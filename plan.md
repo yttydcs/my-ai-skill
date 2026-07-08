@@ -8,7 +8,7 @@
 - Docs Root: `D:\project\my-ai-skills\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence`
-- Current Stage: `3.1 - Planning complete; ready for execution`
+- Current Stage: `4 - Archive complete; default closeout pending`
 
 ## Stage Records
 
@@ -182,3 +182,39 @@ Patch `skills/m-test` and `skills/m-test/references/testing.md`, then align shar
 #### Issue List
 - 阻塞：否
 - 进入 3.2
+
+### Stage 3.2 - Implementation
+- `MTU-1`: completed. Updated `$m-test` rules for UI evidence and direct result table; updated umbrella stage rules.
+- `MTU-2`: completed. Updated feature, requirement, spec, intake, and affected indexes.
+- `MTU-3`: partially completed. Validation and install sync completed before archive.
+- Lightweight validation:
+  - `tools\validate-skills.ps1 -Skill m-test`: passed.
+  - `tools\validate-skills.ps1 -Skill m-autoflow`: passed.
+  - `git diff --check`: passed with expected CRLF conversion warnings only.
+  - `tools\sync-skills.ps1 -Skill m-test`: completed.
+  - `tools\sync-skills.ps1 -Skill m-autoflow`: completed.
+- Implementation commit: `2e770ba feat: require UI evidence in m test`
+- 阻塞：否
+
+### Stage 3.3 - Review Decision
+- Heavy `$m-test`: skipped for this workflow.
+- Skip reason: this workflow changes skill and documentation text only; it does not modify an application UI, runtime behavior, data, auth, storage, or external integration path.
+- Residual risk: future wording may still need refinement after real UI workflow usage; mitigated by stable docs and archive trace.
+- 阻塞：否
+
+### Stage 4 - Change Archive
+- `$m-docs` usage: applied to route intake, stable-doc impact, change archive, and index updates.
+- Change archive: `docs/change/2026-07-08_m-test-ui-evidence.md`
+- Intake impact: updated
+- Feature impact: updated
+- Requirements impact: updated
+- Specs impact: updated
+- Decision impact: none
+- Lessons impact: none
+- Related intake: `docs/intake/2026-07-08_m-test-ui-evidence.md`
+- Related features: `docs/features/m-autoflow-workflow.md`
+- Related requirements: `docs/requirements/m-autoflow-skill.md`
+- Related specs: `docs/specs/m-autoflow-skill.md`
+- Related decisions: none
+- Related lessons: none
+- Default closeout: enabled by `$m-archive` semantics.
