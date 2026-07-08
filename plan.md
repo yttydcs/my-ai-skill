@@ -8,7 +8,7 @@
 - Docs Root: `D:\project\my-ai-skills\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-plan-task-table`
-- Current Stage: `3.1 - Planning complete; ready for execution`
+- Current Stage: `4 - Archive complete; default closeout pending`
 
 ## Stage Records
 
@@ -179,3 +179,39 @@ Patch `$m-plan` source and `planning.md`, add a reusable task table template in 
 #### Issue List
 - 阻塞：否
 - 进入 3.2
+
+### Stage 3.2 - Implementation
+- `MPT-1`: completed. Updated `$m-plan`, planning reference, shared stage rules, and shared templates for a direct task summary table.
+- `MPT-2`: completed. Updated feature, requirement, spec, intake, and affected indexes.
+- `MPT-3`: partially completed. Validation and install sync completed before archive.
+- Lightweight validation:
+  - `tools\validate-skills.ps1 -Skill m-plan`: passed.
+  - `tools\validate-skills.ps1 -Skill m-autoflow`: passed.
+  - `git diff --check`: passed with expected CRLF conversion warnings only.
+  - `tools\sync-skills.ps1 -Skill m-plan`: completed.
+  - `tools\sync-skills.ps1 -Skill m-autoflow`: completed.
+- Implementation commit: `43760ab feat: add m plan task summary table`
+- 阻塞：否
+
+### Stage 3.3 - Review Decision
+- Heavy `$m-test`: skipped.
+- Skip reason: this workflow changes skill and documentation text only; it does not modify application UI, runtime behavior, data, auth, storage, or external integration paths.
+- Residual risk: table wording may need refinement after real planning workflows use it; mitigated by stable docs, template, and archive trace.
+- 阻塞：否
+
+### Stage 4 - Change Archive
+- `$m-docs` usage: applied to route intake, stable-doc impact, change archive, and index updates.
+- Change archive: `docs/change/2026-07-08_m-plan-task-table.md`
+- Intake impact: updated
+- Feature impact: updated
+- Requirements impact: updated
+- Specs impact: updated
+- Decision impact: none
+- Lessons impact: none
+- Related intake: `docs/intake/2026-07-08_m-plan-task-table.md`
+- Related features: `docs/features/m-autoflow-workflow.md`
+- Related requirements: `docs/requirements/m-autoflow-skill.md`
+- Related specs: `docs/specs/m-autoflow-skill.md`
+- Related decisions: none
+- Related lessons: none
+- Default closeout: enabled by `$m-archive` semantics.

@@ -25,6 +25,7 @@ Store completed workflow result documents for this repository.
 
 ## Current Docs
 
+- [2026-07-08_m-plan-task-table.md](2026-07-08_m-plan-task-table.md)
 - [2026-07-08_m-test-ui-evidence.md](2026-07-08_m-test-ui-evidence.md)
 - [2026-07-08_m-archive-default-closeout.md](2026-07-08_m-archive-default-closeout.md)
 - [2026-07-08_m-skill-phase-rename.md](2026-07-08_m-skill-phase-rename.md)
