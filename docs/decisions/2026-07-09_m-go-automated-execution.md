@@ -51,4 +51,8 @@ Add `$m-go` as a separate canonical companion skill in the `m-*` workflow family
 
 ## Related Plan
 
-Active workflow plan: worktree-root `plan.md`, to be archived or linked from `docs/change` during workflow closeout.
+- [../plan/2026-07-09_m-go-automated-execution.md](../plan/2026-07-09_m-go-automated-execution.md)
+
+## Related Change
+
+- [../change/2026-07-09_m-go-automated-execution.md](../change/2026-07-09_m-go-automated-execution.md)

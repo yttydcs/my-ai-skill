@@ -35,5 +35,5 @@ The user requested a new `m:go` command. Its positioning should be similar to `m
 - [../requirements/m-autoflow-skill.md](../requirements/m-autoflow-skill.md)
 - [../specs/m-autoflow-skill.md](../specs/m-autoflow-skill.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
-
-Active workflow plan: worktree-root `plan.md`, to be archived or linked from `docs/change` during workflow closeout.
+- [../plan/2026-07-09_m-go-automated-execution.md](../plan/2026-07-09_m-go-automated-execution.md)
+- [../change/2026-07-09_m-go-automated-execution.md](../change/2026-07-09_m-go-automated-execution.md)
