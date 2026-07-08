@@ -47,7 +47,7 @@
 - Related decision:
   - [../decisions/2026-07-08_private-docs-root-and-feature-first-governance.md](../decisions/2026-07-08_private-docs-root-and-feature-first-governance.md)
 - Related plan:
-  - [../../plan.md](../../plan.md)
+  - Not retained as a stable `docs/plan` archive for this historical workflow; use the related change archive's task mapping.
 
 ## Related Changes
 

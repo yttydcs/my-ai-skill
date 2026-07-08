@@ -23,4 +23,4 @@ Store archived workflow planning documents when they need to be retained beyond 
 
 ## Current Docs
 
-- None yet.
+- [2026-07-08_m-plan-task-table.md](2026-07-08_m-plan-task-table.md) - `$m-plan` direct task summary table workflow

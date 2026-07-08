@@ -23,6 +23,7 @@ The user requested:
 - Feature: [../features/m-autoflow-workflow.md](../features/m-autoflow-workflow.md)
 - Requirements: [../requirements/m-autoflow-skill.md](../requirements/m-autoflow-skill.md)
 - Specs: [../specs/m-autoflow-skill.md](../specs/m-autoflow-skill.md)
+- Plan archive: [../plan/2026-07-08_m-plan-task-table.md](../plan/2026-07-08_m-plan-task-table.md)
 - Change archive: [../change/2026-07-08_m-plan-task-table.md](../change/2026-07-08_m-plan-task-table.md)
 
 ## Open Questions

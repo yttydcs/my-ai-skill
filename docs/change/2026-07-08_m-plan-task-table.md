@@ -77,6 +77,10 @@ No lesson was created because this is a direct durable workflow requirement, not
 
 - none
 
+## Related plan
+
+- [../plan/2026-07-08_m-plan-task-table.md](../plan/2026-07-08_m-plan-task-table.md)
+
 ## 对应 plan.md 任务映射
 
 - `MPT-1`: updated `$m-plan` and shared planning rules to require a direct task summary table.

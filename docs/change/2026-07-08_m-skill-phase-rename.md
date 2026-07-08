@@ -79,7 +79,7 @@ A reusable validator lesson was promoted because the workflow found a repeatable
 
 ## Related plan
 
-- [../../plan.md](../../plan.md)
+- Not retained as a stable `docs/plan` archive for this historical workflow; the task mapping below remains the retained planning trace.
 
 ## 对应 plan.md 任务映射
 

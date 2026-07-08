@@ -55,7 +55,7 @@
 - Related decisions:
   - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - Related plan:
-  - [../../plan.md](../../plan.md)
+  - Not retained as a stable `docs/plan` archive for this historical workflow; use the related change archive's task mapping.
 
 ## Related Changes
 

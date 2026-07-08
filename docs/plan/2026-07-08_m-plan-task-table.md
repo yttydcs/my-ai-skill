@@ -1,4 +1,4 @@
-# Plan - m-plan task summary table
+# 2026-07-08 m-plan task summary table
 
 ## Workflow Information
 - Repo: `D:\project\my-ai-skills`
