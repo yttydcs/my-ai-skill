@@ -31,7 +31,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 
 - Invoke `$m-autoflow` when the user wants the full workflow or wants the umbrella to choose the next phase.
 - Invoke `$m-discuss` for discovery, requirement shaping, brainstorming, optional research, and early worktree setup.
-- Invoke `$m-plan` for architecture, executable planning, and approval gating.
+- Invoke `$m-plan` for architecture, executable planning, direct task summary, and approval gating.
 - Invoke `$m-execute` for confirmed Task ID implementation plus lightweight validation.
 - Invoke `$m-test` for optional heavy validation and review, including UI operation evidence when UI changes are tested.
 - Invoke `$m-archive` for change archive, lessons, and workflow closeout.
@@ -65,6 +65,9 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - When the user keeps docs private, stable docs must be read from and written to `docs_root`, not inferred from code repo `docs/` directories.
 - Active workflow control stays in the worktree root as `plan.md` or `todo.md`.
 - Planning artifacts must include an execution-scope split with `Will Execute` and `Will Not Execute Now` groups. Every known Task ID must appear in exactly one group, and non-executed tasks must include the reason.
+- After `$m-plan` creates or confirms the active `plan.md` / `todo.md`, the direct response must include a task summary table.
+- The task summary table must include `Task ID`, `Title`, `Scope`, `Files / Modules`, `Acceptance / Tests`, and `Risk / Notes`.
+- The task summary table must summarize the active plan artifact and preserve the `Will Execute` / `Will Not Execute Now` split.
 - Execution owns lightweight local validation such as syntax checks, type checks, focused lint, touched-file formatting checks, focused unit tests, and `git diff --check`.
 - Heavy validation is optional. It may be skipped for low-risk small changes when execution-stage validation is sufficient and the skip reason plus residual risk are recorded.
 - The user may explicitly skip `$m-test` and proceed directly to `$m-archive`; the archive must record skipped validation, missing evidence, and residual risk.

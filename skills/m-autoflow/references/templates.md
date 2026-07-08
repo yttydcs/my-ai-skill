@@ -109,6 +109,16 @@ Use these templates as concise defaults.
 - Rollback:
 ```
 
+## Plan Task Summary Table
+
+Use this table in the direct `$m-plan` response after creating or confirming the active `plan.md` / `todo.md`.
+
+```md
+| Task ID | Title | Scope | Files / Modules | Acceptance / Tests | Risk / Notes |
+| --- | --- | --- | --- | --- | --- |
+| <Task ID> | <short title> | Will execute / Will not execute now | <paths or modules> | <short acceptance or test cue> | <risk, blocker, or deferral reason> |
+```
+
 ## docs/change Skeleton
 
 ```md

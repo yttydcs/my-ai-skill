@@ -31,14 +31,15 @@ Give the user one disciplined workflow family for turning an idea into discussio
 2. Discussion clarifies the request, records open questions, compares options, rejects weak directions, and recommends a path.
 3. Discussion creates or confirms the dedicated worktree when project, docs, and code-repo boundaries are clear enough.
 4. Planning turns the discussion brief into requirements, architecture, and a handoff-ready `plan.md` / `todo.md`.
-5. The user approves execution scope.
-6. Execution implements only approved Task IDs and runs lightweight checks.
-7. Heavy testing runs when risk justifies it, or the user may explicitly skip it and proceed to archive with residual risk recorded.
-8. When heavy testing runs for UI changes, Codex opens and operates the affected interface and provides screenshot evidence.
-9. `$m-test` reports a concise pass/fail table directly in the user response.
-10. Archive records the change, stable-doc impact, lessons impact, validation, rollback, and sub-agent trace.
-11. Archive closes the workflow by default through verified control-plane merge and worktree cleanup.
-12. The workflow stops after archive only when the user explicitly asks for archive-only handling, no merge, or no cleanup.
+5. `$m-plan` shows a concise task summary table directly in the user response.
+6. The user approves execution scope.
+7. Execution implements only approved Task IDs and runs lightweight checks.
+8. Heavy testing runs when risk justifies it, or the user may explicitly skip it and proceed to archive with residual risk recorded.
+9. When heavy testing runs for UI changes, Codex opens and operates the affected interface and provides screenshot evidence.
+10. `$m-test` reports a concise pass/fail table directly in the user response.
+11. Archive records the change, stable-doc impact, lessons impact, validation, rollback, and sub-agent trace.
+12. Archive closes the workflow by default through verified control-plane merge and worktree cleanup.
+13. The workflow stops after archive only when the user explicitly asks for archive-only handling, no merge, or no cleanup.
 
 ## Artifacts And Layout
 
@@ -69,6 +70,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 
 - A phase is blocked when unresolved questions remain or a required artifact is missing.
 - Blocked output uses `问题清单` and `阻塞：是`.
+- Planning must include a direct task summary table that reflects the active `plan.md` / `todo.md`.
 - Execution must report lightweight validation.
 - Heavy validation must report either passed checks or skip rationale with residual risk.
 - UI-impacting changes tested through `$m-test` must include actual UI operation evidence and screenshot paths.
@@ -84,6 +86,10 @@ Given the user invokes `$m-discuss`, when the request is still broad, then Codex
 ### Reject Weak Requirements
 
 Given a requested requirement is unsafe, contradictory, or not implementable, when `$m-plan` evaluates it, then Codex blocks planning or returns to discussion with a better alternative instead of silently accepting it.
+
+### Plan Task Summary
+
+Given `$m-plan` creates or confirms a plan, when the user reviews the planning response, then Codex shows a concise task table with Task ID, scope, files/modules, acceptance/tests, and risk notes.
 
 ### Keep Docs Private
 

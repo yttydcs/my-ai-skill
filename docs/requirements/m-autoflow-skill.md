@@ -21,6 +21,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - require worktree-first execution before implementation, with worktree setup starting during discussion when project boundaries are clear
 - require `plan.md` or `todo.md` in the active worktree before implementation
 - require planning artifacts to explicitly separate tasks that will execute after approval from tasks that will not execute in the next execution phase, with a reason for every non-executed task
+- require `$m-plan` to directly output a concise task summary table after creating or confirming the active plan
 - require explicit blocker handling with `问题清单` and `阻塞：是`
 - require rollback reason recording and document synchronization
 - require no silent assumptions about business, data, interface, environment, dependency version, acceptance, or preference
@@ -57,6 +58,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - The user wants an early discussion phase that researches current best practices only when that would improve the requirement.
 - The user requires git worktree isolation before coding.
 - The user requires handoff-ready `plan.md` artifacts before any coding or delegation.
+- The user wants a compact task summary in chat after planning without opening `plan.md` for the basic scope review.
 - The user requires auditable sub-agent governance and a final `docs/change` archive.
 - The user wants future troubleshooting to start from reusable lessons instead of re-reading old archives.
 - The user wants private docs to be kept outside pushable code repositories while implementation happens in one or more code repos.
@@ -82,6 +84,9 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-plan` must emit requirements analysis and architecture design before the executable plan.
 - `$m-plan` must create or confirm root-level `plan.md` or `todo.md` in the active worktree.
 - `$m-plan` must place every known Task ID in exactly one execution-scope group: tasks to execute after approval, or tasks not to execute now with the blocking, deferral, out-of-scope, research-only, or separate-approval reason.
+- `$m-plan` must output a concise direct task summary table after creating or confirming the active plan.
+- The `$m-plan` task table must include Task ID, title, scope, files/modules, acceptance/tests, and risk/notes.
+- The `$m-plan` task table must summarize the active plan artifact and must not conflict with `plan.md` or `todo.md`.
 - `$m-plan` must ask for clarification instead of assuming missing requirements.
 - `$m-plan` must escalate uncertain best-practice choices instead of deciding silently.
 - `$m-execute` must block if the active workflow lacks confirmed `plan.md` or `todo.md`.
@@ -120,6 +125,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - A code repo may contain a `docs/` directory that is not canonical for the project.
 - A capability may span several repos while one private feature doc remains the source of truth.
 - A stale `plan.md` from another workflow may exist and need replacement.
+- A plan may have only blocked or deferred tasks; the direct task table must not imply execution approval.
 - Platform policy may forbid sub-agent use without explicit user authorization.
 - Current external facts may be stale or conflicting; online research must mark uncertainty instead of treating unverified findings as stable truth.
 - A lightweight execution check may be blocked by repo configuration; the workflow must record the reason and residual risk instead of hiding the gap.
@@ -135,6 +141,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - The umbrella skill routes to the phase skills without removing the `$m-autoflow` entry point.
 - The phase skills enforce discussion, planning, execution, testing, archive, and blocker rules.
 - The plan artifact clearly states which Task IDs will execute after approval and which Task IDs will not execute in the next execution phase.
+- `$m-plan` responses include a concise direct task summary table.
 - Optional online research is controlled by discussion, supports source verification and citations, and routes stable-doc impact through `$m-docs`.
 - Lightweight validation is part of execution, while heavyweight integration/UI/usability/security/performance testing is optional and separately recorded.
 - UI-impacting changes tested by `$m-test` produce actual operation evidence and screenshot paths.

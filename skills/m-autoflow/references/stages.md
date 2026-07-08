@@ -71,6 +71,7 @@ Required output:
 - 错误与安全
 - 性能与测试策略
 - 可扩展性设计点
+- direct task summary table with Task ID, title, execution scope, files/modules, acceptance/tests, and risk/notes
 
 Plan artifact requirements:
 
@@ -78,6 +79,7 @@ Plan artifact requirements:
 - Make the document handoff-ready without relying on the current chat.
 - If the user already provided a complete `plan.md` or `todo.md`, confirm it instead of rewriting it.
 - If the provided plan is incomplete, complete it before implementation.
+- After creating or confirming the active plan, output a concise task summary table directly to the user. The table summarizes `plan.md` / `todo.md` and must preserve the `Will Execute` / `Will Not Execute Now` split.
 - Include:
   - project goal and current state
   - repo, branch, base, project root, docs root, code repos, worktree absolute path, and current stage

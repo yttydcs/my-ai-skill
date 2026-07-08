@@ -25,6 +25,7 @@ Store original request evidence before it is refined into feature, requirement, 
 
 ## Current Docs
 
+- [2026-07-08_m-plan-task-table.md](2026-07-08_m-plan-task-table.md) - source: Codex chat, direct task summary table after planning
 - [2026-07-08_m-test-ui-evidence.md](2026-07-08_m-test-ui-evidence.md) - source: Codex chat, UI test evidence and direct result table requirements
 - [2026-07-08_m-archive-default-closeout.md](2026-07-08_m-archive-default-closeout.md) - source: Codex chat, archive command should imply workflow closeout
 - [2026-07-08_m-skill-phase-rename.md](2026-07-08_m-skill-phase-rename.md) - source: Codex chat, phase skill rename/discuss workflow requirements

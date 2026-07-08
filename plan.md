@@ -1,54 +1,53 @@
-# Plan - m-test UI evidence and result table
+# Plan - m-plan task summary table
 
 ## Workflow Information
 - Repo: `D:\project\my-ai-skills`
-- Branch: `refactor/m-test-ui-evidence`
-- Base: `main` at `a99cdc0`
+- Branch: `refactor/m-plan-task-table`
+- Base: `main` at `ac5fe4d`
 - Project Root: `D:\project\my-ai-skills`
 - Docs Root: `D:\project\my-ai-skills\docs`
 - Code Repos: `D:\project\my-ai-skills`
-- Worktree: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence`
-- Current Stage: `4 - Archive complete; default closeout pending`
+- Worktree: `D:\project\my-ai-skills\worktrees\m-plan-task-table`
+- Current Stage: `3.1 - Planning complete; ready for execution`
 
 ## Stage Records
 
 ### Initialization
-- `guide.md`: requires each modification round to auto-commit with an English commit message matching previous style.
+- `guide.md`: requires each modification round to auto-commit with an English commit message matching prior style.
 - Project/docs/code repo confirmation: this repo is both skill source repo and selected docs root for this workflow change.
 - Base/worktree confirmation: dedicated worktree created under `worktrees\`; main repo remains control plane.
 
 ### Discuss - Discovery And Requirements Shaping
 #### Goal
-Strengthen `$m-test` for UI changes and make its results easier to consume without opening markdown files.
+Make `$m-plan` output a concise task table directly after planning so the user can review execution scope without opening `plan.md`.
 
 #### Scope
-- Must require actual opening, operation, and screenshot evidence when `$m-test` is executed for UI-impacting changes.
-- Must make UI evidence a blocking condition inside a run `$m-test`.
-- Must require a concise pass/fail table in the direct user response.
-- Must preserve `$m-test` as optional: the user may explicitly skip testing and go directly to `$m-archive`.
-- Must update stable feature, requirement, and spec docs because workflow behavior changes.
-- Must sync installed `m-test` and affected umbrella rules after validation.
-- Must not push, add remotes, or choose docs backup targets.
+- Must require a direct user-facing task summary table after `$m-plan`.
+- Must keep `plan.md` or `todo.md` as the source of detailed handoff truth.
+- Must include enough task fields to show what will execute, what will not execute, and why.
+- Must update `$m-plan`, shared `m-autoflow` stage/template rules, and stable docs.
+- Must sync installed `m-plan` and `m-autoflow` after validation.
+- Must not push, add remotes, publish docs, or choose backup targets.
 
 #### Assumptions
-- The user's latest message approves implementing these requirements.
-- "UI changes" includes page, component, style, layout, route, interaction, form, modal, visible state, or responsive behavior changes.
-- If the user skips `$m-test`, archive should record that testing was skipped and describe residual risk instead of pretending UI evidence exists.
+- The user's latest message approves implementing this rule.
+- "Plan 之后" means after `$m-plan` produces or confirms the plan artifact, the direct response should include the task table.
+- This is a workflow output contract change, not a runtime product behavior change.
 
 #### Open Questions
 - None.
 
 #### Options Considered
-- Option A: only mention screenshots as recommended evidence. Rejected because the user wants actual opening/operation/screenshots as an acceptance rule.
-- Option B: make `$m-test` mandatory for every UI change. Rejected because the user explicitly wants `$m-test` to remain optional and skippable by going to `$m-archive`.
-- Option C: keep `$m-test` optional, but when it runs for UI changes, require actual UI operation evidence and a direct pass/fail table. Recommended.
+- Option A: only add a table inside `plan.md`. Rejected because the user's goal is to reduce opening markdown files.
+- Option B: output the full task details in chat. Rejected because it would be noisy and duplicate `plan.md`.
+- Option C: keep full details in `plan.md` and output a compact direct table. Recommended.
 
 #### Research Summary
-- No web research used; this is a direct workflow policy requirement from the user.
+- No web research used; this is a direct workflow requirement from the user.
 
 #### Worktree / Branch / Docs Root Status
 - Worktree: ready.
-- Branch: `refactor/m-test-ui-evidence`.
+- Branch: `refactor/m-plan-task-table`.
 - Docs root: repository `docs`.
 
 #### Issue List
@@ -57,57 +56,55 @@ Strengthen `$m-test` for UI changes and make its results easier to consume witho
 ### Plan - Requirements And Architecture
 #### Requirements Analysis
 ##### Goal
-Update `$m-test` so UI-impacting changes produce concrete visual and interaction evidence when tested, while preserving the user's right to skip testing and archive directly.
+Require `$m-plan` to show a compact task summary table in the direct response after the plan is drafted or confirmed.
 
 ##### Functional Requirements
-- `$m-test` must detect UI-impacting changes.
-- When `$m-test` runs and UI is impacted, it must open the application or relevant page, perform affected user operations, and provide screenshot evidence.
-- If UI evidence cannot be gathered during a run `$m-test`, the result must be failed or blocked.
-- `$m-test` must output a concise table directly to the user showing each checked area and pass/fail/blocked/skipped status.
-- The direct table must include enough context to avoid requiring the user to open markdown files for the basic verdict.
-- User-directed skip remains allowed: the user may skip `$m-test` and invoke `$m-archive`, with residual testing risk recorded.
+- `$m-plan` must output a concise task summary table after planning.
+- The table must summarize Task ID, task title, execution scope/status, main files/modules, acceptance/test focus, and risk/notes.
+- The table must include both tasks that will execute after approval and tasks that will not execute now.
+- The table must not replace `plan.md`; detailed per-task acceptance, tests, and rollback remain in the active plan artifact.
+- Blocked planning output may use a blocker table or issue list, but must not imply execution approval.
 
 ##### Non-functional Requirements
-- Keep `SKILL.md` concise and place detailed rules in references.
-- Keep output language simple enough for repeated operational use.
-- Avoid adding runtime dependencies or hard-coded environment assumptions.
+- Keep `SKILL.md` concise and move detailed table rules into references/templates.
+- Avoid duplicating large task details in chat.
+- Preserve existing docs governance and private docs guardrails.
 
 ##### Inputs / Outputs
-- Input: direct user clarification in chat.
-- Output: updated skill source, reference docs, stable docs, intake, change archive, synced installed skills, and commits.
+- Input: direct user requirement in chat.
+- Output: updated skill source, references, stable docs, intake, change archive, synced installed skills, and commits.
 
 ##### Edge Cases
-- A UI cannot be launched due environment/auth/dependency issues: `$m-test` records blocked or failed, not passed.
-- A non-UI change runs `$m-test`: screenshot evidence is not required, but the result table still is.
-- User explicitly skips `$m-test`: proceed to archive with skip reason and residual risk.
-- Responsive UI affected: include desktop and mobile screenshots when practical.
+- A plan has no executable tasks due blockers: table should show blocked/deferred tasks and the response must forbid execution.
+- A plan is confirming an existing complete `plan.md`: still output the table based on the confirmed task list.
+- Multi-repo planning: table should show repo/module or worktree cues in the files/modules column.
 
 ##### Acceptance Criteria
-- Current `m-test` rules require UI open/operate/screenshot evidence when UI changes are tested.
-- Current rules require a direct user-facing pass/fail table for `$m-test` output.
-- Current rules preserve optional skip and direct `$m-archive` path.
-- Relevant validators pass and installed skills sync.
+- Current `$m-plan` rules require a direct task summary table after planning.
+- Shared `m-autoflow` planning rules and templates define the same table.
+- Stable docs describe the new direct planning table behavior.
+- Validators pass and installed skills sync.
 
 ##### Risks
-- If "UI" is defined too narrowly, visual regressions could slip through. Mitigation: define broad UI-impacting criteria.
-- If screenshots are required even when the user skips `$m-test`, optionality is lost. Mitigation: scope screenshot evidence to a run `$m-test`, and require archive risk disclosure for skip.
+- The direct table could drift from `plan.md`. Mitigation: require it to summarize the active `plan.md` / `todo.md`, not redefine scope.
 
 #### Architecture Design
 ##### Overall Solution
-Patch `skills/m-test` and `skills/m-test/references/testing.md`, then align shared stage rules and stable docs.
+Patch `$m-plan` source and `planning.md`, add a reusable task table template in shared templates, align shared stage rules, and update stable docs.
 
 ##### Module Responsibilities
-- `skills/m-test`: entry-level semantics and exit output requirements.
-- `skills/m-test/references/testing.md`: detailed UI evidence, result table, skip, and failure rules.
-- `skills/m-autoflow/references/stages.md`: shared stage summary and optional skip semantics.
-- Stable docs: current truth for the workflow capability.
+- `skills/m-plan`: entry-level output contract.
+- `skills/m-plan/references/planning.md`: detailed direct table requirements.
+- `skills/m-autoflow/references/stages.md`: shared stage output requirements.
+- `skills/m-autoflow/references/templates.md`: reusable table format.
+- Stable docs: durable workflow behavior.
 
 ##### Error Handling and Safety
-- UI evidence missing during a run `$m-test` blocks or fails the test phase.
-- User-directed skip is explicitly recorded and does not fabricate evidence.
+- If planning is blocked, output blockers and do not mark tasks as executable.
+- The table must preserve `Will Execute` / `Will Not Execute Now` boundaries.
 
 ##### Performance and Testing Strategy
-- Run targeted skill validators for `m-test` and `m-autoflow`.
+- Run targeted skill validation for `m-plan` and `m-autoflow`.
 - Run `git diff --check`.
 - Run sync for changed installed skills.
 
@@ -117,7 +114,7 @@ Patch `skills/m-test` and `skills/m-test/references/testing.md`, then align shar
 - Requirements impact: clarify
 - Specs impact: clarify
 - Decision impact: none
-- Related intake: `docs/intake/2026-07-08_m-test-ui-evidence.md`
+- Related intake: `docs/intake/2026-07-08_m-plan-task-table.md`
 - Related features: `docs/features/m-autoflow-workflow.md`
 - Related requirements: `docs/requirements/m-autoflow-skill.md`
 - Related specs: `docs/specs/m-autoflow-skill.md`
@@ -126,95 +123,59 @@ Patch `skills/m-test` and `skills/m-test/references/testing.md`, then align shar
 
 #### Executable Task List
 ##### Will Execute
-- `MTU-1`: Update `$m-test` rules for UI evidence and direct result table.
-- `MTU-2`: Update stable docs and intake for the new test semantics.
-- `MTU-3`: Validate, sync installed skills, archive, merge, and clean worktree.
+- `MPT-1`: Update `$m-plan` and shared planning rules to require a direct task summary table.
+- `MPT-2`: Update stable docs and intake for the new planning output contract.
+- `MPT-3`: Validate, sync installed skills, archive, merge, and clean worktree.
 
 ##### Will Not Execute Now
-- Browser automation tooling implementation: out of scope; this skill records workflow rules, not a reusable test runner.
-- Pushing changes: out of scope unless separately requested.
-- Docs remote, backup, or publication changes: user-owned and out of scope.
+- Push to remote: out of scope unless separately requested.
+- UI/runtime tests: out of scope because this changes skill/docs text only.
+- New automation to generate the table mechanically: out of scope; the skill defines the required output contract.
 
 #### Task Details
-##### MTU-1 - Update m-test rules
+##### MPT-1 - Update m-plan rules
 - Owner: Main agent
-- Worktree: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence`
-- Plan Path: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence\plan.md`
-- Goal: require UI evidence and direct pass/fail table when `$m-test` runs.
-- Files / Modules: `skills/m-test`, `skills/m-autoflow/references/stages.md`
+- Worktree: `D:\project\my-ai-skills\worktrees\m-plan-task-table`
+- Plan Path: `D:\project\my-ai-skills\worktrees\m-plan-task-table\plan.md`
+- Goal: require direct task summary table after `$m-plan`.
+- Files / Modules: `skills/m-plan`, `skills/m-autoflow/references/stages.md`, `skills/m-autoflow/references/templates.md`.
 - Write Set: skill source and reference markdown.
-- Acceptance: UI-impacting tested changes require actual open/operate/screenshots; output table required; user skip preserved.
+- Acceptance: direct table contract exists and preserves execution scope boundaries.
 - Test Points: targeted `rg`, skill validators, `git diff --check`.
-- Rollback: revert the commit and resync installed skills.
+- Rollback: revert commit and resync installed skills.
 
-##### MTU-2 - Update stable docs
+##### MPT-2 - Update stable docs
 - Owner: Main agent
-- Worktree: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence`
-- Plan Path: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence\plan.md`
-- Goal: keep feature, requirement, and spec docs aligned with the new semantics.
+- Worktree: `D:\project\my-ai-skills\worktrees\m-plan-task-table`
+- Plan Path: `D:\project\my-ai-skills\worktrees\m-plan-task-table\plan.md`
+- Goal: record planning table behavior as stable workflow truth.
 - Files / Modules: `docs/features`, `docs/requirements`, `docs/specs`, `docs/intake`.
 - Write Set: stable docs and indexes.
-- Acceptance: stable docs describe UI evidence, direct result table, and optional user skip.
+- Acceptance: docs describe direct task table after plan.
 - Test Points: targeted `rg` and diff review.
-- Rollback: revert changed docs.
+- Rollback: revert docs changes.
 
-##### MTU-3 - Validate, sync, archive, and close
+##### MPT-3 - Validate, sync, archive, and close
 - Owner: Main agent
-- Worktree: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence`
-- Plan Path: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence\plan.md`
+- Worktree: `D:\project\my-ai-skills\worktrees\m-plan-task-table`
+- Plan Path: `D:\project\my-ai-skills\worktrees\m-plan-task-table\plan.md`
 - Goal: validate, sync, archive, and close the workflow.
 - Files / Modules: validation/sync scripts and `docs/change`.
-- Write Set: generated installed skill copies via sync, change archive, affected indexes.
+- Write Set: installed skill copies via sync, change archive, affected indexes.
 - Acceptance: validation passes, commits exist, branch merges to main, worktree removed.
 - Test Points: validators, sync output, final status.
 - Rollback: revert commits on main and rerun sync if needed.
 
 #### Dependencies
-- Existing `tools/validate-skills.ps1` and `tools/sync-skills.ps1`.
+- Existing validation and sync scripts.
 
 #### Risks and Notes
 - This is a skill/docs behavior change, not runtime application code.
-- Heavy `$m-test` for this workflow will be skipped because this workflow itself does not change UI.
+- Heavy `$m-test` will be skipped because no application UI or runtime behavior changes.
 
 #### Parallelism Assessment
-- No sub-agents. The change is small, tightly coupled, and benefits from single-agent consistency.
+- No sub-agents. The change is small and instruction consistency matters more than parallel throughput.
 
 #### Issue List
 - 阻塞：否
 - 进入 3.2
-
-### Stage 3.2 - Implementation
-- `MTU-1`: completed. Updated `$m-test` rules for UI evidence and direct result table; updated umbrella stage rules.
-- `MTU-2`: completed. Updated feature, requirement, spec, intake, and affected indexes.
-- `MTU-3`: partially completed. Validation and install sync completed before archive.
-- Lightweight validation:
-  - `tools\validate-skills.ps1 -Skill m-test`: passed.
-  - `tools\validate-skills.ps1 -Skill m-autoflow`: passed.
-  - `git diff --check`: passed with expected CRLF conversion warnings only.
-  - `tools\sync-skills.ps1 -Skill m-test`: completed.
-  - `tools\sync-skills.ps1 -Skill m-autoflow`: completed.
-- Implementation commit: `2e770ba feat: require UI evidence in m test`
-- 阻塞：否
-
-### Stage 3.3 - Review Decision
-- Heavy `$m-test`: skipped for this workflow.
-- Skip reason: this workflow changes skill and documentation text only; it does not modify an application UI, runtime behavior, data, auth, storage, or external integration path.
-- Residual risk: future wording may still need refinement after real UI workflow usage; mitigated by stable docs and archive trace.
-- 阻塞：否
-
-### Stage 4 - Change Archive
-- `$m-docs` usage: applied to route intake, stable-doc impact, change archive, and index updates.
-- Change archive: `docs/change/2026-07-08_m-test-ui-evidence.md`
-- Intake impact: updated
-- Feature impact: updated
-- Requirements impact: updated
-- Specs impact: updated
-- Decision impact: none
-- Lessons impact: none
-- Related intake: `docs/intake/2026-07-08_m-test-ui-evidence.md`
-- Related features: `docs/features/m-autoflow-workflow.md`
-- Related requirements: `docs/requirements/m-autoflow-skill.md`
-- Related specs: `docs/specs/m-autoflow-skill.md`
-- Related decisions: none
-- Related lessons: none
-- Default closeout: enabled by `$m-archive` semantics.

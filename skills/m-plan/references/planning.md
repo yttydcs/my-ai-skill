@@ -56,6 +56,32 @@ Use this reference for `$m-plan`, the architecture and execution-planning phase 
 - dependencies, risks, and open questions
 - parallelism assessment and any allowed sub-agent context package
 
+## Direct Task Summary Table
+
+After creating or confirming the active `plan.md` / `todo.md`, output a concise task summary table directly to the user.
+
+The table is a readable summary of the active plan artifact. It must not redefine scope, omit known tasks, or conflict with `plan.md` / `todo.md`.
+
+Minimum columns:
+
+- Task ID
+- Title
+- Scope (`Will execute` / `Will not execute now`)
+- Files / Modules
+- Acceptance / Tests
+- Risk / Notes
+
+Include every known task from the execution scope split. For tasks not executing now, put the reason in `Risk / Notes`.
+
+Example:
+
+```md
+| Task ID | Title | Scope | Files / Modules | Acceptance / Tests | Risk / Notes |
+| --- | --- | --- | --- | --- | --- |
+| T1 | Add personnel list filter | Will execute | `src/features/personnel` | Filter works; focused unit test | Low risk |
+| T2 | Export personnel report | Will not execute now | `api/reports` | Not in next phase | Deferred; separate approval |
+```
+
 ## Blocking Output
 
 When any required prerequisite is missing:

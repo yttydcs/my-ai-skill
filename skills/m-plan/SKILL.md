@@ -1,6 +1,6 @@
 ---
 name: m-plan
-description: Architecture and execution-planning phase for the m-autoflow workflow. Use when Codex needs to consume a $m-discuss brief or clear requirements, reject unreasonable requirements, design the technical approach, create or confirm root plan.md/todo.md, define Task IDs, acceptance, tests, rollback, and stop before implementation for user approval.
+description: Architecture and execution-planning phase for the m-autoflow workflow. Use when Codex needs to consume a $m-discuss brief or clear requirements, reject unreasonable requirements, design the technical approach, create or confirm root plan.md/todo.md, define Task IDs, acceptance, tests, rollback, output a concise task summary table, and stop before implementation for user approval.
 ---
 
 # m:plan
@@ -37,6 +37,7 @@ Use this skill to convert a coherent requirement into an executable architecture
 7. Explicitly use `$m-docs` before confirming the plan.
 8. Create or confirm root `plan.md` or `todo.md` in the active worktree. Include docs root, code repos, task IDs, file/module scope, acceptance, tests, rollback points, dependencies, risks, and parallelism notes.
 9. Explicitly separate tasks that will be executed after approval from tasks that will not be executed in the next execution phase. Every known task must appear in exactly one section, with the reason for any deferred, blocked, out-of-scope, or research-only task.
+10. After drafting or confirming the plan, output a concise task summary table directly to the user. The table summarizes the active `plan.md` / `todo.md`; it does not replace the detailed plan.
 
 ## Private Docs Guardrails
 
@@ -50,6 +51,10 @@ Use this skill to convert a coherent requirement into an executable architecture
 Before implementation, output a clear plan status:
 
 ```md
+| Task ID | Title | Scope | Files / Modules | Acceptance / Tests | Risk / Notes |
+| --- | --- | --- | --- | --- | --- |
+| <id> | <title> | Will execute / Will not execute now | <paths/modules> | <short acceptance or test cue> | <risk or reason> |
+
 Execution scope after approval:
 - Will execute: <Task IDs>
 - Will not execute now: <Task IDs and reasons>
@@ -62,6 +67,10 @@ Do not dispatch implementation sub-agents
 After the user confirms the plan:
 
 ```md
+| Task ID | Title | Scope | Files / Modules | Acceptance / Tests | Risk / Notes |
+| --- | --- | --- | --- | --- | --- |
+| <id> | <title> | Will execute / Will not execute now | <paths/modules> | <short acceptance or test cue> | <risk or reason> |
+
 Execution scope after approval:
 - Will execute: <Task IDs>
 - Will not execute now: <Task IDs and reasons>
