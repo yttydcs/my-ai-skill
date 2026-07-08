@@ -59,3 +59,7 @@ Discussion owns discovery, brainstorming, current-practice research when needed,
 ## Related Specs
 
 - [../specs/m-autoflow-skill.md](../specs/m-autoflow-skill.md)
+
+## Related Changes
+
+- [../change/2026-07-08_m-skill-phase-rename.md](../change/2026-07-08_m-skill-phase-rename.md)

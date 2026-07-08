@@ -27,3 +27,4 @@ Store reusable incident knowledge, query-friendly troubleshooting lessons, and p
 ## Current Docs
 
 - [searchable-lessons-capture.md](searchable-lessons-capture.md) - keywords: archive, lessons, troubleshooting, recurring investigation
+- [skill-frontmatter-yaml-colon.md](skill-frontmatter-yaml-colon.md) - keywords: skill validator, YAML frontmatter, colon, description, mapping values are not allowed

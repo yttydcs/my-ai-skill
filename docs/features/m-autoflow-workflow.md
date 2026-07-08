@@ -103,3 +103,11 @@ Given a low-risk small change passes execution checks, when heavy testing is unn
 ## Related Decisions
 
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
+
+## Related Changes
+
+- [../change/2026-07-08_m-skill-phase-rename.md](../change/2026-07-08_m-skill-phase-rename.md)
+
+## Related Lessons
+
+- [../lessons/skill-frontmatter-yaml-colon.md](../lessons/skill-frontmatter-yaml-colon.md)

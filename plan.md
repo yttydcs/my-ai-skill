@@ -10,7 +10,7 @@
 - Code Repos:
   - `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-skill-phase-rename`
-- Current Stage: `3.2 - Execution validation complete; ready for local commit`
+- Current Stage: `4 - Archive complete; awaiting workflow-end confirmation`
 - Planning skill: `$m-plan`
 - Docs governance skill: `$m-docs`
 - Discussion / optional research skill: `$m-discuss`
@@ -483,7 +483,7 @@ Used `$m-docs` to classify the planning outputs and future stable-doc impact.
   - `docs/decisions/2026-07-08_private-docs-root-and-feature-first-governance.md`
   - `docs/decisions/2026-07-08_m-skill-phase-naming.md`
 - Related lessons:
-  - none
+  - `docs/lessons/skill-frontmatter-yaml-colon.md`
 
 #### Stable Docs Impact
 
@@ -492,7 +492,7 @@ Used `$m-docs` to classify the planning outputs and future stable-doc impact.
 - Requirements impact: clarify
 - Specs impact: clarify
 - Decision impact: add
-- Lessons known at planning time: none
+- Lessons impact: updated during archive
 
 #### Executable Task List
 
@@ -503,7 +503,7 @@ Used `$m-docs` to classify the planning outputs and future stable-doc impact.
 - [x] `MSR-5` Update references, prompts, dependency names, and current docs references.
 - [x] `MSR-6` Validate, sync, and clean stale installed phase skill directories.
 - [x] `MSR-7` Commit approved execution changes locally.
-- [ ] `MSR-8` Review and archive this workflow.
+- [x] `MSR-8` Review and archive this workflow.
 - [ ] `MSR-9` Decide whether to push or publish the local branch.
 - [ ] `MSR-10` Add old-name compatibility aliases.
 
@@ -904,15 +904,108 @@ Used `$m-docs` to classify the planning outputs and future stable-doc impact.
 - Blocked: No.
 - Exit criteria met for Stage 3.2.
 
+### Stage 3.3 - Review
+
+#### Heavy Test Decision
+
+- Heavy `$m-test` phase: skipped.
+- Skip reason:
+  - The change is a skill/docs/package rename and documentation governance update.
+  - No product runtime, data migration, network boundary, auth, storage, billing, or user-facing application flow changed.
+  - Execution-stage validation covered skill packages, manifests, local install output, and stale-reference cleanup.
+
+#### Review Checklist
+
+- 需求覆盖: 通过
+- 架构合理性: 通过
+- 性能风险（N+1 / 重复计算 / 多余 I/O / 锁竞争）: 通过
+- 性能指标 / 阈值: 通过, not applicable to this skill/docs rename
+- 可用性 / 用户路径: 通过
+- 可读性与一致性: 通过
+- 可扩展性与配置化: 通过
+- 稳定性与安全: 通过
+- 安全边界 / 权限 / 数据暴露: 通过
+- 测试覆盖情况: 通过
+- 整体流程 / 联调验证: 通过
+- 子Agent治理与审计: 通过, no sub-agents were used
+
+#### Residual Risk
+
+- The current Codex session may not refresh the visible skill list until a new session or skill reload.
+- Users who explicitly invoke old long phase names will need to use the new names unless a future alias workflow is approved.
+
+#### Issue List
+
+- None.
+- Blocked: No.
+- Exit criteria met for Stage 3.3.
+
+### Stage 4 - Archive
+
+#### Docs Governance Routing Result
+
+Used `$m-docs` to confirm archive routing, stable-doc impact, indexes, and lessons handling.
+
+- Docs root:
+  - `D:\project\my-ai-skills\worktrees\m-skill-phase-rename\docs`
+- Archive:
+  - `docs/change/2026-07-08_m-skill-phase-rename.md`
+- Lessons:
+  - `docs/lessons/skill-frontmatter-yaml-colon.md`
+- Indexes updated:
+  - `docs/change/README.md`
+  - `docs/lessons/README.md`
+- Stable-doc cross-links updated:
+  - `docs/intake/2026-07-08_m-skill-phase-rename.md`
+  - `docs/features/m-autoflow-workflow.md`
+  - `docs/requirements/m-autoflow-skill.md`
+  - `docs/specs/m-autoflow-skill.md`
+  - `docs/decisions/2026-07-08_m-skill-phase-naming.md`
+
+#### Stable Docs Impact
+
+- Intake impact: updated
+- Feature impact: updated
+- Requirements impact: updated
+- Specs impact: updated
+- Decision impact: updated
+- Lessons impact: updated
+
+#### Validation During Archive
+
+- Passed:
+  - `tools\validate-skills.ps1 -Skill m-autoflow`
+  - `tools\validate-skills.ps1 -Skill m-discuss`
+  - `tools\validate-skills.ps1 -Skill m-plan`
+  - `tools\validate-skills.ps1 -Skill m-execute`
+  - `tools\validate-skills.ps1 -Skill m-test`
+  - `tools\validate-skills.ps1 -Skill m-archive`
+- Passed:
+  - stale old-name scan across `skills`, `manifests`, `docs/requirements`, `docs/specs`, `docs/features`, and `docs/decisions`
+  - installed canonical `m-*` skill list check
+  - `git diff --check`
+
+#### Publication / Backup
+
+- No remote, push, docs publication, or backup target was configured.
+- Branch remains local-only unless the user later chooses otherwise.
+
+#### Issue List
+
+- None.
+- Blocked: No.
+- Archive is complete.
+- Workflow end still requires explicit user confirmation before merge and worktree cleanup.
+
 ## Exit Gate
 
-Execution status:
+Workflow status:
 
-- Executed: `MSR-1`, `MSR-2`, `MSR-3`, `MSR-4`, `MSR-5`, `MSR-6`, `MSR-7`
+- Executed: `MSR-1`, `MSR-2`, `MSR-3`, `MSR-4`, `MSR-5`, `MSR-6`, `MSR-7`, `MSR-8`
 - Will not execute now:
-  - `MSR-8` - separate review/archive phase after implementation and validation.
   - `MSR-9` - user-owned remote/push/publication/backup decision.
   - `MSR-10` - deferred old-name compatibility aliases, only if explicitly requested.
 
 Blocked: no
-Ready for review/archive phase when the user invokes or approves it.
+Archive complete.
+Awaiting explicit workflow-end confirmation before merge and worktree cleanup.

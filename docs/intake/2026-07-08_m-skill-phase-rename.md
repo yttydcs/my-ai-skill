@@ -59,5 +59,4 @@
 
 ## Related Changes
 
-- Later archive:
-  - planned [../change/2026-07-08_m-skill-phase-rename.md](../change/2026-07-08_m-skill-phase-rename.md)
+- [../change/2026-07-08_m-skill-phase-rename.md](../change/2026-07-08_m-skill-phase-rename.md)
