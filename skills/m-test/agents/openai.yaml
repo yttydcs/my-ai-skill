@@ -1,0 +1,4 @@
+interface:
+  display_name: "m:test"
+  short_description: "Validate and review workflow changes"
+  default_prompt: "Use $m-test to run validation and code review for confirmed workflow tasks."

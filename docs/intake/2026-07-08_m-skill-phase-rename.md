@@ -47,13 +47,13 @@
 ## Routed Docs
 
 - Related feature:
-  - planned [../features/m-autoflow-workflow.md](../features/m-autoflow-workflow.md)
+  - [../features/m-autoflow-workflow.md](../features/m-autoflow-workflow.md)
 - Related requirements:
   - [../requirements/m-autoflow-skill.md](../requirements/m-autoflow-skill.md)
 - Related specs:
   - [../specs/m-autoflow-skill.md](../specs/m-autoflow-skill.md)
 - Related decisions:
-  - planned [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
+  - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - Related plan:
   - [../../plan.md](../../plan.md)
 

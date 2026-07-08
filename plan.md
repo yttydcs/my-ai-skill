@@ -10,10 +10,10 @@
 - Code Repos:
   - `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-skill-phase-rename`
-- Current Stage: `3.1 - Plan ready for user approval`
-- Planning skill: `$m-autoflow-plan`
+- Current Stage: `3.2 - Execution validation complete; ready for local commit`
+- Planning skill: `$m-plan`
 - Docs governance skill: `$m-docs`
-- Optional research skill: `$m-autoflow-research`
+- Discussion / optional research skill: `$m-discuss`
 
 ## Stage Records
 
@@ -474,14 +474,14 @@ Used `$m-docs` to classify the planning outputs and future stable-doc impact.
   - `docs/intake/2026-07-08_docs-private-governance.md`
 - Related features:
   - `docs/features/README.md`
-  - planned `docs/features/m-autoflow-workflow.md`
+  - `docs/features/m-autoflow-workflow.md`
 - Related requirements:
   - `docs/requirements/m-autoflow-skill.md`
 - Related specs:
   - `docs/specs/m-autoflow-skill.md`
 - Related decisions:
   - `docs/decisions/2026-07-08_private-docs-root-and-feature-first-governance.md`
-  - planned `docs/decisions/2026-07-08_m-skill-phase-naming.md`
+  - `docs/decisions/2026-07-08_m-skill-phase-naming.md`
 - Related lessons:
   - none
 
@@ -496,13 +496,13 @@ Used `$m-docs` to classify the planning outputs and future stable-doc impact.
 
 #### Executable Task List
 
-- [ ] `MSR-1` Update stable docs and records for the new phase model.
-- [ ] `MSR-2` Rename canonical phase skill packages and manifests.
-- [ ] `MSR-3` Add `m-discuss` and fold optional research behavior into it.
-- [ ] `MSR-4` Refactor `m-autoflow` into a thin umbrella/reference-driven collection.
-- [ ] `MSR-5` Update references, prompts, dependency names, and current docs references.
-- [ ] `MSR-6` Validate, sync, and clean stale installed phase skill directories.
-- [ ] `MSR-7` Commit approved execution changes locally.
+- [x] `MSR-1` Update stable docs and records for the new phase model.
+- [x] `MSR-2` Rename canonical phase skill packages and manifests.
+- [x] `MSR-3` Add `m-discuss` and fold optional research behavior into it.
+- [x] `MSR-4` Refactor `m-autoflow` into a thin umbrella/reference-driven collection.
+- [x] `MSR-5` Update references, prompts, dependency names, and current docs references.
+- [x] `MSR-6` Validate, sync, and clean stale installed phase skill directories.
+- [x] `MSR-7` Commit approved execution changes locally.
 - [ ] `MSR-8` Review and archive this workflow.
 - [ ] `MSR-9` Decide whether to push or publish the local branch.
 - [ ] `MSR-10` Add old-name compatibility aliases.
@@ -830,15 +830,89 @@ Used `$m-docs` to classify the planning outputs and future stable-doc impact.
 - Blocked: No.
 - Exit criteria met for Stage 3.1.
 
+### Stage 3.2 - Execution
+
+#### Parallelism Assessment
+
+- Implementation sub-agents were not used.
+- Reason:
+  - directory renames, manifests, references, stable docs, and install cleanup all depend on one naming contract
+  - splitting the edits would increase merge/conflict and stale-reference risk
+
+#### Completed Task Mapping
+
+- `MSR-1`:
+  - Added `docs/features/m-autoflow-workflow.md`.
+  - Updated `docs/features/README.md`.
+  - Rewrote current `docs/requirements/m-autoflow-skill.md` around the new canonical phase names.
+  - Rewrote current `docs/specs/m-autoflow-skill.md` around the new package, trigger, docs, sub-agent, validation, and cleanup contracts.
+  - Added `docs/decisions/2026-07-08_m-skill-phase-naming.md`.
+  - Updated `docs/decisions/README.md`.
+  - Updated the intake record's planned feature/decision links to actual links.
+- `MSR-2`:
+  - Renamed canonical phase packages and manifests to `m-plan`, `m-execute`, `m-test`, `m-archive`, and `m-discuss`.
+  - Removed old long phase source package names from the canonical source tree.
+- `MSR-3`:
+  - Added first-class `$m-discuss` skill behavior.
+  - Folded optional online research behavior into `skills/m-discuss/references/research.md`.
+  - Added discussion handoff, worktree, research, and source-quality rules.
+- `MSR-4`:
+  - Refactored `$m-autoflow` into an umbrella / collection entry.
+  - Kept shared workflow references under `skills/m-autoflow/references`.
+  - Updated umbrella manifest dependencies to the new phase skills.
+- `MSR-5`:
+  - Updated phase prompts, references, manifests, stable docs, and current source references to the new names.
+  - Preserved old names only in source-preserving intake and historical archive contexts.
+- `MSR-6`:
+  - Validated and synced all six canonical skills.
+  - Removed stale installed old phase skill directories from `C:\Users\HelloWorld\.codex\skills`.
+- `MSR-7`:
+  - This execution result is committed locally after validation as required by `guide.md`.
+
+#### Validation Results
+
+- Passed:
+  - `tools\validate-skills.ps1 -Skill m-autoflow`
+  - `tools\validate-skills.ps1 -Skill m-discuss`
+  - `tools\validate-skills.ps1 -Skill m-plan`
+  - `tools\validate-skills.ps1 -Skill m-execute`
+  - `tools\validate-skills.ps1 -Skill m-test`
+  - `tools\validate-skills.ps1 -Skill m-archive`
+- Passed:
+  - `tools\sync-skills.ps1 -Skill m-autoflow`
+  - `tools\sync-skills.ps1 -Skill m-discuss`
+  - `tools\sync-skills.ps1 -Skill m-plan`
+  - `tools\sync-skills.ps1 -Skill m-execute`
+  - `tools\sync-skills.ps1 -Skill m-test`
+  - `tools\sync-skills.ps1 -Skill m-archive`
+- Passed:
+  - current-source stale-name scan across `skills`, `manifests`, `docs/requirements`, `docs/specs`, `docs/features`, and `docs/decisions`
+  - `git diff --check`
+- Notes:
+  - `git diff --check` reported only CRLF normalization warnings from Git on Windows.
+  - Installed canonical `m-*` skills now include `m-autoflow`, `m-discuss`, `m-plan`, `m-execute`, `m-test`, and `m-archive`.
+  - Old installed long phase directories were removed.
+
+#### Residual Risk
+
+- This change affects skill invocation and local installed skill discovery. The current Codex session's displayed skill list may not refresh until a new session or skill reload.
+- Heavy workflow review and `docs/change` archive are intentionally left for `MSR-8`.
+
+#### Issue List
+
+- None.
+- Blocked: No.
+- Exit criteria met for Stage 3.2.
+
 ## Exit Gate
 
-Execution scope after approval:
+Execution status:
 
-- Will execute: `MSR-1`, `MSR-2`, `MSR-3`, `MSR-4`, `MSR-5`, `MSR-6`, `MSR-7`
+- Executed: `MSR-1`, `MSR-2`, `MSR-3`, `MSR-4`, `MSR-5`, `MSR-6`, `MSR-7`
 - Will not execute now:
   - `MSR-8` - separate review/archive phase after implementation and validation.
   - `MSR-9` - user-owned remote/push/publication/backup decision.
   - `MSR-10` - deferred old-name compatibility aliases, only if explicitly requested.
 
 Blocked: no
-Enter execution only after the user explicitly confirms this plan.
+Ready for review/archive phase when the user invokes or approves it.

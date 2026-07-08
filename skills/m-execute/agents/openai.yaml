@@ -1,0 +1,4 @@
+interface:
+  display_name: "m:execute"
+  short_description: "Execute confirmed workflow tasks"
+  default_prompt: "Use $m-execute to implement confirmed plan tasks inside the active worktree."

@@ -1,4 +1,0 @@
-interface:
-  display_name: "m:autoflow plan"
-  short_description: "Plan staged implementation workflows"
-  default_prompt: "Use $m-autoflow-plan to analyze requirements, design architecture, and produce a gated plan."

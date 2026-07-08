@@ -1,0 +1,14 @@
+{
+  "name": "m-test",
+  "version": "0.1.0",
+  "install_mode": "copy",
+  "source_dir": "skills/m-test",
+  "dist_dir": "dist/codex/m-test",
+  "codex_install_root": "%USERPROFILE%/.codex/skills",
+  "depends_on_skills": [
+    "m-autoflow"
+  ],
+  "reference_files": [
+    "references/testing.md"
+  ]
+}

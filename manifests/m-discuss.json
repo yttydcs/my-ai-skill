@@ -1,0 +1,16 @@
+{
+  "name": "m-discuss",
+  "version": "0.1.0",
+  "install_mode": "copy",
+  "source_dir": "skills/m-discuss",
+  "dist_dir": "dist/codex/m-discuss",
+  "codex_install_root": "%USERPROFILE%/.codex/skills",
+  "depends_on_skills": [
+    "m-autoflow",
+    "m-docs"
+  ],
+  "reference_files": [
+    "references/discussion.md",
+    "references/research.md"
+  ]
+}

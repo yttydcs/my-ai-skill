@@ -1,0 +1,4 @@
+interface:
+  display_name: "m:discuss"
+  short_description: "Explore options before planning"
+  default_prompt: "Use $m-discuss to clarify the request, compare options, and prepare for planning."

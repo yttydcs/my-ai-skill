@@ -1,21 +1,25 @@
 # Stage Rules
 
-Use this file to execute stages `1` through `4`.
+Use this file to coordinate the `m-autoflow` phases.
 
 ## Global Rules
 
 - Only one stage may be active at a time.
-- Optional `$m-autoflow-research` may run as a read-only planning aid before or during stages `1` and `2` only when the user explicitly asks for web research, online investigation, or current external facts.
-- Do not run web research by default during normal planning.
+- `$m-discuss` owns discovery, brainstorming, optional web research, and early worktree setup.
+- `$m-plan` owns architecture and executable planning.
+- `$m-execute` owns implementation and lightweight validation.
+- `$m-test` owns optional heavy validation and review.
+- `$m-archive` owns change archive, lessons, workflow-end confirmation, merge, and cleanup.
+- Do not run web research by default; use it from `$m-discuss` only when current external facts or best practices matter.
 - A workflow may iterate or roll back, but every rollback must:
   - state the reason
   - update the affected plan or archive docs before proceeding
 - If information is unclear, missing, ambiguous, or based on an unconfirmed assumption, stop and ask the user instead of guessing.
 - Before unresolved issues are fixed, output `问题清单`, mark `阻塞：是`, and forbid advancing or coding.
 
-## Stage 1 - Requirements Analysis
+## Discuss - Discovery And Requirements Shaping
 
-Before drafting stage `1` output:
+Before drafting discuss output:
 
 - identify `project_root`, `docs_root`, `code_repos`, and `active_worktree` when private docs or multi-repo boundaries matter
 - if `docs/intake` exists, read relevant original request evidence when traceability matters
@@ -26,8 +30,32 @@ Before drafting stage `1` output:
 
 Required output:
 
+- 原始请求 / 来源
 - 目标
 - 范围（必须 / 可选 / 不做）
+- 假设
+- 问题清单
+- 可行方案
+- 被拒绝方案与原因
+- 推荐方向
+- research 摘要与 citation（如使用）
+- worktree / branch / docs root 状态
+
+If anything is unclear, output `问题清单`, mark `阻塞：是`, and stop before planning.
+
+## Plan - Architecture And Execution Planning
+
+Before drafting plan output:
+
+- consume the `$m-discuss` brief when it exists
+- if `docs/specs` exists, read the relevant spec docs first
+- if `docs/decisions` exists, read relevant decision docs when architecture choices constrain the work
+- if `docs/README.md` exists, use it as an entry point when it helps locate the right spec doc
+- treat stable specs and decisions as higher-priority context than code-only inference when they are present and relevant
+- reject unreasonable, unsafe, contradictory, or under-specified requirements and return to `$m-discuss`
+
+Required output:
+
 - 使用场景
 - 功能需求
 - 非功能需求
@@ -35,19 +63,6 @@ Required output:
 - 边界异常
 - 验收标准
 - 风险
-
-If anything is unclear, output `问题清单`, mark `阻塞：是`, and stop.
-
-## Stage 2 - Architecture Design
-
-Before drafting stage `2` output:
-
-- if `docs/specs` exists, read the relevant spec docs first
-- if `docs/decisions` exists, read relevant decision docs when architecture choices constrain the work
-- if `docs/README.md` exists, use it as an entry point when it helps locate the right spec doc
-- treat stable specs and decisions as higher-priority context than code-only inference when they are present and relevant
-
-Required output:
 
 - 总体方案（含选型理由 / 备选对比）
 - 模块职责
@@ -57,11 +72,7 @@ Required output:
 - 性能与测试策略
 - 可扩展性设计点
 
-If anything is unclear, output `问题清单`, mark `阻塞：是`, and stop.
-
-## Stage 3.1 - Planning
-
-Requirements:
+Plan artifact requirements:
 
 - Create or update the active worktree-root `plan.md` or `todo.md`.
 - Make the document handoff-ready without relying on the current chat.
@@ -102,7 +113,7 @@ After confirmation:
 
 Entry condition:
 
-- stages `1`, `2`, and `3.1` are all unblocked
+- discuss and plan are unblocked, or direct plan invocation recorded why discuss was skipped
 
 Rules:
 

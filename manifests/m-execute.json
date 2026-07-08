@@ -1,0 +1,14 @@
+{
+  "name": "m-execute",
+  "version": "0.1.0",
+  "install_mode": "copy",
+  "source_dir": "skills/m-execute",
+  "dist_dir": "dist/codex/m-execute",
+  "codex_install_root": "%USERPROFILE%/.codex/skills",
+  "depends_on_skills": [
+    "m-autoflow"
+  ],
+  "reference_files": [
+    "references/execution.md"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "m-plan",
+  "version": "0.1.0",
+  "install_mode": "copy",
+  "source_dir": "skills/m-plan",
+  "dist_dir": "dist/codex/m-plan",
+  "codex_install_root": "%USERPROFILE%/.codex/skills",
+  "depends_on_skills": [
+    "m-autoflow",
+    "m-docs",
+    "m-discuss"
+  ],
+  "reference_files": [
+    "references/planning.md"
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "m:plan"
+  short_description: "Design executable workflow plans"
+  default_prompt: "Use $m-plan to design the architecture and produce a gated implementation plan."

@@ -5,7 +5,7 @@ Use this file only in stages `3.2` and `3.3`.
 ## Phase Boundary
 
 - Sub-agents are forbidden in stages `1`, `2`, `3.1`, and `4`.
-- Exception: `$m-autoflow-research` may use read-only research sub-agents before or during planning when the user explicitly asks for web research and host policy permits delegation.
+- Exception: `$m-discuss` may use read-only research sub-agents when the user explicitly asks for web research or current external facts and host policy permits delegation.
 - The research exception does not allow code edits, worktree changes, plan confirmation, implementation, validation, archive, merge, or cleanup delegation.
 
 ## Mandatory Parallelism Assessment
@@ -26,7 +26,7 @@ If sub-agents are not used, state why, such as:
 - insufficient context separation
 - host policy or user-authorization limits
 
-For `$m-autoflow-research`, assess whether the research can be split into independent read-only lanes. Use parallel research sub-agents only when this split is clear, and record the lanes plus synthesis responsibility.
+For `$m-discuss` research, assess whether the research can be split into independent read-only lanes. Use parallel research sub-agents only when this split is clear, and record the lanes plus synthesis responsibility.
 
 ## Hard Preconditions
 

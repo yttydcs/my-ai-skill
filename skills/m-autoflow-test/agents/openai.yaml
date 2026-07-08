@@ -1,4 +1,0 @@
-interface:
-  display_name: "m:autoflow test"
-  short_description: "Validate and review workflow changes"
-  default_prompt: "Use $m-autoflow-test to run validation and code review for confirmed workflow tasks."

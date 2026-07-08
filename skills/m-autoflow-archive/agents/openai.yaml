@@ -1,4 +1,0 @@
-interface:
-  display_name: "m:autoflow archive"
-  short_description: "Archive and close staged workflows"
-  default_prompt: "Use $m-autoflow-archive to create docs/change records and close the workflow when confirmed."

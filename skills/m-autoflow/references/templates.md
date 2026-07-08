@@ -35,27 +35,40 @@ Use these templates as concise defaults.
 - project/docs/code repo confirmation:
 - base/worktree confirmation:
 
-### Stage 1 - Requirements Analysis
+### Discuss - Discovery And Requirements Shaping
 #### Goal
 #### Scope
-#### Use Cases
-#### Functional Requirements
-#### Non-functional Requirements
-#### Inputs / Outputs
-#### Edge Cases
-#### Acceptance Criteria
-#### Risks
+#### Assumptions
+#### Open Questions
+#### Options Considered
+#### Rejected Options
+#### Recommended Direction
+#### Research Summary
+#### Worktree / Branch / Docs Root Status
 #### Issue List
 
-### Stage 2 - Architecture Design
-#### Overall Solution
-#### Alternatives Considered
-#### Module Responsibilities
-#### Data / Call Flow
-#### Interface Drafts
-#### Error Handling and Safety
-#### Performance and Testing Strategy
-#### Extensibility Design Points
+### Plan - Requirements And Architecture
+#### Discussion Summary
+#### Accepted / Rejected Requirements
+#### Requirements Analysis
+##### Goal
+##### Scope
+##### Use Cases
+##### Functional Requirements
+##### Non-functional Requirements
+##### Inputs / Outputs
+##### Edge Cases
+##### Acceptance Criteria
+##### Risks
+#### Architecture Design
+##### Overall Solution
+##### Alternatives Considered
+##### Module Responsibilities
+##### Data / Call Flow
+##### Interface Drafts
+##### Error Handling and Safety
+##### Performance and Testing Strategy
+##### Extensibility Design Points
 #### Issue List
 
 ### Stage 3.1 - Planning
