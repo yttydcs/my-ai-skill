@@ -34,7 +34,9 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - require mandatory review decision and `docs/change` archive before workflow completion
 - require controlled sub-agent usage only in allowed phases
 - keep execution responsible for implementation plus lightweight local validation such as syntax checks, type checks, focused lint, touched-file formatting checks, focused unit tests, and `git diff --check`
-- treat `$m-test` as optional heavy validation for integration, end-to-end flow, usability, security, and performance; allow skipping it for low-risk small changes when the reason and residual risk are recorded
+- treat `$m-test` as optional heavy validation for integration, end-to-end flow, UI evidence, usability, security, and performance; allow the user to explicitly skip it and go to `$m-archive` when the reason and residual risk are recorded
+- require `$m-test`, when run for UI-impacting changes, to open the affected UI, operate the affected path, and provide screenshot evidence
+- require `$m-test` to directly output a concise pass/fail/blocked/skipped result table
 
 ### Optional
 
@@ -61,6 +63,9 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - The user wants a feature such as personnel management to be documented once as a complete feature dossier, even when several repos implement it.
 - The user wants to run only discussion, planning, execution, testing, or archive without loading the full umbrella workflow.
 - The user makes a small low-risk change where lightweight execution-stage validation is sufficient and heavyweight workflow testing should be skipped with a recorded reason.
+- The user changes UI and expects visual validation evidence instead of code-only review.
+- The user wants a compact test result summary in chat without opening markdown artifacts.
+- The user explicitly chooses to skip `$m-test` and proceed directly to `$m-archive`.
 
 ## Functional Requirements
 
@@ -83,6 +88,10 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-execute` must map every implementation change to a confirmed Task ID.
 - `$m-execute` must report lightweight validation that passed, skipped checks with reasons, and any heavier validation still needed.
 - `$m-test` must decide whether heavy validation is needed, record skip rationale when skipped, and review usability, security, and performance when it runs.
+- `$m-test` must require actual UI opening, user-path operation, and screenshot evidence when it runs for UI-impacting changes.
+- `$m-test` must treat missing UI evidence during a run `$m-test` as `不通过` or `阻塞`, not as a pass.
+- `$m-test` must output a concise direct result table showing checks and pass/fail/blocked/skipped status.
+- The workflow must allow the user to skip `$m-test` and invoke `$m-archive`, while preserving the skipped-testing reason and residual risk in archive records.
 - `$m-archive` must record intake, feature, requirement, spec, decision, and lessons impact.
 - `$m-archive` must capture searchable lesson cues when the workflow produced reusable debugging knowledge.
 - `$m-archive` must treat normal archive invocation as a request to archive and end the workflow.
@@ -115,6 +124,8 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - Current external facts may be stale or conflicting; online research must mark uncertainty instead of treating unverified findings as stable truth.
 - A lightweight execution check may be blocked by repo configuration; the workflow must record the reason and residual risk instead of hiding the gap.
 - Heavy testing may be unnecessary for low-risk changes; the workflow must record why it was skipped.
+- A UI cannot be opened due environment, auth, build, dependency, or runtime problems; if `$m-test` is running, the UI validation must be failed or blocked.
+- UI responsive behavior may require both desktop and mobile screenshot evidence when affected.
 - Direct `$m-plan` invocation may skip discussion only when the plan records why discussion was unnecessary or already satisfied.
 
 ## Acceptance Criteria
@@ -125,7 +136,9 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - The phase skills enforce discussion, planning, execution, testing, archive, and blocker rules.
 - The plan artifact clearly states which Task IDs will execute after approval and which Task IDs will not execute in the next execution phase.
 - Optional online research is controlled by discussion, supports source verification and citations, and routes stable-doc impact through `$m-docs`.
-- Lightweight validation is part of execution, while heavyweight integration/usability/security/performance testing is optional and separately recorded.
+- Lightweight validation is part of execution, while heavyweight integration/UI/usability/security/performance testing is optional and separately recorded.
+- UI-impacting changes tested by `$m-test` produce actual operation evidence and screenshot paths.
+- `$m-test` output includes a concise direct result table.
 - The archive can route reusable lessons into `docs/lessons` for later lookup.
 - Planning and archive respect private docs roots and do not publish docs without the user's explicit instruction.
 - All canonical skills validate and sync successfully.

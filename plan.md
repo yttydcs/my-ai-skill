@@ -1,53 +1,54 @@
-# Plan - m-archive default closeout
+# Plan - m-test UI evidence and result table
 
 ## Workflow Information
 - Repo: `D:\project\my-ai-skills`
-- Branch: `refactor/m-archive-default-closeout`
-- Base: `main` at `a13d504`
+- Branch: `refactor/m-test-ui-evidence`
+- Base: `main` at `a99cdc0`
 - Project Root: `D:\project\my-ai-skills`
 - Docs Root: `D:\project\my-ai-skills\docs`
 - Code Repos: `D:\project\my-ai-skills`
-- Worktree: `D:\project\my-ai-skills\worktrees\m-archive-default-closeout`
-- Current Stage: `4 - Archive complete; default closeout pending`
+- Worktree: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence`
+- Current Stage: `3.1 - Planning complete; ready for execution`
 
 ## Stage Records
 
 ### Initialization
-- `guide.md`: requires every modification round to auto-commit with an English commit message matching prior style.
-- Project/docs/code repo confirmation: this repository is both source package repo and selected governed docs root for this skill change.
+- `guide.md`: requires each modification round to auto-commit with an English commit message matching previous style.
+- Project/docs/code repo confirmation: this repo is both skill source repo and selected docs root for this workflow change.
 - Base/worktree confirmation: dedicated worktree created under `worktrees\`; main repo remains control plane.
 
 ### Discuss - Discovery And Requirements Shaping
 #### Goal
-Align `$m-archive` semantics with the user's clarification: invoking archive should mean "archive and end workflow" by default.
+Strengthen `$m-test` for UI changes and make its results easier to consume without opening markdown files.
 
 #### Scope
-- Must update skill rules that still require a second workflow-end confirmation after `$m-archive`.
-- Must preserve an explicit escape hatch for "archive only, do not merge/clean" when the user says so.
-- Must update stable feature, requirement, and spec docs because the workflow behavior changes.
-- Must add a dated change archive for this correction.
-- Must sync installed skill copies after validation.
+- Must require actual opening, operation, and screenshot evidence when `$m-test` is executed for UI-impacting changes.
+- Must make UI evidence a blocking condition inside a run `$m-test`.
+- Must require a concise pass/fail table in the direct user response.
+- Must preserve `$m-test` as optional: the user may explicitly skip testing and go directly to `$m-archive`.
+- Must update stable feature, requirement, and spec docs because workflow behavior changes.
+- Must sync installed `m-test` and affected umbrella rules after validation.
 - Must not push, add remotes, or choose docs backup targets.
 
 #### Assumptions
-- The user's latest statement is a direct requirement correction and implementation approval for this narrow behavior fix.
-- Existing historical `docs/change` entries remain append-only and may keep older wording as history.
-- Heavy integration testing is unnecessary because this is a skill/docs behavior correction with no runtime logic.
+- The user's latest message approves implementing these requirements.
+- "UI changes" includes page, component, style, layout, route, interaction, form, modal, visible state, or responsive behavior changes.
+- If the user skips `$m-test`, archive should record that testing was skipped and describe residual risk instead of pretending UI evidence exists.
 
 #### Open Questions
 - None.
 
 #### Options Considered
-- Option A: keep explicit second confirmation. Rejected because it conflicts with the user's desired command semantics.
-- Option B: make `$m-archive` always merge and clean immediately. Rejected because users still need a safe "archive only" escape hatch.
-- Option C: make `$m-archive` default to closeout, but stop when the user explicitly requests archive-only. Recommended.
+- Option A: only mention screenshots as recommended evidence. Rejected because the user wants actual opening/operation/screenshots as an acceptance rule.
+- Option B: make `$m-test` mandatory for every UI change. Rejected because the user explicitly wants `$m-test` to remain optional and skippable by going to `$m-archive`.
+- Option C: keep `$m-test` optional, but when it runs for UI changes, require actual UI operation evidence and a direct pass/fail table. Recommended.
 
 #### Research Summary
-- No web research used; this is a local workflow semantics correction based on direct user feedback.
+- No web research used; this is a direct workflow policy requirement from the user.
 
 #### Worktree / Branch / Docs Root Status
 - Worktree: ready.
-- Branch: `refactor/m-archive-default-closeout`.
+- Branch: `refactor/m-test-ui-evidence`.
 - Docs root: repository `docs`.
 
 #### Issue List
@@ -56,57 +57,59 @@ Align `$m-archive` semantics with the user's clarification: invoking archive sho
 ### Plan - Requirements And Architecture
 #### Requirements Analysis
 ##### Goal
-Make `$m-archive` equivalent to ending the workflow by default, including archive, merge, and cleanup.
+Update `$m-test` so UI-impacting changes produce concrete visual and interaction evidence when tested, while preserving the user's right to skip testing and archive directly.
 
 ##### Functional Requirements
-- `$m-archive` must create/update archive docs and then proceed to closeout by default.
-- `$m-archive` must not ask "whether to end workflow" after a normal archive invocation.
-- `$m-archive` must stop after archive only when the user explicitly requests not to merge or clean up.
-- `$m-autoflow` umbrella and shared stage rules must describe the same behavior.
-- Stable docs must describe the new default closeout semantics.
+- `$m-test` must detect UI-impacting changes.
+- When `$m-test` runs and UI is impacted, it must open the application or relevant page, perform affected user operations, and provide screenshot evidence.
+- If UI evidence cannot be gathered during a run `$m-test`, the result must be failed or blocked.
+- `$m-test` must output a concise table directly to the user showing each checked area and pass/fail/blocked/skipped status.
+- The direct table must include enough context to avoid requiring the user to open markdown files for the basic verdict.
+- User-directed skip remains allowed: the user may skip `$m-test` and invoke `$m-archive`, with residual testing risk recorded.
 
 ##### Non-functional Requirements
-- Keep instructions concise and avoid duplicating phase details.
-- Preserve private docs remote/push/backup guardrails.
-- Keep historical archives append-only except for indexes that list the new change.
+- Keep `SKILL.md` concise and place detailed rules in references.
+- Keep output language simple enough for repeated operational use.
+- Avoid adding runtime dependencies or hard-coded environment assumptions.
 
 ##### Inputs / Outputs
-- Input: direct user correction in the current chat.
-- Output: updated skill source, stable docs, change archive, synced installed skills, and a local commit.
+- Input: direct user clarification in chat.
+- Output: updated skill source, reference docs, stable docs, intake, change archive, synced installed skills, and commits.
 
 ##### Edge Cases
-- User says "只归档", "不要合并", or "不要清理": archive stops after docs and reports retained worktree state.
-- Worktree is dirty at closeout: archive must preserve unrelated dirt and block or report instead of deleting.
-- Docs root is separate from code repo in another project: archive must not infer push/backup decisions.
+- A UI cannot be launched due environment/auth/dependency issues: `$m-test` records blocked or failed, not passed.
+- A non-UI change runs `$m-test`: screenshot evidence is not required, but the result table still is.
+- User explicitly skips `$m-test`: proceed to archive with skip reason and residual risk.
+- Responsive UI affected: include desktop and mobile screenshots when practical.
 
 ##### Acceptance Criteria
-- No current source or stable docs claim that normal `$m-archive` must ask for a second workflow-end confirmation.
-- `$m-archive` docs clearly state default closeout and explicit archive-only override.
-- Relevant validators pass.
-- Installed copies for changed skills are synced.
-- Worktree is merged and removed after archive because default closeout now applies.
+- Current `m-test` rules require UI open/operate/screenshot evidence when UI changes are tested.
+- Current rules require a direct user-facing pass/fail table for `$m-test` output.
+- Current rules preserve optional skip and direct `$m-archive` path.
+- Relevant validators pass and installed skills sync.
 
 ##### Risks
-- Over-broad search/replace could rewrite historical change records. Mitigation: change only current skill and stable docs, not old archives except new archive/index.
+- If "UI" is defined too narrowly, visual regressions could slip through. Mitigation: define broad UI-impacting criteria.
+- If screenshots are required even when the user skips `$m-test`, optionality is lost. Mitigation: scope screenshot evidence to a run `$m-test`, and require archive risk disclosure for skip.
 
 #### Architecture Design
 ##### Overall Solution
-Patch the source-of-truth instructions in `skills/m-archive`, `skills/m-autoflow`, and shared references, then align `docs/features`, `docs/requirements`, and `docs/specs`.
+Patch `skills/m-test` and `skills/m-test/references/testing.md`, then align shared stage rules and stable docs.
 
 ##### Module Responsibilities
-- `skills/m-archive`: phase-specific closeout behavior.
-- `skills/m-autoflow`: umbrella routing behavior.
-- `skills/m-autoflow/references/stages.md`: shared phase sequencing and closeout rules.
-- Stable docs: current product truth for future planning and impact checks.
+- `skills/m-test`: entry-level semantics and exit output requirements.
+- `skills/m-test/references/testing.md`: detailed UI evidence, result table, skip, and failure rules.
+- `skills/m-autoflow/references/stages.md`: shared stage summary and optional skip semantics.
+- Stable docs: current truth for the workflow capability.
 
 ##### Error Handling and Safety
-- Keep closeout gated by clean-status verification, control-plane merge, and explicit preservation of unrelated dirt.
-- Keep "archive only" available via explicit user instruction.
+- UI evidence missing during a run `$m-test` blocks or fails the test phase.
+- User-directed skip is explicitly recorded and does not fabricate evidence.
 
 ##### Performance and Testing Strategy
-- Run targeted skill validation for `m-autoflow` and `m-archive`.
+- Run targeted skill validators for `m-test` and `m-autoflow`.
 - Run `git diff --check`.
-- Run sync for changed installed skills after validation.
+- Run sync for changed installed skills.
 
 #### Stable Docs Impact
 - Intake impact: add
@@ -114,7 +117,7 @@ Patch the source-of-truth instructions in `skills/m-archive`, `skills/m-autoflow
 - Requirements impact: clarify
 - Specs impact: clarify
 - Decision impact: none
-- Related intake: `docs/intake/2026-07-08_m-archive-default-closeout.md`
+- Related intake: `docs/intake/2026-07-08_m-test-ui-evidence.md`
 - Related features: `docs/features/m-autoflow-workflow.md`
 - Related requirements: `docs/requirements/m-autoflow-skill.md`
 - Related specs: `docs/specs/m-autoflow-skill.md`
@@ -123,94 +126,59 @@ Patch the source-of-truth instructions in `skills/m-archive`, `skills/m-autoflow
 
 #### Executable Task List
 ##### Will Execute
-- `MAC-1`: Update archive and umbrella skill rules.
-- `MAC-2`: Update stable docs and indexes for default closeout semantics.
-- `MAC-3`: Validate, sync installed skills, commit, archive, merge, and clean worktree.
+- `MTU-1`: Update `$m-test` rules for UI evidence and direct result table.
+- `MTU-2`: Update stable docs and intake for the new test semantics.
+- `MTU-3`: Validate, sync installed skills, archive, merge, and clean worktree.
 
 ##### Will Not Execute Now
-- Compatibility aliases for old skill names: out of scope.
-- Docs remote, push, backup, or publication: user-owned and out of scope.
+- Browser automation tooling implementation: out of scope; this skill records workflow rules, not a reusable test runner.
+- Pushing changes: out of scope unless separately requested.
+- Docs remote, backup, or publication changes: user-owned and out of scope.
 
 #### Task Details
-##### MAC-1 - Update skill rules
+##### MTU-1 - Update m-test rules
 - Owner: Main agent
-- Worktree: `D:\project\my-ai-skills\worktrees\m-archive-default-closeout`
-- Plan Path: `D:\project\my-ai-skills\worktrees\m-archive-default-closeout\plan.md`
-- Goal: make `$m-archive` default to closeout and remove second-confirmation wording.
-- Files / Modules: `skills/m-archive`, `skills/m-autoflow`, shared references.
-- Write Set: skill source and reference markdown files.
-- Acceptance: no current rules require asking whether to end after archive.
-- Test Points: validator and targeted `rg`.
-- Rollback: revert commit before merge, or revert merge commit after closeout.
+- Worktree: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence`
+- Plan Path: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence\plan.md`
+- Goal: require UI evidence and direct pass/fail table when `$m-test` runs.
+- Files / Modules: `skills/m-test`, `skills/m-autoflow/references/stages.md`
+- Write Set: skill source and reference markdown.
+- Acceptance: UI-impacting tested changes require actual open/operate/screenshots; output table required; user skip preserved.
+- Test Points: targeted `rg`, skill validators, `git diff --check`.
+- Rollback: revert the commit and resync installed skills.
 
-##### MAC-2 - Update stable docs
+##### MTU-2 - Update stable docs
 - Owner: Main agent
-- Worktree: `D:\project\my-ai-skills\worktrees\m-archive-default-closeout`
-- Plan Path: `D:\project\my-ai-skills\worktrees\m-archive-default-closeout\plan.md`
+- Worktree: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence`
+- Plan Path: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence\plan.md`
 - Goal: keep feature, requirement, and spec docs aligned with the new semantics.
 - Files / Modules: `docs/features`, `docs/requirements`, `docs/specs`, `docs/intake`.
 - Write Set: stable docs and indexes.
-- Acceptance: current stable docs describe archive as default closeout with archive-only override.
-- Test Points: targeted `rg` and markdown diff review.
+- Acceptance: stable docs describe UI evidence, direct result table, and optional user skip.
+- Test Points: targeted `rg` and diff review.
 - Rollback: revert changed docs.
 
-##### MAC-3 - Validate, sync, archive, and close
+##### MTU-3 - Validate, sync, archive, and close
 - Owner: Main agent
-- Worktree: `D:\project\my-ai-skills\worktrees\m-archive-default-closeout`
-- Plan Path: `D:\project\my-ai-skills\worktrees\m-archive-default-closeout\plan.md`
-- Goal: validate, sync installed skills, commit, create change archive, then close workflow by default.
-- Files / Modules: validation tooling, sync tooling, `docs/change`.
-- Write Set: `dist` and installed skill copies from sync if generated by the existing tool; `docs/change` archive and indexes.
-- Acceptance: validation passes, commit exists, branch merges to main, worktree removed.
-- Test Points: `tools/validate-skills.ps1`, `tools/sync-skills.ps1`, `git diff --check`, final `git status`.
-- Rollback: revert source commit or restore from main before merge.
+- Worktree: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence`
+- Plan Path: `D:\project\my-ai-skills\worktrees\m-test-ui-evidence\plan.md`
+- Goal: validate, sync, archive, and close the workflow.
+- Files / Modules: validation/sync scripts and `docs/change`.
+- Write Set: generated installed skill copies via sync, change archive, affected indexes.
+- Acceptance: validation passes, commits exist, branch merges to main, worktree removed.
+- Test Points: validators, sync output, final status.
+- Rollback: revert commits on main and rerun sync if needed.
 
 #### Dependencies
-- Existing validation and sync scripts.
+- Existing `tools/validate-skills.ps1` and `tools/sync-skills.ps1`.
 
 #### Risks and Notes
-- This is a low-risk instruction and documentation update.
-- Heavy `$m-test` will be skipped with rationale in the archive if targeted validation passes.
+- This is a skill/docs behavior change, not runtime application code.
+- Heavy `$m-test` for this workflow will be skipped because this workflow itself does not change UI.
 
 #### Parallelism Assessment
-- No sub-agents. The write set is small and tightly coupled, so parallel editing would add coordination overhead.
+- No sub-agents. The change is small, tightly coupled, and benefits from single-agent consistency.
 
 #### Issue List
 - 阻塞：否
 - 进入 3.2
-
-### Stage 3.2 - Implementation
-- `MAC-1`: completed. Updated archive and umbrella skill rules to make `$m-archive` default to closeout with explicit archive-only override.
-- `MAC-2`: completed. Updated stable feature, requirement, and spec docs; added intake evidence and index entry.
-- `MAC-3`: partially completed. Validation and install sync completed before archive.
-- Lightweight validation:
-  - `tools\validate-skills.ps1 -Skill m-autoflow`: passed.
-  - `tools\validate-skills.ps1 -Skill m-archive`: passed.
-  - `git diff --check`: passed with expected CRLF conversion warnings only.
-  - `tools\sync-skills.ps1 -Skill m-autoflow`: completed.
-  - `tools\sync-skills.ps1 -Skill m-archive`: completed.
-- Implementation commit: `7e3dfc1 fix: make archive close workflows by default`
-- 阻塞：否
-
-### Stage 3.3 - Review Decision
-- Heavy `$m-test`: skipped.
-- Skip reason: low-risk instruction/docs correction with no runtime code, data, auth, storage, or UI behavior.
-- Residual risk: wording mismatch could recur if future docs reintroduce second-confirmation language; mitigated by targeted `rg` checks and stable-doc updates.
-- 阻塞：否
-
-### Stage 4 - Change Archive
-- `$m-docs` usage: applied to route intake, stable-doc impact, change archive, and index updates.
-- Change archive: `docs/change/2026-07-08_m-archive-default-closeout.md`
-- Intake impact: updated
-- Feature impact: updated
-- Requirements impact: updated
-- Specs impact: updated
-- Decision impact: none
-- Lessons impact: none
-- Related intake: `docs/intake/2026-07-08_m-archive-default-closeout.md`
-- Related features: `docs/features/m-autoflow-workflow.md`
-- Related requirements: `docs/requirements/m-autoflow-skill.md`
-- Related specs: `docs/specs/m-autoflow-skill.md`
-- Related decisions: none
-- Related lessons: none
-- Default closeout: enabled by the corrected `$m-archive` semantics.

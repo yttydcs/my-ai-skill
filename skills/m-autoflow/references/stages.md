@@ -144,14 +144,15 @@ Rules:
 
 ## Stage 3.3 - Code Review
 
-First decide whether heavy testing / review is needed. This stage may be skipped for low-risk small changes when stage `3.2` lightweight validation is sufficient.
+First decide whether heavy testing / review is needed. This stage may be skipped when the user explicitly chooses to proceed directly to `$m-archive`, or for low-risk small changes when stage `3.2` lightweight validation is sufficient.
 
 If skipped, record:
 
 - skip reason
+- whether the skip was an explicit user choice
 - stage `3.2` checks that passed
 - residual risk
-- why integration, usability, security, and performance review are not required
+- why integration, usability, security, and performance review are not required or were explicitly accepted as unrun
 
 If not skipped, review each item and mark `通过` or `不通过`:
 
@@ -167,6 +168,14 @@ If not skipped, review each item and mark `通过` or `不通过`:
 - 测试覆盖情况
 - 整体流程 / 联调验证
 - 子Agent治理与审计（任务映射、上下文完整性、文件所有权、结果复核、冲突处理、记录完整性）
+
+When UI is impacted and `$m-test` runs:
+
+- open the actual application, page, preview, or story
+- operate the affected user path
+- capture screenshot evidence
+- include a concise pass/fail table in the direct user response
+- mark the test `不通过` or `阻塞` if UI evidence cannot be gathered
 
 If any item fails, return to `3.2`.
 

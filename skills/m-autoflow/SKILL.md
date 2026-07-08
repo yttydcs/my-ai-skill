@@ -47,7 +47,7 @@ The phase skills are companion entry points. Keep `$m-autoflow` as the whole-wor
 ## Guardrails
 
 - Only one stage may be active at a time.
-- Do not skip, merge, or reorder stages.
+- Do not silently skip, merge, or reorder stages. `$m-test` may be explicitly skipped by the user or skipped with recorded low-risk rationale.
 - Do not assume missing business rules, data contracts, interfaces, environment details, dependency versions, acceptance criteria, or user preferences.
 - Do not write code without a dedicated worktree and confirmed `plan.md`.
 - Do not treat rollback as a silent action; state the reason and update the affected docs.

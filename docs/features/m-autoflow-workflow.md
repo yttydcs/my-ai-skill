@@ -33,10 +33,12 @@ Give the user one disciplined workflow family for turning an idea into discussio
 4. Planning turns the discussion brief into requirements, architecture, and a handoff-ready `plan.md` / `todo.md`.
 5. The user approves execution scope.
 6. Execution implements only approved Task IDs and runs lightweight checks.
-7. Heavy testing runs only when risk justifies it; otherwise the workflow records why it was skipped.
-8. Archive records the change, stable-doc impact, lessons impact, validation, rollback, and sub-agent trace.
-9. Archive closes the workflow by default through verified control-plane merge and worktree cleanup.
-10. The workflow stops after archive only when the user explicitly asks for archive-only handling, no merge, or no cleanup.
+7. Heavy testing runs when risk justifies it, or the user may explicitly skip it and proceed to archive with residual risk recorded.
+8. When heavy testing runs for UI changes, Codex opens and operates the affected interface and provides screenshot evidence.
+9. `$m-test` reports a concise pass/fail table directly in the user response.
+10. Archive records the change, stable-doc impact, lessons impact, validation, rollback, and sub-agent trace.
+11. Archive closes the workflow by default through verified control-plane merge and worktree cleanup.
+12. The workflow stops after archive only when the user explicitly asks for archive-only handling, no merge, or no cleanup.
 
 ## Artifacts And Layout
 
@@ -69,6 +71,8 @@ Give the user one disciplined workflow family for turning an idea into discussio
 - Blocked output uses `问题清单` and `阻塞：是`.
 - Execution must report lightweight validation.
 - Heavy validation must report either passed checks or skip rationale with residual risk.
+- UI-impacting changes tested through `$m-test` must include actual UI operation evidence and screenshot paths.
+- `$m-test` must include a concise direct pass/fail table so the user can understand results without opening archive markdown.
 - Archive must link related intake, feature, requirement, spec, decision, lessons, and plan artifacts.
 
 ## Acceptance Scenarios
@@ -92,6 +96,14 @@ Given one user capability is implemented by several repos, when the workflow doc
 ### Lightweight Change
 
 Given a low-risk small change passes execution checks, when heavy testing is unnecessary, then Codex records the skip reason and residual risk before archive.
+
+### UI Change Validation
+
+Given a workflow changes UI, when `$m-test` runs, then Codex opens the affected interface, operates the affected user path, captures screenshot evidence, and summarizes pass/fail status in a direct table.
+
+### User Skips Heavy Testing
+
+Given the user explicitly chooses to skip `$m-test`, when the workflow proceeds to `$m-archive`, then Codex records the skipped testing, missing evidence, and residual risk instead of fabricating validation.
 
 ## Related Requirements
 

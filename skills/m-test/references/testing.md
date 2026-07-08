@@ -7,7 +7,8 @@ Use this reference for `$m-test`, the optional heavy validation phase of `m-auto
 - Lightweight syntax, typecheck, formatting, lint, targeted unit tests, and `git diff --check` belong in `$m-execute`.
 - This phase is for heavier validation: integration, end-to-end workflow, manual product review, usability, security, and performance.
 - This phase can be skipped for small low-risk changes when execution-stage validation is sufficient.
-- If skipped, record why and describe residual risk.
+- The user may also explicitly skip this phase and proceed directly to `$m-archive`.
+- If skipped, record why, who accepted the skip when relevant, and describe residual risk.
 
 ## Skip Decision
 
@@ -21,10 +22,13 @@ Skip this phase when all are true:
 Do not skip this phase when any are true:
 
 - the change affects end-to-end user workflows
+- the change affects UI and the user did not explicitly choose to skip `$m-test`
 - the change crosses frontend/backend/service boundaries
 - permissions, authentication, authorization, secrets, storage, billing, or data exposure are affected
 - performance-sensitive paths, large data, concurrency, background jobs, or external APIs are affected
 - prior validation was blocked or inconclusive
+
+If the user explicitly chooses to skip `$m-test`, proceed to `$m-archive` rather than running this phase. The archive must record the skip, missing evidence, and residual risk. Do not fabricate test results.
 
 ## Heavy Validation Scope
 
@@ -33,6 +37,45 @@ Do not skip this phase when any are true:
 - Review security boundaries: input trust, authorization, data exposure, secret handling, injection surfaces, and unsafe defaults.
 - Review performance indicators: latency-sensitive paths, repeated I/O, N+1 behavior, avoidable O(n^2), memory growth, contention, and configured thresholds where available.
 - If a heavy test cannot run, record why and describe residual risk.
+
+## UI Validation Evidence
+
+When `$m-test` runs and the change affects UI, visible layout, components, styles, routes, interaction, forms, dialogs, state display, or responsive behavior:
+
+- open the actual application, page, preview, or story that exercises the changed UI
+- perform the affected user operations, not only load the initial page
+- capture screenshot evidence for the validated state
+- include desktop viewport evidence at minimum
+- include mobile viewport evidence when responsive behavior or mobile layout may be affected
+- record the URL, viewport, operation path, screenshot path, findings, and conclusion
+
+If the UI cannot be opened or operated because of environment, auth, dependency, build, or runtime issues, mark the UI validation as `不通过` or `阻塞`. Do not count it as a skipped pass.
+
+If the user explicitly skips `$m-test`, UI screenshots are not required during this phase because the phase did not run. The missing UI evidence and residual risk must be carried into `$m-archive`.
+
+## Direct Result Table
+
+Always include a concise table in the direct user response so the user can see the verdict without opening markdown files.
+
+Minimum columns:
+
+- Area
+- Check
+- Status (`通过` / `不通过` / `阻塞` / `跳过`)
+- Evidence
+- Notes
+
+For UI-impacting changes where `$m-test` runs, include at least one row for actual UI operation and screenshot evidence.
+
+Example:
+
+```md
+| Area | Check | Status | Evidence | Notes |
+| --- | --- | --- | --- | --- |
+| UI | Open affected page and operate key path | 通过 | `artifacts/ui/personnel-edit-desktop.png` | Desktop path verified |
+| UI | Mobile responsive state | 跳过 | none | Not affected by this change |
+| Security | Permission boundary | 通过 | review | No auth surface changed |
+```
 
 ## Mandatory Review Checklist
 
@@ -75,7 +118,7 @@ If skipped:
 
 ```md
 测试阶段：跳过
-跳过原因：<reason>
+跳过原因：<reason, including explicit user choice when applicable>
 执行阶段验证：<checks>
 残余风险：<risk>
 阻塞：否

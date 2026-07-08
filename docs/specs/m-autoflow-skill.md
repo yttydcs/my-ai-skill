@@ -33,7 +33,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - Invoke `$m-discuss` for discovery, requirement shaping, brainstorming, optional research, and early worktree setup.
 - Invoke `$m-plan` for architecture, executable planning, and approval gating.
 - Invoke `$m-execute` for confirmed Task ID implementation plus lightweight validation.
-- Invoke `$m-test` for optional heavy validation and review.
+- Invoke `$m-test` for optional heavy validation and review, including UI operation evidence when UI changes are tested.
 - Invoke `$m-archive` for change archive, lessons, and workflow closeout.
 - Web research must be initiated from `$m-discuss` only when current external facts, best-practice comparison, explicit user request, or source-backed investigation is needed.
 - `skills/m-autoflow/agents/openai.yaml` must not set:
@@ -67,7 +67,11 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - Planning artifacts must include an execution-scope split with `Will Execute` and `Will Not Execute Now` groups. Every known Task ID must appear in exactly one group, and non-executed tasks must include the reason.
 - Execution owns lightweight local validation such as syntax checks, type checks, focused lint, touched-file formatting checks, focused unit tests, and `git diff --check`.
 - Heavy validation is optional. It may be skipped for low-risk small changes when execution-stage validation is sufficient and the skip reason plus residual risk are recorded.
+- The user may explicitly skip `$m-test` and proceed directly to `$m-archive`; the archive must record skipped validation, missing evidence, and residual risk.
 - When heavy validation runs, it must cover integration or end-to-end flow, usability, security boundaries, and performance indicators when applicable.
+- When heavy validation runs for UI-impacting changes, it must open the actual UI, operate the affected user path, and capture screenshot evidence.
+- If UI evidence cannot be gathered during a run `$m-test`, the result must be `不通过` or `阻塞`.
+- `$m-test` must output a concise direct result table with `Area`, `Check`, `Status`, `Evidence`, and `Notes` columns.
 - `docs/change/YYYY-MM-DD_topic.md` is required before a workflow counts as complete.
 - The change archive belongs in the selected governed docs root when a private docs root exists.
 - Archive must record `Lessons impact`, `Related lessons`, and searchable lesson cues.
