@@ -85,7 +85,8 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-test` must decide whether heavy validation is needed, record skip rationale when skipped, and review usability, security, and performance when it runs.
 - `$m-archive` must record intake, feature, requirement, spec, decision, and lessons impact.
 - `$m-archive` must capture searchable lesson cues when the workflow produced reusable debugging knowledge.
-- `$m-archive` must ask whether the workflow should end after the archive is complete.
+- `$m-archive` must treat normal archive invocation as a request to archive and end the workflow.
+- `$m-archive` must stop after archive only when the user explicitly requests archive-only handling, no merge, no cleanup, or an equivalent pause.
 - The workflow must not add docs remotes, push docs, or choose docs backup targets without explicit user instruction.
 - The workflow must allow read-only parallel research lanes only from `$m-discuss` and only when host policy permits delegation.
 - The workflow must keep implementation delegation gated by a confirmed plan, bounded Task IDs, complete context packages, and non-conflicting write sets.

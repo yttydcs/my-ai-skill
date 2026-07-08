@@ -1,13 +1,15 @@
 ---
 name: m-archive
-description: Archive and closeout phase for the m-autoflow workflow. Use after $m-execute and optional $m-test pass, to explicitly invoke $m-docs, create docs/change records in the selected docs root, record intake/feature/requirement/spec/decision impact, promote reusable lessons, update indexes, ask whether to end the workflow, and only after explicit confirmation merge branches and clean worktrees.
+description: Archive and closeout phase for the m-autoflow workflow. Use after $m-execute and optional $m-test pass, to explicitly invoke $m-docs, create docs/change records in the selected docs root, record intake/feature/requirement/spec/decision impact, promote reusable lessons, update indexes, and by default finish the workflow through control-plane merge and worktree cleanup unless the user explicitly requested archive-only handling.
 ---
 
 # m:archive
 
 ## Overview
 
-Use this skill to preserve the workflow result as governed documentation and, only after explicit user confirmation, close the workflow through merge and worktree cleanup.
+Use this skill to preserve the workflow result as governed documentation and close the workflow through merge and worktree cleanup by default.
+
+Invoking `$m-archive` means "archive and end this workflow". Stop after archive only when the user explicitly asks for archive-only handling, no merge, no cleanup, or an equivalent pause.
 
 ## Quick Start
 
@@ -35,9 +37,8 @@ If any item is false, return to `$m-test` or `$m-execute`.
 3. Record task mapping, decisions, tests, intake/feature/requirement/spec/decision impact, rollback, and sub-agent trace.
 4. Promote reusable troubleshooting or workflow knowledge into `docs/lessons` when it is likely to recur.
 5. Update affected indexes.
-6. Ask whether to end the workflow.
-7. If the user does not explicitly confirm workflow end, stop after archive readiness.
-8. If the user confirms workflow end, perform merge and worktree cleanup from the repo control plane, preserving unrelated dirt and reporting final local/remote state honestly.
+6. If the user explicitly requested archive-only handling, stop after archive readiness and report the retained branch/worktree state.
+7. Otherwise, perform merge and worktree cleanup from the repo control plane, preserving unrelated dirt and reporting final local/remote state honestly.
 
 ## Exit Gate
 
@@ -46,7 +47,7 @@ End with:
 - archive paths
 - intake/features/requirements/specs/decisions/lessons impact
 - validation summary
-- merge and cleanup status when workflow end was confirmed
+- merge and cleanup status, or retained branch/worktree status when archive-only handling was explicitly requested
 - remaining local state, including unpushed commits or unrelated dirt
 
-Do not merge or remove worktrees before explicit workflow-end confirmation.
+Do not merge or remove worktrees before archive completion, status verification, and unrelated-dirt preservation checks.

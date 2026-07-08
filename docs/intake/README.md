@@ -25,5 +25,6 @@ Store original request evidence before it is refined into feature, requirement, 
 
 ## Current Docs
 
+- [2026-07-08_m-archive-default-closeout.md](2026-07-08_m-archive-default-closeout.md) - source: Codex chat, archive command should imply workflow closeout
 - [2026-07-08_m-skill-phase-rename.md](2026-07-08_m-skill-phase-rename.md) - source: Codex chat, phase skill rename/discuss workflow requirements
 - [2026-07-08_docs-private-governance.md](2026-07-08_docs-private-governance.md) - source: Codex chat, docs governance/privacy/multi-repo requirements

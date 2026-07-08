@@ -72,10 +72,10 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - The change archive belongs in the selected governed docs root when a private docs root exists.
 - Archive must record `Lessons impact`, `Related lessons`, and searchable lesson cues.
 - Archive must create or update `docs/lessons` when the workflow exposed reusable troubleshooting knowledge.
-- After archive, the workflow must ask whether to end.
-- If the user confirms workflow end, merge and worktree cleanup happen from the repo control-plane only.
+- After archive, the workflow must close by default through repo control-plane merge and worktree cleanup.
+- If the user explicitly requests archive-only handling, no merge, no cleanup, or an equivalent pause, the workflow must stop after archive readiness and report retained branch/worktree state.
 - If archive produced lessons docs or lesson-index updates, workflow end must carry them back into the global docs tree.
-- Merge and worktree cleanup are forbidden until the user confirms workflow end.
+- Merge and worktree cleanup are forbidden until archive completion, status verification, and unrelated-dirt preservation checks pass.
 
 ## Docs Integration Contract
 

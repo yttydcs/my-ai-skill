@@ -9,7 +9,7 @@ Use this file to coordinate the `m-autoflow` phases.
 - `$m-plan` owns architecture and executable planning.
 - `$m-execute` owns implementation and lightweight validation.
 - `$m-test` owns optional heavy validation and review.
-- `$m-archive` owns change archive, lessons, workflow-end confirmation, merge, and cleanup.
+- `$m-archive` owns change archive, lessons, default workflow closeout, merge, and cleanup.
 - Do not run web research by default; use it from `$m-discuss` only when current external facts or best practices matter.
 - A workflow may iterate or roll back, but every rollback must:
   - state the reason
@@ -203,13 +203,16 @@ Requirements:
   - update `docs/lessons/README.md` and any affected indexes
 - Do not leave reusable troubleshooting knowledge only inside `docs/change`.
 - Do not add docs remotes, push docs, publish docs, or choose backup targets unless the user explicitly asks.
-- Ask whether to end the workflow after the archive is complete.
+- Close the workflow by default after archive completion.
+- Stop after archive only when the user explicitly requested archive-only handling, no merge, no cleanup, or an equivalent pause.
 
-## Workflow End Confirmation
+## Archive-only Override And Closeout
 
-- If the user says `否`:
-  - continue with the next round starting from stage `1`
-- If the user says `是`:
+- If the user explicitly requests archive-only handling, no merge, no cleanup, or an equivalent pause:
+  - stop after archive readiness
+  - report retained branch/worktree state
+  - continue a later round from the appropriate stage when requested
+- Otherwise:
   - merge in the repo control-plane
   - move or link retained plan/change/lesson artifacts into the selected docs root when project rules require it
   - keep docs repo publication and backup decisions separate from code repo merge

@@ -17,7 +17,7 @@ Use this skill as the umbrella entry for the staged `m-*` workflow. It routes th
   - `$m-plan` for architecture, rejection of bad requirements, and executable `plan.md` / `todo.md` gating.
   - `$m-execute` for approved Task ID implementation and lightweight validation.
   - `$m-test` for optional heavy validation, integration testing, usability review, security review, and performance review.
-  - `$m-archive` for `docs/change`, lessons, workflow-end confirmation, merge, and cleanup.
+  - `$m-archive` for `docs/change`, lessons, default workflow closeout, merge, and cleanup.
 - If governed docs exist, prioritize `docs/intake`, `docs/features`, `docs/requirements`, `docs/specs`, and `docs/decisions` before relying on code-only inference.
 - Read `references/initialization.md` before worktree setup.
 - Read `references/stages.md` for phase order, handoffs, and blocker rules.
@@ -31,8 +31,8 @@ Use this skill as the umbrella entry for the staged `m-*` workflow. It routes th
 2. Use `$m-plan` only after the requirement is coherent enough for architecture planning.
 3. Use `$m-execute` only after the plan is confirmed and the user approved implementation.
 4. Use `$m-test` when heavy validation is needed, or record a justified skip.
-5. Use `$m-archive` after validation to write governed archives and ask whether to end the workflow.
-6. Merge and clean worktrees only after explicit workflow-end confirmation.
+5. Use `$m-archive` after validation to write governed archives and close the workflow by default.
+6. Stop after archive only when the user explicitly requested archive-only handling, no merge, or no cleanup.
 
 ## Split Phase Mapping
 
@@ -56,7 +56,7 @@ The phase skills are companion entry points. Keep `$m-autoflow` as the whole-wor
 - Do not leave reusable lessons only in `docs/change`; promote them into `docs/lessons` when they should be queried later.
 - Do not write governed private docs into a pushable code repo unless the user selected that repo as the docs root.
 - Do not add docs remotes, push docs, publish docs, or choose backup targets unless the user explicitly asks.
-- Do not merge or clean the worktree until the user explicitly confirms workflow end.
+- Do not merge or clean the worktree before archive completion, status verification, and unrelated-dirt preservation checks.
 
 ## References
 

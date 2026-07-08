@@ -50,9 +50,11 @@ Do not leave reusable knowledge only in `docs/change`.
 
 ## Closeout
 
-Ask whether to end the workflow after archive completion.
+`$m-archive` means "archive and end this workflow" by default. Do not ask for a second workflow-end confirmation after a normal archive invocation.
 
-Only after explicit confirmation:
+Stop after archive only when the user explicitly asks for archive-only handling, no merge, no cleanup, or an equivalent pause.
+
+Default closeout sequence:
 
 1. verify worktree and repo status
 2. preserve unrelated dirt

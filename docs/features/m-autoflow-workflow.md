@@ -12,7 +12,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 
 ## Actors
 
-- User: owns goals, priorities, docs publication choices, and final workflow-end confirmation.
+- User: owns goals, priorities, docs publication choices, and explicit archive-only pauses when they do not want default workflow closeout.
 - Main Codex agent: owns phase orchestration, requirements decisions, architecture decisions, integration, validation summary, and final acceptance.
 - Optional sub-agents: may perform bounded read-only research, implementation, or review work only when the active phase permits delegation.
 
@@ -23,7 +23,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 - `$m-plan`: architecture and execution planning.
 - `$m-execute`: confirmed Task ID implementation and lightweight validation.
 - `$m-test`: optional heavy validation and review.
-- `$m-archive`: change archive, lessons, workflow-end confirmation, merge decision, and cleanup routing.
+- `$m-archive`: change archive, lessons, default workflow closeout, merge decision, and cleanup routing.
 
 ## User Workflow
 
@@ -35,7 +35,8 @@ Give the user one disciplined workflow family for turning an idea into discussio
 6. Execution implements only approved Task IDs and runs lightweight checks.
 7. Heavy testing runs only when risk justifies it; otherwise the workflow records why it was skipped.
 8. Archive records the change, stable-doc impact, lessons impact, validation, rollback, and sub-agent trace.
-9. The workflow asks whether to end before merge and cleanup.
+9. Archive closes the workflow by default through verified control-plane merge and worktree cleanup.
+10. The workflow stops after archive only when the user explicitly asks for archive-only handling, no merge, or no cleanup.
 
 ## Artifacts And Layout
 
