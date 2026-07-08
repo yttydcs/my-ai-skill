@@ -1,6 +1,6 @@
 ---
 name: m-autoflow-archive
-description: Archive and closeout phase for the m-autoflow staged engineering workflow. Use after tests and review pass to explicitly invoke $m-docs, create docs/change records, promote reusable lessons into docs/lessons, update indexes, ask whether to end the workflow, and only after explicit confirmation merge branches and clean worktrees.
+description: Archive and closeout phase for the m-autoflow staged engineering workflow. Use after tests and review pass to explicitly invoke $m-docs, create docs/change records in the selected docs root, record intake/feature/requirement/spec/decision impact, promote reusable lessons into docs/lessons, update indexes, ask whether to end the workflow, and only after explicit confirmation merge branches and clean worktrees.
 ---
 
 # m:autoflow archive
@@ -15,6 +15,7 @@ Use this skill to preserve the workflow result as governed documentation and, on
 - Read `../m-autoflow/references/m-docs-integration.md` before treating archive work as complete.
 - Read `../m-autoflow/references/templates.md` when creating `docs/change` or `docs/lessons` artifacts.
 - Explicitly invoke `$m-docs` for documentation routing, impact checks, lessons, and indexes.
+- Do not infer docs remote, push, publication, or backup strategy.
 
 ## Entry Gate
 
@@ -29,9 +30,9 @@ If any item is false, return to `$m-autoflow-test` or `$m-autoflow-execute`.
 
 ## Workflow
 
-1. Use `$m-docs` to check requirements/specs impact and docs routing.
-2. Create `docs/change/YYYY-MM-DD_topic.md` in the appropriate docs tree.
-3. Record task mapping, decisions, tests, impact, rollback, and sub-agent trace.
+1. Use `$m-docs` to check stable-doc impact and docs routing.
+2. Create `docs/change/YYYY-MM-DD_topic.md` in the selected docs root.
+3. Record task mapping, decisions, tests, intake/feature/requirement/spec/decision impact, rollback, and sub-agent trace.
 4. Promote reusable troubleshooting or workflow knowledge into `docs/lessons` when it is likely to recur.
 5. Update affected indexes.
 6. Ask whether to end the workflow.
@@ -43,7 +44,7 @@ If any item is false, return to `$m-autoflow-test` or `$m-autoflow-execute`.
 End with:
 
 - archive paths
-- requirements/specs/lessons impact
+- intake/features/requirements/specs/decisions/lessons impact
 - validation summary
 - merge and cleanup status when workflow end was confirmed
 - remaining local state, including unpushed commits or unrelated dirt

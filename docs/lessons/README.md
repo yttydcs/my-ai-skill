@@ -22,7 +22,7 @@ Store reusable incident knowledge, query-friendly troubleshooting lessons, and p
 - Use stable names without dates when the lesson is long-lived.
 - Group by module or domain when useful.
 - Capture lookup hints so someone can match the lesson from symptoms instead of re-reading change logs.
-- Link lessons back to relevant requirements, specs, and changes.
+- Link lessons back to relevant intake, features, requirements, specs, decisions, and changes.
 
 ## Current Docs
 

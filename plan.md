@@ -6,7 +6,7 @@
 - Branch: `refactor/docs-private-governance`
 - Base: `main`
 - Worktree: `D:\project\my-ai-skills\worktrees\docs-private-governance`
-- Current Stage: `3.1 - Planning, awaiting user approval`
+- Current Stage: `3.2 - Execution complete, awaiting review/archive`
 - Planning skill: `$m-autoflow-plan`
 - Docs governance skill: `$m-docs`
 
@@ -426,11 +426,11 @@ Used `$m-docs` for routing and impact review.
 
 #### Executable Task List
 
-- [ ] `PDG-1` Update stable docs for private docs governance.
-- [ ] `PDG-2` Update `m-docs` category model, routing, templates, indexes, and bootstrap support.
-- [ ] `PDG-3` Update `m-autoflow` and `m-autoflow-plan` to use private docs roots during planning and archive.
-- [ ] `PDG-4` Validate and sync affected skills.
-- [ ] `PDG-5` Commit approved execution changes locally.
+- [x] `PDG-1` Update stable docs for private docs governance.
+- [x] `PDG-2` Update `m-docs` category model, routing, templates, indexes, and bootstrap support.
+- [x] `PDG-3` Update `m-autoflow` and `m-autoflow-plan` to use private docs roots during planning and archive.
+- [x] `PDG-4` Validate and sync affected skills.
+- [x] `PDG-5` Commit approved execution changes locally.
 - [ ] `PDG-6` Review and archive the workflow.
 - [ ] `PDG-7` Decide docs remote, push, or backup strategy.
 - [ ] `PDG-8` Create or migrate docs for any external user project.
@@ -678,6 +678,86 @@ Used `$m-docs` for routing and impact review.
 - None.
 - Blocked: No.
 - Exit criteria met for Stage 3.1.
+
+### Stage 3.2 - Execution
+
+#### Parallelism Assessment
+
+- Sub-agents were not used.
+- Reason:
+  - `PDG-1`, `PDG-2`, and `PDG-3` share one taxonomy and source-of-truth boundary, so splitting the work would risk inconsistent wording.
+  - `PDG-4` validation and sync were small local checks.
+  - The main agent kept ownership of integration and acceptance.
+
+#### PDG-1 - Stable Docs
+
+- Completed.
+- Added private-docs-root, intake, features, and decisions guidance to the repository docs entry points.
+- Added category README files:
+  - `docs/intake/README.md`
+  - `docs/features/README.md`
+  - `docs/decisions/README.md`
+- Updated stable docs:
+  - `docs/requirements/m-docs-skill.md`
+  - `docs/specs/m-docs-skill.md`
+  - `docs/requirements/m-autoflow-skill.md`
+  - `docs/specs/m-autoflow-skill.md`
+- Updated affected category indexes and lesson wording so current docs no longer imply that `change` or `lessons` can replace stable truth.
+
+#### PDG-2 - m-docs Source
+
+- Completed.
+- Updated `skills/m-docs/SKILL.md` to classify `intake`, `features`, `requirements`, `specs`, `decisions`, `plan`, `change`, and `lessons`.
+- Replaced the taxonomy, routing, impact, indexing, and template references with private-docs-aware rules.
+- Updated lessons rules to link back to features and decisions when recurring knowledge exposes stable-doc gaps.
+- Extended `bootstrap_docs_tree.py` with:
+  - expanded categories
+  - optional `--docs-root`
+  - feature module buckets
+  - private docs publication guidance
+
+#### PDG-3 - m-autoflow / Planning / Archive Source
+
+- Completed.
+- Updated `m-autoflow` umbrella instructions, initialization rules, stage rules, docs integration, and templates to record:
+  - `project_root`
+  - `docs_root`
+  - `code_repos`
+  - `active_worktree`
+  - intake/feature/requirement/spec/decision impact
+- Updated `m-autoflow-plan` to require private docs-root and feature/intake checks during planning.
+- Updated `m-autoflow-archive` to archive into the selected docs root and record expanded stable-doc impact.
+- Kept docs remote, push, publication, and backup decisions user-owned.
+
+#### PDG-4 - Validation And Sync
+
+- Completed.
+- Lightweight validation:
+  - `python -m py_compile skills\m-docs\scripts\bootstrap_docs_tree.py`
+  - `python skills\m-docs\scripts\bootstrap_docs_tree.py --docs-root tmp\docs-bootstrap-smoke --module personnel --dry-run`
+  - `git diff --check`
+  - `tools\validate-skills.ps1 -Skill m-docs`
+  - `tools\validate-skills.ps1 -Skill m-autoflow`
+  - `tools\validate-skills.ps1 -Skill m-autoflow-plan`
+  - `tools\validate-skills.ps1 -Skill m-autoflow-archive`
+- Local sync:
+  - `tools\sync-skills.ps1 -Skill m-docs`
+  - `tools\sync-skills.ps1 -Skill m-autoflow`
+  - `tools\sync-skills.ps1 -Skill m-autoflow-plan`
+  - `tools\sync-skills.ps1 -Skill m-autoflow-archive`
+- Notes:
+  - `git diff --check` produced only LF/CRLF conversion warnings and no whitespace errors.
+  - No remote, push, publication, or backup action was performed.
+
+#### PDG-5 - Local Commit
+
+- Completed by the local commit that includes this execution record.
+
+#### Stage 3.2 Issue List
+
+- None.
+- Blocked: No.
+- Exit criteria met for Stage 3.2.
 
 ## Exit Gate
 

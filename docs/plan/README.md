@@ -18,8 +18,8 @@ Store archived workflow planning documents when they need to be retained beyond 
 ## Naming / Maintenance Rules
 
 - Prefer `YYYY-MM-DD_topic.md`.
-- Record related requirements and specs.
-- Record requirement/spec impact before implementation.
+- Record related intake, features, requirements, specs, decisions, and lessons.
+- Record stable-doc impact before implementation.
 
 ## Current Docs
 

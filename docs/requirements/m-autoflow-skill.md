@@ -23,13 +23,17 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - require rollback reason recording and document synchronization
 - require no silent assumptions about business, data, interface, environment, dependency version, acceptance, or preference
 - require explicit `$m-docs` usage in stages `3.1` and `4`
+- require planning and archive phases to identify the private `docs_root` when governed docs should not live in code repositories
+- require behavior-changing workflows to check affected intake, feature, requirement, spec, and decision docs before implementation
+- require multi-repo capabilities to record project root, docs root, code repos, and active worktrees separately
+- require docs remote, push, and backup decisions to remain user-owned
 - require stage `4` to extract reusable experience / lessons and record searchable lookup hints
 - require stage `4` to either update `docs/lessons` or record why `Lessons impact: none`
 - require mandatory review and `docs/change` archive before completion
 - require controlled sub-agent usage only in allowed phases
 - preserve `$m-autoflow` as the umbrella workflow entry while allowing split-phase companion skills for research, planning, execution, testing, and archive
 - support an optional online research phase only when the user explicitly asks for web search, online investigation, latest/current external information, or source-backed research
-- require online research findings to be verified, cited, and routed through `$m-docs` when they change stable requirements or specs
+- require online research findings to be verified, cited, and routed through `$m-docs` when they change stable docs
 - keep execution responsible for implementation plus lightweight local validation such as syntax checks, type checks, focused lint, touched-file formatting checks, focused unit tests, and `git diff --check`
 - treat the test/review phase as optional heavy validation for integration, end-to-end flow, usability, security, and performance; allow skipping it for low-risk small changes when the reason and residual risk are recorded
 
@@ -51,6 +55,8 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - The user requires handoff-ready `plan.md` artifacts before any coding or delegation.
 - The user requires auditable sub-agent governance and a final `docs/change` archive.
 - The user wants future troubleshooting to start from reusable lessons instead of re-reading old archives.
+- The user wants private docs to be kept outside pushable code repositories while implementation happens in one or more code repos.
+- The user wants a feature such as personnel management to be documented once as a complete feature dossier, even when several repos implement it.
 - The user wants to run only planning, execution, testing, archive, or research without loading the full umbrella workflow.
 - The user explicitly asks for online research before planning and expects current, cited external evidence.
 - The user makes a small low-risk change where lightweight execution-stage validation is sufficient and heavyweight workflow testing should be skipped with a recorded reason.
@@ -61,6 +67,10 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - The skill must block if the dedicated worktree is missing.
 - The skill must block if the active workflow lacks `plan.md` or `todo.md` before `3.2`.
 - The skill must read relevant requirement docs first in stage `1` when `docs/requirements` exists.
+- The skill must prefer private docs-root stable docs when the user has separated docs from code repos.
+- The skill must read relevant `docs/features` records for user-visible feature behavior when they exist.
+- The skill must read relevant `docs/intake` records when original request evidence matters.
+- The skill must read relevant `docs/decisions` records when architecture choices constrain the work.
 - The skill must emit stage outputs for requirements analysis and architecture design before planning.
 - The plan phase must place every known Task ID in exactly one execution-scope group: tasks to execute after approval, or tasks not to execute now with the blocking, deferral, out-of-scope, research-only, or separate-approval reason.
 - The skill must ask for clarification instead of assuming missing requirements.
@@ -74,6 +84,7 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - The skill must keep implementation sub-agent delegation gated by a confirmed plan, bounded Task IDs, complete context packages, and non-conflicting write sets.
 - The execute phase must report lightweight validation that passed, skipped checks with reasons, and any heavier validation still needed.
 - The test phase must decide whether heavy validation is needed, record skip rationale when skipped, and review usability, security, and performance when it runs.
+- The skill must not add docs remotes, push docs, or choose docs backup targets without explicit user instruction.
 
 ## Non-functional Requirements
 
@@ -90,6 +101,9 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 
 - `guide.md` may be absent.
 - The repository docs tree may be incomplete.
+- A private docs root may be separate from every participating code repo.
+- A code repo may contain a `docs/` directory that is not canonical for the project.
+- A capability may span several repos while one private feature doc remains the source of truth.
 - A stale `plan.md` from another workflow may exist and need replacement.
 - Platform policy may forbid sub-agent use without explicit user authorization.
 - Current external facts may be stale or conflicting; online research must mark uncertainty instead of treating unverified findings as stable truth.
@@ -107,6 +121,7 @@ Provide a reusable skill that drives a staged, auditable engineering workflow fr
 - Optional online research is explicit-request-only, supports read-only parallel research lanes, and requires source verification and citations.
 - Lightweight validation is part of execution, while heavyweight integration/usability/security/performance testing is optional and separately recorded.
 - The stage `4` archive can route reusable lessons into `docs/lessons` for later lookup.
+- The planning and archive phases respect private docs roots and do not publish docs without the user's explicit instruction.
 - The skill validates and syncs successfully.
 
 ## Related Specs

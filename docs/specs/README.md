@@ -9,6 +9,7 @@ Store technical contracts, integration rules, architecture constraints, and work
 - Start here after requirements when a capability needs durable technical rules.
 - Use this section when the question is how the capability is structured technically, what contracts it obeys, or what implementation guardrails must remain true.
 - Update specs whenever behavior-changing work alters packaging, invocation, or integration contracts.
+- For user-visible feature behavior, read `../features/` first and use specs only for the technical contracts behind that behavior.
 
 ## What Belongs Here
 
@@ -17,6 +18,8 @@ Store technical contracts, integration rules, architecture constraints, and work
 - m-docs integration rules
 - validation and installation behavior
 - sub-agent governance contracts
+- cross-repo interface contracts
+- private docs-root discovery and safety rules
 
 ## Boundary With Requirements
 
@@ -30,6 +33,12 @@ Store technical contracts, integration rules, architecture constraints, and work
   - what outcomes it must provide
   - what boundaries and acceptance criteria define success
 - Do not move long-lived intent or acceptance criteria into `specs` just because the implementation changed.
+
+## Boundary With Features And Decisions
+
+- `features` describe current product behavior and acceptance from the user's perspective.
+- `specs` describe the technical contract that supports or constrains that behavior.
+- `decisions` record why a significant option was chosen; they do not replace specs or feature docs.
 
 ## Naming / Maintenance Rules
 

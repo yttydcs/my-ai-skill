@@ -1,6 +1,6 @@
 ---
 name: m-autoflow-plan
-description: Plan phase for the m-autoflow staged engineering workflow. Use when Codex needs to initialize a dedicated worktree, analyze requirements, design architecture, create or confirm root plan.md/todo.md, check docs governance with $m-docs, and stop before implementation for user review. Use for planning-first requests, plan.md creation, or the planning portion of strict staged implementation work. If the user explicitly asks for web research or current external information, invoke $m-autoflow-research as an optional read-only planning aid before finalizing requirements or architecture.
+description: Plan phase for the m-autoflow staged engineering workflow. Use when Codex needs to initialize a dedicated worktree, identify project/docs/code repo boundaries, analyze requirements, design architecture, create or confirm root plan.md/todo.md, check docs governance with $m-docs, and stop before implementation for user review. Use for planning-first requests, plan.md creation, or the planning portion of strict staged implementation work. If the user explicitly asks for web research or current external information, invoke $m-autoflow-research as an optional read-only planning aid before finalizing requirements or architecture.
 ---
 
 # m:autoflow plan
@@ -14,26 +14,35 @@ Use this skill to run the planning side of `m-autoflow`: initialization, require
 - Read `references/planning.md`.
 - If invoking as part of the original full workflow, keep `$m-autoflow` as the umbrella context and use this skill for stages `0` through `3.1`.
 - Do not perform web research by default. If the user explicitly asks for online research, current/latest external facts, or source-backed investigation, read `../m-autoflow-research/SKILL.md` and run it before finalizing requirements or architecture.
+- When private docs are expected, identify `project_root`, `docs_root`, `code_repos`, and `active_worktree` before planning writes stable docs.
 - Read the original canonical references only when needed:
   - `../m-autoflow/references/initialization.md` for worktree, branch, repo, and `guide.md` prerequisites.
-  - `../m-autoflow/references/m-docs-integration.md` before editing `plan.md`, requirements, specs, change, or lessons docs.
+  - `../m-autoflow/references/m-docs-integration.md` before editing `plan.md`, intake, features, requirements, specs, decisions, change, or lessons docs.
   - `../m-autoflow/references/templates.md` when creating the active `plan.md` or `todo.md`.
 
 ## Workflow
 
-1. Confirm the task needs staged execution and identify the real owning repo, base branch, modules, and working path.
+1. Confirm the task needs staged execution and identify the project root, private docs root, real owning repo or repos, base branch, modules, and working path.
 2. Read `guide.md` when present and apply project-local workflow rules before generic defaults.
 3. Ensure implementation will happen only in a dedicated branch and worktree; if missing, create or request it before planning proceeds.
 4. If explicit web research was requested, run `$m-autoflow-research` and keep only verified, cited findings.
 5. Run requirements analysis:
+   - prefer relevant `docs/intake` and `docs/features` docs when the work changes user-visible behavior
    - prefer relevant `docs/requirements` docs when they exist
    - record goal, scope, use cases, functional and non-functional requirements, inputs/outputs, edge cases, acceptance criteria, and risks
 6. Run architecture analysis:
    - prefer relevant `docs/specs` docs when they exist
+   - prefer relevant `docs/decisions` docs when architecture choices constrain the work
    - record solution, alternatives, module responsibilities, data/call flow, interfaces, errors, safety, performance, tests, and extension points
 7. Explicitly use `$m-docs` before confirming the plan.
-8. Create or confirm root `plan.md` or `todo.md` in the active worktree. Include task IDs, file/module scope, acceptance, tests, rollback points, dependencies, risks, and parallelism notes.
+8. Create or confirm root `plan.md` or `todo.md` in the active worktree. Include docs root, code repos, task IDs, file/module scope, acceptance, tests, rollback points, dependencies, risks, and parallelism notes.
 9. Explicitly separate tasks that will be executed after approval from tasks that will not be executed in the next execution phase. Every known task must appear in exactly one section, with the reason for any deferred, blocked, out-of-scope, or research-only task.
+
+## Private Docs Guardrails
+
+- Do not write governed docs into a pushable code repo when the user expects private docs.
+- Do not add docs remotes, push docs, publish docs, or choose backup targets.
+- If a docs root is required but unclear, stop before implementation and ask or record a blocker.
 
 ## Exit Gate
 

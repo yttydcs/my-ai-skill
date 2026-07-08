@@ -53,7 +53,7 @@ The documentation model separated `change` and `lessons`, but the archive workfl
 - Do not leave reusable troubleshooting knowledge only inside `docs/change`.
 - Capture lookup hints in every lesson: symptoms, keywords, trigger conditions, and quick checks.
 - Update `docs/lessons/README.md` whenever a new lesson is created or renamed.
-- Keep stable requirements/specs separate from lessons even when the lesson triggered the correction.
+- Keep stable feature, requirement, spec, and decision docs separate from lessons even when the lesson triggered the correction.
 
 ## Related Docs
 

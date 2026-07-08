@@ -17,9 +17,12 @@ Use this file to execute stages `1` through `4`.
 
 Before drafting stage `1` output:
 
+- identify `project_root`, `docs_root`, `code_repos`, and `active_worktree` when private docs or multi-repo boundaries matter
+- if `docs/intake` exists, read relevant original request evidence when traceability matters
+- if `docs/features` exists, read relevant feature docs first for user-visible behavior
 - if `docs/requirements` exists, read the relevant requirement docs first
 - if `docs/README.md` exists, use it as an entry point when it helps locate the right requirement doc
-- treat stable requirement docs as higher-priority context than code-only inference when they are present and relevant
+- treat stable docs from the selected docs root as higher-priority context than code-only inference when they are present and relevant
 
 Required output:
 
@@ -40,8 +43,9 @@ If anything is unclear, output `问题清单`, mark `阻塞：是`, and stop.
 Before drafting stage `2` output:
 
 - if `docs/specs` exists, read the relevant spec docs first
+- if `docs/decisions` exists, read relevant decision docs when architecture choices constrain the work
 - if `docs/README.md` exists, use it as an entry point when it helps locate the right spec doc
-- treat stable spec docs as higher-priority context than code-only inference when they are present and relevant
+- treat stable specs and decisions as higher-priority context than code-only inference when they are present and relevant
 
 Required output:
 
@@ -65,8 +69,9 @@ Requirements:
 - If the provided plan is incomplete, complete it before implementation.
 - Include:
   - project goal and current state
-  - repo, branch, base, worktree absolute path, and current stage
-  - related requirements, specs, and lessons when already known
+  - repo, branch, base, project root, docs root, code repos, worktree absolute path, and current stage
+  - related intake, features, requirements, specs, decisions, and lessons when already known
+  - stable-doc impact for intake, features, requirements, specs, and decisions
   - executable checklist
   - task IDs
   - per-task goal, files, acceptance, tests, rollback
@@ -159,15 +164,21 @@ If any item fails, return to `3.2`.
 Requirements:
 
 - explicitly use `$m-docs`
-- Create `docs/change/YYYY-MM-DD_topic.md`.
+- Create `docs/change/YYYY-MM-DD_topic.md` in the selected docs root.
 - Include:
   - 变更背景 / 目标
   - 具体变更内容
+  - `Intake impact: none | updated`
+  - `Feature impact: none | updated`
   - `Requirements impact: none | updated`
   - `Specs impact: none | updated`
+  - `Decision impact: none | updated`
   - `Lessons impact: none | updated`
+  - `Related intake: ...`
+  - `Related features: ...`
   - `Related requirements: ...`
   - `Related specs: ...`
+  - `Related decisions: ...`
   - `Related lessons: ...`
   - 对应 `plan.md` 任务映射
   - 经验 / 教训摘要
@@ -180,6 +191,7 @@ Requirements:
   - create or update the corresponding `docs/lessons/<topic>.md`
   - update `docs/lessons/README.md` and any affected indexes
 - Do not leave reusable troubleshooting knowledge only inside `docs/change`.
+- Do not add docs remotes, push docs, publish docs, or choose backup targets unless the user explicitly asks.
 - Ask whether to end the workflow after the archive is complete.
 
 ## Workflow End Confirmation
@@ -188,7 +200,6 @@ Requirements:
   - continue with the next round starting from stage `1`
 - If the user says `是`:
   - merge in the repo control-plane
-  - merge the worktree `plan.md` into the global `plan.md`
-  - move worktree `docs/change` files into the global `docs/change`
-  - move worktree `docs/lessons` files and affected lesson indexes into the global docs tree
+  - move or link retained plan/change/lesson artifacts into the selected docs root when project rules require it
+  - keep docs repo publication and backup decisions separate from code repo merge
   - remove and prune the worktree

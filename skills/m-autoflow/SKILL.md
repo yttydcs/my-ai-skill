@@ -7,7 +7,7 @@ description: Enforce a staged, auditable software execution workflow with worktr
 
 ## Overview
 
-Use this skill to execute implementation work under strict stage gates, explicit blockers, worktree isolation, and auditable artifacts. Treat speed as secondary to correctness, traceability, and handoff quality.
+Use this skill to execute implementation work under strict stage gates, explicit blockers, worktree isolation, and auditable artifacts. Treat speed as secondary to correctness, traceability, and handoff quality. When projects separate private docs from code repositories, identify `project_root`, `docs_root`, `code_repos`, and `active_worktree` before changing code or governed docs.
 
 ## Quick Start
 
@@ -18,11 +18,11 @@ Use this skill to execute implementation work under strict stage gates, explicit
   - `$m-autoflow-execute` for approved implementation mapped to confirmed Task IDs, including light syntax/static/focused checks.
   - `$m-autoflow-test` for optional heavy workflow validation, integration testing, usability review, security review, and performance review.
   - `$m-autoflow-archive` for `docs/change`, lessons, workflow-end confirmation, merge, and cleanup.
-- If `docs/requirements` or `docs/specs` exists, prioritize them during stages `1` and `2` before falling back to code-only inference.
+- If governed docs exist, prioritize `docs/intake`, `docs/features`, `docs/requirements`, `docs/specs`, and `docs/decisions` during stages `1` and `2` before falling back to code-only inference.
 - Do not run web research by default. Use `$m-autoflow-research` before or during planning only when the user explicitly asks for web search, online research, latest/current external facts, or source-backed investigation.
 - Read `references/initialization.md` before stage `1`.
 - Read `references/stages.md` to execute stages `1` through `4` and emit the required outputs.
-- Read `references/m-docs-integration.md` before editing `plan.md`, `docs/requirements`, `docs/specs`, `docs/change`, or `docs/lessons`.
+- Read `references/m-docs-integration.md` before editing `plan.md`, intake, features, requirements, specs, decisions, `docs/change`, or `docs/lessons`.
 - Read `references/subagents.md` before any parallelism assessment or delegation in `3.2` or `3.3`.
 - Read `references/templates.md` when creating `plan.md`, `docs/change`, or `docs/lessons` artifacts.
 
@@ -32,15 +32,15 @@ Use this skill to execute implementation work under strict stage gates, explicit
 2. Start with initialization, not coding:
    - confirm the task actually requires strict staged workflow execution
    - read `guide.md` if it exists
-   - confirm repo, base branch, and participating modules
+   - confirm project root, docs root, repo, base branch, and participating modules
    - require a dedicated branch and worktree under the current project root's own `worktrees\` directory (`<project-root>\worktrees\`)
    - refuse implementation in the main repo path
-3. Run stage `1` requirements analysis and prioritize `docs/requirements` when it exists before relying on code or chat context alone.
-4. Run stage `2` architecture analysis and prioritize `docs/specs` when it exists before relying on code or chat context alone.
-5. In stage `3.1`, explicitly use `$m-docs`, record requirements/specs impact plus any already-known related lessons, and confirm the active worktree-root `plan.md` or `todo.md`.
+3. Run stage `1` requirements analysis and prioritize private-docs-root intake, feature, and requirement docs when they exist before relying on code or chat context alone.
+4. Run stage `2` architecture analysis and prioritize private-docs-root specs and decisions when they exist before relying on code or chat context alone.
+5. In stage `3.1`, explicitly use `$m-docs`, record intake/feature/requirements/specs/decision impact plus any already-known related lessons, and confirm the active worktree-root `plan.md` or `todo.md`.
 6. In stage `3.2`, map every implementation change to a confirmed Task ID. Perform a parallelism assessment, but only use sub-agents when both the workflow rules and host platform policy allow it.
 7. In stage `3.3`, decide whether heavy testing/review is needed. Skip it for low-risk small changes when execution checks are sufficient and the reason is recorded; otherwise review integration flow, usability, security, and performance, then return to `3.2` if any item fails.
-8. In stage `4`, explicitly use `$m-docs`, archive the workflow in `docs/change/YYYY-MM-DD_topic.md`, extract reusable experience / lessons plus lookup hints, update `docs/lessons` when needed, and then ask whether the workflow should end.
+8. In stage `4`, explicitly use `$m-docs`, archive the workflow in the selected docs root as `docs/change/YYYY-MM-DD_topic.md`, extract reusable experience / lessons plus lookup hints, update `docs/lessons` when needed, and then ask whether the workflow should end.
 9. If the user ends the workflow, perform the required merge and worktree cleanup steps. If not, restart from stage `1` for the next iteration.
 
 ## Split Phase Mapping
@@ -61,8 +61,10 @@ The split skills are companion entry points. Do not remove or bypass this origin
 - Do not write code without a dedicated worktree and confirmed `plan.md`.
 - Do not treat rollback as a silent action; state the reason and update the affected docs.
 - Do not dispatch sub-agents without a complete context package and an allowed phase.
-- Do not treat `docs/change` as the stable source of truth for requirements or specs.
+- Do not treat `docs/change` as the stable source of truth for intake, features, requirements, specs, or decisions.
 - Do not leave reusable lessons only in `docs/change`; promote them into `docs/lessons` when they should be queried later.
+- Do not write governed private docs into a pushable code repo unless the user selected that repo as the docs root.
+- Do not add docs remotes, push docs, publish docs, or choose backup targets unless the user explicitly asks.
 - Do not merge or clean the worktree until the user explicitly confirms workflow end.
 
 ## References

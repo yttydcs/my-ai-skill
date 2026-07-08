@@ -7,7 +7,7 @@ Store completed workflow result documents for this repository.
 ## How to Enter This Section
 
 - Write here after implementation or investigation finishes.
-- Record whether requirements or specs changed before treating a workflow as complete.
+- Record whether intake, features, requirements, specs, decisions, or lessons changed before treating a workflow as complete.
 - If reusable troubleshooting knowledge emerged, link or promote it into `docs/lessons/`.
 
 ## What Belongs Here
@@ -19,8 +19,8 @@ Store completed workflow result documents for this repository.
 ## Naming / Maintenance Rules
 
 - Prefer `YYYY-MM-DD_topic.md`.
-- Record related requirements and specs.
-- Record whether requirements or specs changed.
+- Record related intake, features, requirements, specs, decisions, and lessons.
+- Record whether stable docs changed.
 - Record related lessons when the workflow produced reusable experience.
 
 ## Current Docs

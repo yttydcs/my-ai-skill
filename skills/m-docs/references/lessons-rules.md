@@ -41,7 +41,7 @@ When the user asks how to debug a symptom, whether a problem has happened before
 - Investigation Trail
 - Resolution
 - Prevention / Guardrails
-- Related Requirements / Specs / Changes
+- Related Intake / Features / Requirements / Specs / Decisions / Changes
 
 ## Lookup Hints Checklist
 
@@ -54,8 +54,10 @@ Each lesson should make future lookup easier. Capture at least:
 
 ## Relationship to Other Docs
 
+- If the incident revealed missing or wrong feature behavior, update `features`.
 - If the incident revealed a missing or wrong requirement, update `requirements`.
 - If the incident revealed a wrong technical contract, update `specs`.
+- If the incident revealed a superseded or missing architecture choice, update `decisions`.
 - If the incident came from a concrete workflow, link the relevant `change`.
 - Update the nearest `docs/lessons/README.md` so the lesson remains discoverable from the index.
 - Do not store the only copy of a technical rule inside `lessons`.

@@ -10,12 +10,21 @@ Use this file before stage `1`.
 ## Mandatory Checks
 
 1. Read `guide.md` from the current repository root if it exists.
-2. Confirm the participating repo or repos, modules, and base branch.
+2. Confirm the project root, docs root, participating repo or repos, modules, and base branch.
 3. Ensure every participating repo has:
    - a dedicated semantic branch
    - a dedicated git worktree
 4. Require worktrees under the current project root's own `worktrees\` directory (`<project-root>\worktrees\`).
 5. Select one active execution worktree and keep all implementation there.
+
+## Project / Docs Root Rule
+
+- `project_root` is the local umbrella directory for the work.
+- `docs_root` is the governed documentation root. It may be a local folder or a separate local/private Git repository.
+- `code_repos` are implementation repositories. Do not assume their `docs/` folders are canonical when the user has a private docs root.
+- `active_worktree` is the dedicated worktree where implementation happens.
+- Record `project_root`, `docs_root`, `code_repos`, and `active_worktree` in the plan when they are relevant.
+- If a private docs root is expected but cannot be identified, stop before implementation and ask or record a blocker.
 
 ## Cross-repo Rule
 
@@ -24,6 +33,7 @@ Use this file before stage `1`.
   - its own dedicated worktree
   - its own root `plan.md` or `todo.md`
 - Record every additional worktree path, branch, dependency, and ownership boundary in the main plan.
+- Cross-repo product or feature truth belongs in the private docs root, not duplicated across code repos.
 
 ## Branch Rules
 
@@ -41,6 +51,13 @@ Use this file before stage `1`.
 - Do not perform implementation edits in the main repo.
 - Keep one `plan.md` or `todo.md` per active workflow worktree.
 - For multi-repo workflows, record each worktree path, branch, dependency, and ownership boundary in the main plan.
+- Do not write governed private docs into a pushable code repo unless the user explicitly selected that repo as the docs root.
+
+## Docs Git Rule
+
+- A docs root may have its own Git repository.
+- Do not add remotes, change remotes, push, publish, or choose backup targets unless the user explicitly asks.
+- Keep docs repo commits separate from code repo commits when both are involved.
 
 ## Main Repo Restrictions
 

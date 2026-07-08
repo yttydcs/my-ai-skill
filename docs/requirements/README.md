@@ -9,6 +9,7 @@ Store long-lived capability intent, boundaries, scenarios, and acceptance criter
 - Start here when a workflow introduces or changes a persistent capability.
 - Use this section when the question is why the capability exists, what it must do, what is in scope, or how success is accepted.
 - Update this section before or alongside `docs/change/` when the underlying requirement changes.
+- For user-visible feature behavior such as screens, CRUD flows, buttons, and layout, start with `../features/` and link back here only for broader capability intent or non-feature constraints.
 
 ## What Belongs Here
 
@@ -17,6 +18,17 @@ Store long-lived capability intent, boundaries, scenarios, and acceptance criter
 - core actors and scenarios
 - required behavior and boundaries
 - acceptance criteria that should outlive one workflow
+
+## Boundary With Features
+
+- `features` answer current user-visible behavior:
+  - screens, entry points, layout, buttons, states, permissions, and CRUD workflows
+  - end-to-end acceptance scenarios for a named feature
+- `requirements` answer broader capability intent:
+  - why the capability exists
+  - what durable outcomes and boundaries must hold
+  - non-feature constraints that can apply across several features
+- If a user-visible feature changes, update the feature doc first and update requirements only when the durable capability intent changes.
 
 ## Boundary With Specs
 

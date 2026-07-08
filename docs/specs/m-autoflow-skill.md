@@ -55,15 +55,22 @@ The skill supports explicit invocation and does not forbid host-side implicit se
   - `4. archive`
 - Only one stage may be active at a time.
 - Any rollback must state the reason and update the affected documents.
-- Stage `1` prioritizes relevant docs under `docs/requirements` when they exist.
-- Stage `2` prioritizes relevant docs under `docs/specs` when they exist.
+- Stage `1` prioritizes relevant private-docs-root intake, feature, and requirement docs when they exist.
+- Stage `2` prioritizes relevant private-docs-root specs and decisions when they exist.
 - Optional research is read-only and may feed only verified, cited findings into requirements, architecture, `plan.md`, or stable docs.
+- Planning must distinguish:
+  - `project_root`: umbrella project directory
+  - `docs_root`: private governed docs root
+  - `code_repos`: one or more implementation repositories
+  - `active_worktree`: the current implementation worktree
+- When the user keeps docs private, stable docs must be read from and written to `docs_root`, not inferred from code repo `docs/` directories.
 - Active workflow control stays in the worktree root as `plan.md` or `todo.md`.
 - Stage `3.1` plan artifacts must include an execution scope split with `Will Execute` and `Will Not Execute Now` groups. Every known Task ID must appear in exactly one group, and non-executed tasks must include the reason.
 - Stage `3.2` owns lightweight local validation such as syntax checks, type checks, focused lint, touched-file formatting checks, focused unit tests, and `git diff --check`.
 - Stage `3.3` is optional heavy validation. It may be skipped for low-risk small changes when execution-stage validation is sufficient and the skip reason plus residual risk are recorded.
 - When stage `3.3` runs, it must cover integration or end-to-end flow, usability, security boundaries, and performance indicators when applicable.
 - `docs/change/YYYY-MM-DD_topic.md` is required before a workflow counts as complete.
+- The change archive belongs in the selected governed docs root when a private docs root exists.
 - Stage `4` must record `Lessons impact`, `Related lessons`, and searchable lesson cues in the archive.
 - Stage `4` must create or update `docs/lessons` when the workflow exposed reusable troubleshooting knowledge.
 - After stage `4`, the workflow must ask whether to end.
@@ -76,9 +83,10 @@ The skill supports explicit invocation and does not forbid host-side implicit se
 - Stage `3.1` must explicitly use `$m-docs`.
 - Stage `4` must explicitly use `$m-docs`.
 - `$m-autoflow-research` must explicitly use `$m-docs` when external research changes stable project truth.
-- Requirement/spec impact must be recorded in planning and archive artifacts.
+- Intake, feature, requirement, spec, and decision impact must be recorded in planning and archive artifacts when relevant.
 - Lesson impact and related lesson paths must be recorded in archive artifacts.
 - The root-level active `plan.md` is a workflow-control exception and does not replace `docs/plan/` as an archive category.
+- Docs remote configuration, push target, publication, and backup strategy are user-owned and must not be inferred by the workflow.
 
 ## Sub-agent Contract
 
@@ -107,7 +115,9 @@ The skill supports explicit invocation and does not forbid host-side implicit se
 - Do not proceed past a blocked stage.
 - Do not perform web research by default during ordinary planning.
 - Do not allow plan-external code changes without returning to `3.1`.
-- Do not treat change docs as stable truth for requirements or specs.
+- Do not treat change docs as stable truth for intake, features, requirements, specs, or decisions.
+- Do not write governed private docs into pushable code repos unless the user selected that repo as the docs root.
+- Do not add remotes, push, or choose docs backup locations without explicit user instruction.
 - Do not silently choose among uncertain best-practice options.
 
 ## Performance Considerations

@@ -4,15 +4,22 @@ Use this reference for the archive phase of `m-autoflow`.
 
 ## Required Archive Content
 
-Create `docs/change/YYYY-MM-DD_topic.md` with:
+Create `docs/change/YYYY-MM-DD_topic.md` in the selected docs root with:
 
 - 变更背景 / 目标
 - 具体变更内容
+- Docs root
+- `Intake impact: none | updated`
+- `Feature impact: none | updated`
 - `Requirements impact: none | updated`
 - `Specs impact: none | updated`
+- `Decision impact: none | updated`
 - `Lessons impact: none | updated`
+- Related intake
+- Related features
 - Related requirements
 - Related specs
+- Related decisions
 - Related lessons
 - 对应 `plan.md` 任务映射
 - 经验 / 教训摘要
@@ -33,6 +40,13 @@ Create or update `docs/lessons` when the debugging path was:
 - a recurring platform or environment pitfall
 
 Do not leave reusable knowledge only in `docs/change`.
+
+## Private Docs Publication
+
+- A docs root may be a separate local/private Git repository.
+- Do not add remotes, change remotes, push, publish, or choose backup targets unless the user explicitly asks.
+- If docs changes are local-only, say so in the archive or final status.
+- Keep docs repo commits separate from code repo commits when both are involved.
 
 ## Closeout
 

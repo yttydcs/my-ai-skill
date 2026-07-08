@@ -22,6 +22,9 @@ Use these templates as concise defaults.
 - Repo:
 - Branch:
 - Base:
+- Project Root:
+- Docs Root:
+- Code Repos:
 - Worktree:
 - Current Stage:
 
@@ -29,6 +32,7 @@ Use these templates as concise defaults.
 
 ### Initialization
 - guide.md:
+- project/docs/code repo confirmation:
 - base/worktree confirmation:
 
 ### Stage 1 - Requirements Analysis
@@ -57,7 +61,13 @@ Use these templates as concise defaults.
 ### Stage 3.1 - Planning
 #### Project Goal and Current State
 #### Docs Governance Routing Decision
-#### Related Requirements / Specs / Lessons
+#### Related Intake / Features / Requirements / Specs / Decisions / Lessons
+#### Stable Docs Impact
+- Intake impact:
+- Feature impact:
+- Requirements impact:
+- Specs impact:
+- Decision impact:
 #### Executable Task List
 #### Execution Scope After Approval
 ##### Will Execute
@@ -93,11 +103,18 @@ Use these templates as concise defaults.
 
 ## 变更背景 / 目标
 ## 具体变更内容
+## Docs root
+## Intake impact
+## Feature impact
 ## Requirements impact
 ## Specs impact
+## Decision impact
 ## Lessons impact
+## Related intake
+## Related features
 ## Related requirements
 ## Related specs
+## Related decisions
 ## Related lessons
 ## 对应 plan.md 任务映射
 ## 经验 / 教训摘要
