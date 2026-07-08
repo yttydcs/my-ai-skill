@@ -13,12 +13,14 @@
   - `skills/m-discuss`
   - `skills/m-plan`
   - `skills/m-execute`
+  - `skills/m-go`
   - `skills/m-test`
   - `skills/m-archive`
 - Canonical phase install metadata:
   - `manifests/m-discuss.json`
   - `manifests/m-plan.json`
   - `manifests/m-execute.json`
+  - `manifests/m-go.json`
   - `manifests/m-test.json`
   - `manifests/m-archive.json`
 - Install flow:
@@ -33,6 +35,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - Invoke `$m-discuss` for discovery, requirement shaping, brainstorming, optional research, and early worktree setup.
 - Invoke `$m-plan` for architecture, executable planning, direct task summary, and approval gating.
 - Invoke `$m-execute` for confirmed Task ID implementation plus lightweight validation.
+- Invoke `$m-go` for confirmed Task ID implementation through worker sub-agents plus an automatic `$m-test` loop.
 - Invoke `$m-test` for optional heavy validation and review, including UI operation evidence when UI changes are tested.
 - Invoke `$m-archive` for change archive, lessons, and workflow closeout.
 - Web research must be initiated from `$m-discuss` only when current external facts, best-practice comparison, explicit user request, or source-backed investigation is needed.
@@ -46,7 +49,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - Default phase order:
   - `discuss`
   - `plan`
-  - `execute`
+  - `execute` or `go`
   - optional `test`
   - `archive`
 - Direct plan invocation is allowed only when the plan records why discussion was skipped or already satisfied.
@@ -69,6 +72,10 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - The task summary table must include `Task ID`, `Title`, `Scope`, `Files / Modules`, `Acceptance / Tests`, and `Risk / Notes`.
 - The task summary table must summarize the active plan artifact and preserve the `Will Execute` / `Will Not Execute Now` split.
 - Execution owns lightweight local validation such as syntax checks, type checks, focused lint, touched-file formatting checks, focused unit tests, and `git diff --check`.
+- `$m-go` is an alternate execution entry after planning. It requires a confirmed plan, delegates all implementation edits to worker sub-agents, runs safe parallel lanes when write sets allow it, and automatically invokes `$m-test` behavior after delegated execution.
+- During `$m-go`, the main agent owns scheduling, context packaging, conflict handling, diff review, command execution, validation synthesis, external status reporting, and final acceptance. The main agent must not directly edit implementation files.
+- If `$m-go` validation fails, the main agent must delegate bounded fixes and repeat the test loop until acceptance passes or a blocker is explicit.
+- `$m-go` stops before archive, merge, cleanup, and push.
 - Heavy validation is optional. It may be skipped for low-risk small changes when execution-stage validation is sufficient and the skip reason plus residual risk are recorded.
 - The user may explicitly skip `$m-test` and proceed directly to `$m-archive`; the archive must record skipped validation, missing evidence, and residual risk.
 - When heavy validation runs, it must cover integration or end-to-end flow, usability, security boundaries, and performance indicators when applicable.
@@ -96,13 +103,16 @@ The skill family supports explicit invocation and does not forbid host-side impl
 ## Sub-agent Contract
 
 - Implementation sub-agents are allowed only in execution and heavy review phases.
+- `$m-go` requires implementation sub-agents for all file edits in its approved execution scope.
 - Research lanes may be used from discussion only when the user requested or the workflow needs source-backed current research and host policy permits delegation.
 - Research lanes are read-only: they cannot edit code, create plans, confirm requirements, validate implementation, archive changes, merge, or clean up.
 - A parallelism assessment is required on entry to execution and heavy review.
+- `$m-go` must perform the parallelism assessment before dispatch and must use parallel workers for independent non-conflicting write sets when host policy permits it.
 - When host policy permits and the split is safe, sub-agents should be created for qualifying parallel work.
 - Delegation requires a confirmed plan and a complete context package.
 - Research-only delegation requires bounded lanes, source quality expectations, and main-agent synthesis of source trust.
 - Worktree creation, plan confirmation, requirements decisions, architecture decisions, conflict handling, integration, and final acceptance remain with the main agent.
+- For `$m-go`, integration edits required after worker completion must also be delegated to a worker with a bounded write set.
 - Research synthesis and final source trust decisions remain with the main agent.
 - Host platform policy still applies; if the platform requires explicit user authorization for sub-agents, the skill must honor it.
 
@@ -110,8 +120,10 @@ The skill family supports explicit invocation and does not forbid host-side impl
 
 - The umbrella skill must pass `tools/validate-skills.ps1 -Skill m-autoflow`.
 - Each canonical phase skill must pass `tools/validate-skills.ps1 -Skill <skill-name>`.
+- The `$m-go` skill must pass `tools/validate-skills.ps1 -Skill m-go`.
 - The umbrella skill must sync through `tools/sync-skills.ps1 -Skill m-autoflow`.
 - Each canonical phase skill must sync through `tools/sync-skills.ps1 -Skill <skill-name>`.
+- The `$m-go` skill must sync through `tools/sync-skills.ps1 -Skill m-go`.
 - Validation must happen after final source content is written.
 - Stale installed copies of superseded phase names should be removed after the canonical skills sync, unless a future compatibility decision reintroduces aliases.
 
@@ -149,6 +161,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 ## Related Decisions
 
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
+- [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
 
 ## Related Changes
 

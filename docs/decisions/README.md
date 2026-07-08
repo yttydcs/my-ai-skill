@@ -24,5 +24,6 @@ Store append-only architecture decision records for choices that shape structure
 
 ## Current Docs
 
+- [2026-07-09_m-go-automated-execution.md](2026-07-09_m-go-automated-execution.md)
 - [2026-07-08_private-docs-root-and-feature-first-governance.md](2026-07-08_private-docs-root-and-feature-first-governance.md)
 - [2026-07-08_m-skill-phase-naming.md](2026-07-08_m-skill-phase-naming.md)

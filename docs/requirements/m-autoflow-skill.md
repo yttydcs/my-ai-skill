@@ -14,6 +14,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 
 - preserve `$m-autoflow` as the umbrella workflow entry point
 - provide canonical phase entries named `$m-discuss`, `$m-plan`, `$m-execute`, `$m-test`, and `$m-archive`
+- provide `$m-go` as a canonical high-automation execution entry after planning
 - keep the umbrella thin by routing to phase skills and shared references instead of duplicating phase instructions
 - let `$m-discuss` own discovery, brainstorming, option comparison, requirement shaping, optional current-practice research, and early worktree setup
 - let `$m-plan` own requirements consolidation, architecture design, execution planning, and approval gating
@@ -35,6 +36,8 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - require mandatory review decision and `docs/change` archive before workflow completion
 - require controlled sub-agent usage only in allowed phases
 - keep execution responsible for implementation plus lightweight local validation such as syntax checks, type checks, focused lint, touched-file formatting checks, focused unit tests, and `git diff --check`
+- require `$m-go` to keep plan gating, delegate all implementation edits to sub-agents, run safe parallel execution where write sets allow it, and automatically run `$m-test` after delegated execution
+- require `$m-go` to delegate bounded fixes and repeat validation until all acceptance items pass or a blocker is explicit
 - treat `$m-test` as optional heavy validation for integration, end-to-end flow, UI evidence, usability, security, and performance; allow the user to explicitly skip it and go to `$m-archive` when the reason and residual risk are recorded
 - require `$m-test`, when run for UI-impacting changes, to open the affected UI, operate the affected path, and provide screenshot evidence
 - require `$m-test` to directly output a concise pass/fail/blocked/skipped result table
@@ -64,6 +67,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - The user wants private docs to be kept outside pushable code repositories while implementation happens in one or more code repos.
 - The user wants a feature such as personnel management to be documented once as a complete feature dossier, even when several repos implement it.
 - The user wants to run only discussion, planning, execution, testing, or archive without loading the full umbrella workflow.
+- The user wants higher automation after planning, with implementation edits handled by sub-agents and testing run automatically.
 - The user makes a small low-risk change where lightweight execution-stage validation is sufficient and heavyweight workflow testing should be skipped with a recorded reason.
 - The user changes UI and expects visual validation evidence instead of code-only review.
 - The user wants a compact test result summary in chat without opening markdown artifacts.
@@ -92,6 +96,13 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-execute` must block if the active workflow lacks confirmed `plan.md` or `todo.md`.
 - `$m-execute` must map every implementation change to a confirmed Task ID.
 - `$m-execute` must report lightweight validation that passed, skipped checks with reasons, and any heavier validation still needed.
+- `$m-go` must block if the active workflow lacks confirmed `plan.md` or `todo.md`.
+- `$m-go` must map every delegated implementation change to a confirmed Task ID.
+- `$m-go` must require worker sub-agents for implementation edits; the main agent may coordinate, inspect, run commands, review diffs, and accept results but must not directly edit implementation files.
+- `$m-go` must assess Task ID and write-set parallelism, dispatch safe independent work in parallel when host policy and user authorization allow it, and serialize or block conflicting write sets.
+- `$m-go` must automatically run `$m-test` behavior after delegated implementation completes.
+- `$m-go` must return failed validation to delegated fixes and repeat the validation loop until acceptance passes or the blocker is explicit.
+- `$m-go` must stop before `$m-archive`, merge, cleanup, or push.
 - `$m-test` must decide whether heavy validation is needed, record skip rationale when skipped, and review usability, security, and performance when it runs.
 - `$m-test` must require actual UI opening, user-path operation, and screenshot evidence when it runs for UI-impacting changes.
 - `$m-test` must treat missing UI evidence during a run `$m-test` as `不通过` or `阻塞`, not as a pass.
@@ -104,6 +115,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - The workflow must not add docs remotes, push docs, or choose docs backup targets without explicit user instruction.
 - The workflow must allow read-only parallel research lanes only from `$m-discuss` and only when host policy permits delegation.
 - The workflow must keep implementation delegation gated by a confirmed plan, bounded Task IDs, complete context packages, and non-conflicting write sets.
+- The workflow must treat `$m-go` invocation as explicit authorization to use worker sub-agents for the approved execution scope when host policy permits delegation.
 
 ## Non-functional Requirements
 
@@ -137,13 +149,14 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 ## Acceptance Criteria
 
 - `m-autoflow` exists as a valid umbrella skill package in this repository.
-- `m-discuss`, `m-plan`, `m-execute`, `m-test`, and `m-archive` exist as valid companion skill packages in this repository.
+- `m-discuss`, `m-plan`, `m-execute`, `m-go`, `m-test`, and `m-archive` exist as valid companion skill packages in this repository.
 - The umbrella skill routes to the phase skills without removing the `$m-autoflow` entry point.
 - The phase skills enforce discussion, planning, execution, testing, archive, and blocker rules.
 - The plan artifact clearly states which Task IDs will execute after approval and which Task IDs will not execute in the next execution phase.
 - `$m-plan` responses include a concise direct task summary table.
 - Optional online research is controlled by discussion, supports source verification and citations, and routes stable-doc impact through `$m-docs`.
 - Lightweight validation is part of execution, while heavyweight integration/UI/usability/security/performance testing is optional and separately recorded.
+- `$m-go` performs delegated implementation and automatic `$m-test` looping for confirmed plans without making the main agent the implementer.
 - UI-impacting changes tested by `$m-test` produce actual operation evidence and screenshot paths.
 - `$m-test` output includes a concise direct result table.
 - The archive can route reusable lessons into `docs/lessons` for later lookup.
@@ -161,6 +174,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 ## Related Decisions
 
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
+- [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
 
 ## Related Changes
 

@@ -25,6 +25,7 @@ Store original request evidence before it is refined into feature, requirement, 
 
 ## Current Docs
 
+- [2026-07-09_m-go-automated-execution.md](2026-07-09_m-go-automated-execution.md) - source: Codex chat, delegated automated execution and test-loop command
 - [2026-07-09_docs-structure-sync.md](2026-07-09_docs-structure-sync.md) - source: Codex chat, docs tree synchronization request
 - [2026-07-08_m-plan-task-table.md](2026-07-08_m-plan-task-table.md) - source: Codex chat, direct task summary table after planning
 - [2026-07-08_m-test-ui-evidence.md](2026-07-08_m-test-ui-evidence.md) - source: Codex chat, UI test evidence and direct result table requirements

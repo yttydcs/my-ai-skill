@@ -15,6 +15,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 - User: owns goals, priorities, docs publication choices, and explicit archive-only pauses when they do not want default workflow closeout.
 - Main Codex agent: owns phase orchestration, requirements decisions, architecture decisions, integration, validation summary, and final acceptance.
 - Optional sub-agents: may perform bounded read-only research, implementation, or review work only when the active phase permits delegation.
+- `$m-go` worker sub-agents: perform all implementation edits for `$m-go` runs while the main Codex agent schedules, audits, validates, and accepts results.
 
 ## Entry Points
 
@@ -22,6 +23,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 - `$m-discuss`: discovery, brainstorming, current-practice research when useful, requirement shaping, and early worktree setup.
 - `$m-plan`: architecture and execution planning.
 - `$m-execute`: confirmed Task ID implementation and lightweight validation.
+- `$m-go`: high-automation delegated execution and automatic `$m-test` loop for confirmed plans.
 - `$m-test`: optional heavy validation and review.
 - `$m-archive`: change archive, lessons, default workflow closeout, merge decision, and cleanup routing.
 
@@ -33,13 +35,14 @@ Give the user one disciplined workflow family for turning an idea into discussio
 4. Planning turns the discussion brief into requirements, architecture, and a handoff-ready `plan.md` / `todo.md`.
 5. `$m-plan` shows a concise task summary table directly in the user response.
 6. The user approves execution scope.
-7. Execution implements only approved Task IDs and runs lightweight checks.
-8. Heavy testing runs when risk justifies it, or the user may explicitly skip it and proceed to archive with residual risk recorded.
-9. When heavy testing runs for UI changes, Codex opens and operates the affected interface and provides screenshot evidence.
-10. `$m-test` reports a concise pass/fail table directly in the user response.
-11. Archive records the change, stable-doc impact, lessons impact, validation, rollback, and sub-agent trace.
-12. Archive closes the workflow by default through verified control-plane merge and worktree cleanup.
-13. The workflow stops after archive only when the user explicitly asks for archive-only handling, no merge, or no cleanup.
+7. Execution implements only approved Task IDs and runs lightweight checks through `$m-execute`, or the user invokes `$m-go` for delegated implementation and an automatic `$m-test` loop.
+8. `$m-go` dispatches implementation edits to worker sub-agents, reviews their results, runs validation, and delegates bounded fixes until acceptance passes or a blocker is explicit.
+9. Heavy testing runs when risk justifies it, when `$m-go` automatically invokes it, or when the user requests it; the user may explicitly skip `$m-test` only outside the normal `$m-go` path and proceed to archive with residual risk recorded.
+10. When heavy testing runs for UI changes, Codex opens and operates the affected interface and provides screenshot evidence.
+11. `$m-test` reports a concise pass/fail table directly in the user response.
+12. Archive records the change, stable-doc impact, lessons impact, validation, rollback, and sub-agent trace.
+13. Archive closes the workflow by default through verified control-plane merge and worktree cleanup.
+14. The workflow stops after archive only when the user explicitly asks for archive-only handling, no merge, or no cleanup.
 
 ## Artifacts And Layout
 
@@ -72,6 +75,8 @@ Give the user one disciplined workflow family for turning an idea into discussio
 - Blocked output uses `问题清单` and `阻塞：是`.
 - Planning must include a direct task summary table that reflects the active `plan.md` / `todo.md`.
 - Execution must report lightweight validation.
+- `$m-go` must require a confirmed plan, delegate implementation edits to sub-agents, run safe parallel task execution when write sets allow it, and automatically run `$m-test` behavior after delegated execution.
+- `$m-go` must return failing validation to delegated fixes until acceptance passes or the blocker is explicit.
 - Heavy validation must report either passed checks or skip rationale with residual risk.
 - UI-impacting changes tested through `$m-test` must include actual UI operation evidence and screenshot paths.
 - `$m-test` must include a concise direct pass/fail table so the user can understand results without opening archive markdown.
@@ -103,6 +108,10 @@ Given one user capability is implemented by several repos, when the workflow doc
 
 Given a low-risk small change passes execution checks, when heavy testing is unnecessary, then Codex records the skip reason and residual risk before archive.
 
+### Automated Delegated Execution
+
+Given the user invokes `$m-go` after a confirmed plan, when executable Task IDs have bounded write sets, then Codex delegates implementation edits to worker sub-agents, runs safe parallel lanes where possible, automatically runs `$m-test`, and loops delegated fixes until the acceptance checks pass or a blocker is explicit.
+
 ### UI Change Validation
 
 Given a workflow changes UI, when `$m-test` runs, then Codex opens the affected interface, operates the affected user path, captures screenshot evidence, and summarizes pass/fail status in a direct table.
@@ -122,6 +131,7 @@ Given the user explicitly chooses to skip `$m-test`, when the workflow proceeds 
 ## Related Decisions
 
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
+- [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
 
 ## Related Changes
 

@@ -8,6 +8,7 @@ Use this file to coordinate the `m-autoflow` phases.
 - `$m-discuss` owns discovery, brainstorming, optional web research, and early worktree setup.
 - `$m-plan` owns architecture and executable planning.
 - `$m-execute` owns implementation and lightweight validation.
+- `$m-go` owns delegated implementation orchestration and automatic `$m-test` looping after planning.
 - `$m-test` owns optional heavy validation and review.
 - `$m-archive` owns change archive, lessons, default workflow closeout, merge, and cleanup.
 - Do not run web research by default; use it from `$m-discuss` only when current external facts or best practices matter.
@@ -117,6 +118,11 @@ Entry condition:
 
 - discuss and plan are unblocked, or direct plan invocation recorded why discuss was skipped
 
+Execution entry choices:
+
+- `$m-execute` is the normal implementation entry and may use sub-agents when the parallelism assessment allows it.
+- `$m-go` is the high-automation implementation entry; it requires worker sub-agents for all implementation edits and automatically enters `$m-test` behavior after delegated execution converges.
+
 Rules:
 
 - Map every code change to a Task ID.
@@ -134,6 +140,7 @@ Rules:
 - Provide runnable validation steps or tests for key and edge paths.
 - Do not introduce plan-external changes; if required, return to `3.1` and update the plan first.
 - After parallel work completes, the main agent must integrate results, resolve conflicts, and run regression verification.
+- In `$m-go` flows, the main agent must coordinate, inspect, run commands, and accept or reject worker results, but any implementation or integration file edit must be delegated to a worker with a bounded write set.
 - Return to `3.1` if the work expands beyond the confirmed plan.
 - Run lightweight implementation validation before leaving this stage when practical:
   - syntax checks
@@ -180,6 +187,8 @@ When UI is impacted and `$m-test` runs:
 - mark the test `不通过` or `阻塞` if UI evidence cannot be gathered
 
 If any item fails, return to `3.2`.
+
+In `$m-go` flows, failed review or test items return to delegated fixes, then the review loop runs again until all acceptance checks pass or a blocker is explicit.
 
 ## Stage 4 - Change Archive
 

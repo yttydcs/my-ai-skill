@@ -1,0 +1,4 @@
+interface:
+  display_name: "m:go"
+  short_description: "Run delegated execution and testing"
+  default_prompt: "Use $m-go to execute approved plan tasks with worker sub-agents and automatic testing."

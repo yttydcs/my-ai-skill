@@ -7,6 +7,7 @@ Use this file only in stages `3.2` and `3.3`.
 - Sub-agents are forbidden in stages `1`, `2`, `3.1`, and `4`.
 - Exception: `$m-discuss` may use read-only research sub-agents when the user explicitly asks for web research or current external facts and host policy permits delegation.
 - The research exception does not allow code edits, worktree changes, plan confirmation, implementation, validation, archive, merge, or cleanup delegation.
+- `$m-go` is a strict delegated execution entry for stages `3.2` and `3.3`: implementation edits must be done by worker sub-agents, while the main agent coordinates and audits.
 
 ## Mandatory Parallelism Assessment
 
@@ -28,6 +29,8 @@ If sub-agents are not used, state why, such as:
 
 For `$m-discuss` research, assess whether the research can be split into independent read-only lanes. Use parallel research sub-agents only when this split is clear, and record the lanes plus synthesis responsibility.
 
+For `$m-go`, do not skip sub-agents for implementation edits. If delegation is unavailable or unsafe, block `$m-go` instead of falling back to main-agent implementation.
+
 ## Hard Preconditions
 
 Do not delegate unless all of these are true:
@@ -38,6 +41,8 @@ Do not delegate unless all of these are true:
 - the context package is complete
 - host platform policy allows delegation
 - user authorization exists when the host requires it
+
+For `$m-go`, the user's `$m-go` invocation counts as authorization for worker sub-agent execution within the approved plan scope when host policy permits delegation.
 
 For research-only delegation, the active plan may be absent, but all of these must be true:
 
@@ -62,6 +67,8 @@ The main agent must retain responsibility for:
 - code integration
 - final acceptance
 - external status reporting
+
+For `$m-go`, if integration requires file edits, those edits must be delegated to a worker with a bounded write set. The main agent may inspect files, run commands, review diffs, and decide acceptance, but must not directly edit implementation files.
 
 ## Inheritance Rule
 
@@ -99,6 +106,7 @@ Tell each sub-agent:
 - do not add plan-external changes
 - do not revert user or other agent changes
 - report changed files, test results, risks, and completion status
+- if working under `$m-go`, remember that other workers may be active and accommodate their changes without reverting them
 
 ## Required Sub-agent Output
 

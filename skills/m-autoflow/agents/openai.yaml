@@ -1,4 +1,4 @@
 interface:
   display_name: "m:autoflow"
   short_description: "Run staged, auditable software workflows"
-  default_prompt: "Use $m-autoflow to run the full discuss-plan-execute-test-archive workflow."
+  default_prompt: "Use $m-autoflow to run the full discuss-plan-execute-or-go-test-archive workflow."

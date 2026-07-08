@@ -1,13 +1,13 @@
 ---
 name: m-test
-description: Optional heavy test and review phase for the m-autoflow workflow. Use after $m-execute when the change needs integration testing, end-to-end workflow validation, UI operation with screenshot evidence, manual or product usability review, security review, performance metrics, or final high-risk review before docs/change archival. Users may explicitly skip this phase and go to $m-archive, but the skip reason and residual risk must be recorded.
+description: Optional heavy test and review phase for the m-autoflow workflow. Use after $m-execute or inside $m-go when the change needs integration testing, end-to-end validation, UI screenshot evidence, usability review, security review, performance metrics, or final high-risk review before docs/change archival.
 ---
 
 # m:test
 
 ## Overview
 
-Use this skill for heavyweight validation and review after `$m-execute`. It is optional: the user may explicitly skip this phase and proceed to `$m-archive`, with the skip reason and residual risk recorded.
+Use this skill for heavyweight validation and review after `$m-execute` or inside the automatic `$m-go` test loop. It is optional for normal `$m-execute` flows: the user may explicitly skip this phase and proceed to `$m-archive`, with the skip reason and residual risk recorded.
 
 When this phase runs for UI-impacting changes, the UI must be opened, the affected path must be operated, and screenshot evidence must be reported. Missing UI evidence is a failed or blocked `$m-test`, not a pass.
 
