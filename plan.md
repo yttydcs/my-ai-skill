@@ -6,7 +6,7 @@
 - Branch: `refactor/docs-private-governance`
 - Base: `main`
 - Worktree: `D:\project\my-ai-skills\worktrees\docs-private-governance`
-- Current Stage: `3.2 - Execution complete, awaiting review/archive`
+- Current Stage: `4 - Archive complete, awaiting workflow-end decision`
 - Planning skill: `$m-autoflow-plan`
 - Docs governance skill: `$m-docs`
 
@@ -431,7 +431,7 @@ Used `$m-docs` for routing and impact review.
 - [x] `PDG-3` Update `m-autoflow` and `m-autoflow-plan` to use private docs roots during planning and archive.
 - [x] `PDG-4` Validate and sync affected skills.
 - [x] `PDG-5` Commit approved execution changes locally.
-- [ ] `PDG-6` Review and archive the workflow.
+- [x] `PDG-6` Review and archive the workflow.
 - [ ] `PDG-7` Decide docs remote, push, or backup strategy.
 - [ ] `PDG-8` Create or migrate docs for any external user project.
 
@@ -759,15 +759,105 @@ Used `$m-docs` for routing and impact review.
 - Blocked: No.
 - Exit criteria met for Stage 3.2.
 
+### Stage 4 - Review And Archive
+
+#### Docs Governance Routing Decision
+
+Used `$m-docs` for archive routing, stable-doc impact checks, and index updates.
+
+- Docs root:
+  - `D:\project\my-ai-skills\worktrees\docs-private-governance\docs`
+- Related intake:
+  - `docs/intake/2026-07-08_docs-private-governance.md`
+- Related features:
+  - `docs/features/README.md`
+- Related requirements:
+  - `docs/requirements/m-docs-skill.md`
+  - `docs/requirements/m-autoflow-skill.md`
+- Related specs:
+  - `docs/specs/m-docs-skill.md`
+  - `docs/specs/m-autoflow-skill.md`
+- Related decisions:
+  - `docs/decisions/2026-07-08_private-docs-root-and-feature-first-governance.md`
+- Related lessons:
+  - None.
+
+#### Stable Docs Impact
+
+- Intake impact: updated
+- Feature impact: updated
+- Requirements impact: updated
+- Specs impact: updated
+- Decision impact: updated
+- Lessons impact: none
+
+#### Review Result
+
+- Review passed after one small fix.
+- Finding:
+  - `skills/m-docs/scripts/bootstrap_docs_tree.py --module` accepted unvalidated module bucket input.
+- Resolution:
+  - Added module-path validation before any directory or file action.
+  - The script now rejects absolute, drive-qualified, or path-traversing module names.
+  - Updated `docs/specs/m-docs-skill.md` so this safety rule is stable docs, not only code behavior.
+- Residual risk:
+  - None known.
+
+#### Archive Records
+
+- Created `docs/intake/2026-07-08_docs-private-governance.md`.
+- Created `docs/decisions/2026-07-08_private-docs-root-and-feature-first-governance.md`.
+- Created `docs/change/2026-07-08_docs-private-governance.md`.
+- Updated category indexes:
+  - `docs/intake/README.md`
+  - `docs/decisions/README.md`
+  - `docs/change/README.md`
+
+#### Lessons Decision
+
+- No new lesson document was created.
+- Reason:
+  - The review finding was a straightforward script input-validation gap, not an expensive or recurring troubleshooting path.
+  - Searchable cues and the quick check are recorded in the change archive.
+
+#### Validation
+
+- `python -m py_compile skills\m-docs\scripts\bootstrap_docs_tree.py`
+- `python skills\m-docs\scripts\bootstrap_docs_tree.py --docs-root tmp\docs-bootstrap-smoke --module personnel --dry-run`
+- `python skills\m-docs\scripts\bootstrap_docs_tree.py --docs-root tmp\docs-bootstrap-smoke --module ..\escape --dry-run`
+  - result: `exit=2`
+- `git diff --check`
+- `tools\validate-skills.ps1 -Skill m-docs`
+- `tools\validate-skills.ps1 -Skill m-autoflow`
+- `tools\validate-skills.ps1 -Skill m-autoflow-plan`
+- `tools\validate-skills.ps1 -Skill m-autoflow-archive`
+- `tools\sync-skills.ps1 -Skill m-docs`
+- `tools\sync-skills.ps1 -Skill m-autoflow`
+- `tools\sync-skills.ps1 -Skill m-autoflow-plan`
+- `tools\sync-skills.ps1 -Skill m-autoflow-archive`
+
+All checks passed.
+
+#### Stage 4 Issue List
+
+- None.
+- Blocked: No.
+- Exit criteria met for Stage 4.
+
 ## Exit Gate
 
-Execution scope after approval:
+Workflow status after `PDG-6`:
 
-- Will execute: `PDG-1`, `PDG-2`, `PDG-3`, `PDG-4`, `PDG-5`
-- Will not execute now:
-  - `PDG-6` - separate review/archive phase after implementation and validation.
+- Completed:
+  - `PDG-1`
+  - `PDG-2`
+  - `PDG-3`
+  - `PDG-4`
+  - `PDG-5`
+  - `PDG-6`
+- Not executed:
   - `PDG-7` - user-owned remote/push/backup decision.
   - `PDG-8` - future target-project migration requires separate approval.
 
 Blocked: no
-Enter execution only after the user explicitly confirms this plan.
+Archive complete. Do not merge or clean up the worktree until the user explicitly confirms workflow end.

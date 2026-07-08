@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 
 ROOT_README = """# Documentation
@@ -184,6 +184,31 @@ def resolve_docs_root(args: argparse.Namespace) -> Path:
     raise ValueError("Pass project_root or --docs-root.")
 
 
+def normalize_module_path(raw_module: str) -> PurePosixPath | None:
+    module = raw_module.strip().replace("\\", "/")
+    if not module:
+        return None
+
+    module_path = PurePosixPath(module)
+    if module_path.is_absolute() or any(
+        part in {"", ".", ".."} or ":" in part for part in module_path.parts
+    ):
+        raise ValueError(
+            f"Invalid --module value: {raw_module!r}. "
+            "Use a relative module name without drives, '.', or '..'."
+        )
+    return module_path
+
+
+def collect_module_paths(raw_modules: list[str]) -> list[PurePosixPath]:
+    module_paths = []
+    for raw_module in raw_modules:
+        module_path = normalize_module_path(raw_module)
+        if module_path is not None:
+            module_paths.append(module_path)
+    return module_paths
+
+
 def ensure_directory(path: Path, dry_run: bool) -> None:
     if dry_run:
         print(f"[mkdir] {path}")
@@ -206,6 +231,7 @@ def main() -> int:
 
     try:
         docs_root = resolve_docs_root(args)
+        module_paths = collect_module_paths(args.module)
     except ValueError as exc:
         print(f"error: {exc}")
         return 2
@@ -237,40 +263,38 @@ def main() -> int:
         write_file(docs_root / "lessons" / "README.md", LESSONS_README, args.force, args.dry_run),
     ]
 
-    for raw_module in args.module:
-        module = raw_module.strip()
-        if not module:
-            continue
+    for module_path in module_paths:
+        module = module_path.as_posix()
         module_dirs = [
-            docs_root / "features" / module,
-            docs_root / "requirements" / module,
-            docs_root / "specs" / module,
-            docs_root / "lessons" / module,
+            docs_root / "features" / module_path,
+            docs_root / "requirements" / module_path,
+            docs_root / "specs" / module_path,
+            docs_root / "lessons" / module_path,
         ]
         for directory in module_dirs:
             ensure_directory(directory, args.dry_run)
         actions.extend(
             [
                 write_file(
-                    docs_root / "features" / module / "README.md",
+                    docs_root / "features" / module_path / "README.md",
                     MODULE_FEATURES.format(module=module),
                     args.force,
                     args.dry_run,
                 ),
                 write_file(
-                    docs_root / "requirements" / module / "README.md",
+                    docs_root / "requirements" / module_path / "README.md",
                     MODULE_REQUIREMENTS.format(module=module),
                     args.force,
                     args.dry_run,
                 ),
                 write_file(
-                    docs_root / "specs" / module / "README.md",
+                    docs_root / "specs" / module_path / "README.md",
                     MODULE_SPECS.format(module=module),
                     args.force,
                     args.dry_run,
                 ),
                 write_file(
-                    docs_root / "lessons" / module / "README.md",
+                    docs_root / "lessons" / module_path / "README.md",
                     MODULE_LESSONS.format(module=module),
                     args.force,
                     args.dry_run,

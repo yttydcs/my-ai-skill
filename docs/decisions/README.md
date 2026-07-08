@@ -24,4 +24,4 @@ Store append-only architecture decision records for choices that shape structure
 
 ## Current Docs
 
-- None yet.
+- [2026-07-08_private-docs-root-and-feature-first-governance.md](2026-07-08_private-docs-root-and-feature-first-governance.md)

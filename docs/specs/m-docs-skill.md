@@ -84,6 +84,7 @@ The skill is packaged as `skills/m-docs` and keeps the routing logic in small re
 - The generated `docs/decisions/README.md` must explain append-only decision records.
 - The generated `docs/change/README.md` must remind users to promote reusable troubleshooting knowledge into `lessons`.
 - The generated `docs/lessons/README.md` must require lookup hints.
+- Module bucket input must be validated before any directory or file action; reject absolute, drive-qualified, or path-traversing names.
 
 ## Validation Contract
 

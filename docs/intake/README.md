@@ -25,4 +25,4 @@ Store original request evidence before it is refined into feature, requirement, 
 
 ## Current Docs
 
-- None yet.
+- [2026-07-08_docs-private-governance.md](2026-07-08_docs-private-governance.md) - source: Codex chat, docs governance/privacy/multi-repo requirements
