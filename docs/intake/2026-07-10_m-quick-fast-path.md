@@ -39,7 +39,8 @@ The command must still use `$m-docs` to read relevant project documentation befo
 - [Durable requirements](../requirements/m-quick-fast-path.md)
 - [Technical specification](../specs/m-quick-skill.md)
 - [Architecture decision](../decisions/2026-07-10_m-quick-standalone-fast-path.md)
+- [Archived plan](../plan/2026-07-10_m-quick-fast-path.md)
 
 ## Related Changes
 
-- To be added during `$m-archive` after implementation and validation.
+- [2026-07-10_m-quick-fast-path.md](../change/2026-07-10_m-quick-fast-path.md)

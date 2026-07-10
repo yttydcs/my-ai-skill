@@ -67,4 +67,4 @@ High. The boundary is explicit, and the existing `$m-docs` skill already provide
 
 ## Related Changes
 
-- To be added during archive.
+- [2026-07-10_m-quick-fast-path.md](../change/2026-07-10_m-quick-fast-path.md)

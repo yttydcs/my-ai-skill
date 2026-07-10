@@ -28,3 +28,4 @@ Store reusable incident knowledge, query-friendly troubleshooting lessons, and p
 
 - [searchable-lessons-capture.md](searchable-lessons-capture.md) - keywords: archive, lessons, troubleshooting, recurring investigation
 - [skill-frontmatter-yaml-colon.md](skill-frontmatter-yaml-colon.md) - keywords: skill validator, YAML frontmatter, colon, description, mapping values are not allowed
+- [windows-skill-parity-line-endings.md](windows-skill-parity-line-endings.md) - keywords: installed skill drift, SHA-256 mismatch, CRLF, LF, sync-skills, ignore-space-at-eol

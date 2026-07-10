@@ -102,4 +102,4 @@ Provide a direct one-command path for low-risk work that always reads relevant d
 
 ## Related Changes
 
-- To be added during archive.
+- [2026-07-10_m-quick-fast-path.md](../change/2026-07-10_m-quick-fast-path.md)

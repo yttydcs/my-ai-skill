@@ -136,4 +136,8 @@ Escalated or blocked results must identify the failed gate and recommend `$m-dis
 
 ## Related Changes
 
-- To be added during archive.
+- [2026-07-10_m-quick-fast-path.md](../change/2026-07-10_m-quick-fast-path.md)
+
+## Related Lessons
+
+- [windows-skill-parity-line-endings.md](../lessons/windows-skill-parity-line-endings.md)

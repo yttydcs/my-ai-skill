@@ -10,7 +10,7 @@
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-quick`
 - Installed Skill Root: `C:\Users\HelloWorld\.codex\skills`
-- Current Stage: `$m-execute`, Q1-Q4 implemented and lightweight validation complete
+- Current Stage: `$m-archive`, archive artifacts complete and default control-plane closeout pending
 
 ## Stage Records
 
@@ -566,7 +566,7 @@ Use `$m-docs` as follows:
 #### Deferred Task IDs
 
 - Q5 - Not executed. Independent heavy forward-testing remains optional under `$m-test`.
-- Q6 - Not executed. Archive, merge, and worktree cleanup remain owned by `$m-archive`.
+- Q6 - Completed by `$m-archive`; archive artifacts are committed before the control-plane merge and cleanup sequence.
 - Q7 - Not executed. Push remains owned by explicit `$m-gitpush`.
 
 #### Changed Files By Task
@@ -645,3 +645,37 @@ Q4:
 #### Sub-agent Trace
 
 - No sub-agents were used. The host exposed no implementation sub-agent dispatch tool, and the user invoked `$m-execute`, which permits direct main-agent implementation.
+
+### Stage 4 - Archive And Closeout
+
+#### Archive Artifacts
+
+- Plan archive: `docs/plan/2026-07-10_m-quick-fast-path.md`
+- Change archive: `docs/change/2026-07-10_m-quick-fast-path.md`
+- Promoted lesson: `docs/lessons/windows-skill-parity-line-endings.md`
+
+#### Stable Docs Impact
+
+- Intake impact: updated
+- Feature impact: updated
+- Requirements impact: updated
+- Specs impact: updated
+- Decision impact: updated
+- Lessons impact: updated
+
+#### Validation Decision
+
+- Implementation and installed-skill validation passed.
+- Optional independent heavy forward-testing was skipped after its residual risk was disclosed.
+- The user's explicit `$m-archive` invocation accepted closeout on that basis.
+- UI evidence was not applicable because no runtime visual UI changed.
+
+#### Closeout Mode
+
+- Default archive-and-end semantics apply.
+- After the archive commit, the control plane fast-forwards `main`, verifies status, removes the dedicated worktree, and deletes the merged local feature branch.
+- No remote push, docs publication, deployment, or backup action is included.
+
+#### Lessons Decision
+
+- Added `windows-skill-parity-line-endings.md` because line-ending-only hash mismatches are a reusable Windows environment pitfall likely to recur during replace-style skill sync checks.

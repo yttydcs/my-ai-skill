@@ -170,8 +170,9 @@ Given an eligible bounded UI change, when validation runs, then the actual UI pa
 
 ## Related Changes
 
-- To be added during archive.
+- [2026-07-10_m-quick-fast-path.md](../change/2026-07-10_m-quick-fast-path.md)
 
 ## Related Lessons
 
 - [skill-frontmatter-yaml-colon.md](../lessons/skill-frontmatter-yaml-colon.md)
+- [windows-skill-parity-line-endings.md](../lessons/windows-skill-parity-line-endings.md)
