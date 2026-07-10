@@ -1,0 +1,15 @@
+{
+  "name": "m-quick",
+  "version": "0.1.0",
+  "install_mode": "copy",
+  "source_dir": "skills/m-quick",
+  "dist_dir": "dist/codex/m-quick",
+  "codex_install_root": "%USERPROFILE%/.codex/skills",
+  "depends_on_skills": [
+    "m-autoflow",
+    "m-docs"
+  ],
+  "reference_files": [
+    "references/quick.md"
+  ]
+}

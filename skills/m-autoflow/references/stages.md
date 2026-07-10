@@ -5,6 +5,7 @@ Use this file to coordinate the `m-autoflow` phases.
 ## Global Rules
 
 - Only one stage may be active at a time.
+- `$m-quick` is a standalone docs-first fast path outside the stage chain; it may directly edit one selected repository only after its own low-risk gate passes.
 - `$m-discuss` owns discovery, brainstorming, optional web research, and early worktree setup.
 - `$m-plan` owns architecture and executable planning.
 - `$m-execute` owns implementation and lightweight validation.
@@ -17,6 +18,30 @@ Use this file to coordinate the `m-autoflow` phases.
   - update the affected plan or archive docs before proceeding
 - If information is unclear, missing, ambiguous, or based on an unconfirmed assumption, stop and ask the user instead of guessing.
 - Before unresolved issues are fixed, output `问题清单`, mark `阻塞：是`, and forbid advancing or coding.
+
+## Standalone Fast Path - m:quick
+
+`$m-quick` does not enter discuss, plan, implementation, test, or archive stages.
+
+Before editing:
+
+- read project-local instructions
+- identify `project_root`, governed `docs_root`, and exactly one target code repository
+- explicitly use `$m-docs` to read the minimum relevant indexes and stable leaf docs
+- inspect Git status, pre-existing diffs, nearby code, and focused validation surfaces
+- apply the eligibility and automatic-escalation rules from `../../m-quick/references/quick.md`
+
+When the gate passes:
+
+- let the main agent edit the selected current checkout directly
+- do not create a quick-request branch, worktree, root plan, intake record, plan archive, or change archive by default
+- run focused validation and require actual operation plus screenshot evidence for UI-impacting work
+- update stable docs through `$m-docs` only when stable truth changed
+- output the direct `$m-quick` result table
+
+When the gate fails, do not silently enter or create a staged workflow. Recommend `$m-discuss` for unclear intent or conflicting truth, or `$m-plan` for clear but coordinated or high-risk work.
+
+Project-local instructions may require a commit. Push, publication, deployment, merge, archive, and backup choices remain explicit user decisions.
 
 ## Discuss - Discovery And Requirements Shaping
 
@@ -122,6 +147,7 @@ Execution entry choices:
 
 - `$m-execute` is the normal implementation entry and may use sub-agents when the parallelism assessment allows it.
 - `$m-go` is the high-automation implementation entry; it requires worker sub-agents for all implementation edits and automatically enters `$m-test` behavior after delegated execution converges.
+- `$m-quick` is not a stage `3.2` entry and does not weaken the worktree or confirmed-plan gates in this section.
 
 Rules:
 

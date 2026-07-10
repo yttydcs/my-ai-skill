@@ -1,18 +1,19 @@
 ---
 name: m-autoflow
-description: Umbrella collection for the m-* staged engineering workflow. Use when the user wants the whole disciplined flow without invoking each phase manually, routing to $m-discuss, $m-plan, $m-execute, $m-go, $m-test, and $m-archive.
+description: Umbrella collection for the m-* engineering workflow. Use when the user wants the full staged flow or needs routing among the standalone $m-quick fast path and $m-discuss, $m-plan, $m-execute, $m-go, $m-test, and $m-archive phases.
 ---
 
 # m:autoflow
 
 ## Overview
 
-Use this skill as the umbrella entry for the staged `m-*` workflow. It routes the user through the phase skills and shared references without duplicating each phase's full instructions.
+Use this skill as the umbrella entry for the `m-*` workflow collection. It routes the user to the standalone fast path or through staged phase skills and shared references without duplicating their full instructions.
 
 ## Quick Start
 
 - Invoke `$m-autoflow` when the user wants the full workflow.
-- Route to phase skills:
+- Route to companion skills:
+  - `$m-quick` for an explicit, bounded, low-risk one-repo direct change after mandatory `$m-docs` context reading; it is a standalone fast path, not a phase.
   - `$m-discuss` for discovery, brainstorming, optional current research, and early worktree setup.
   - `$m-plan` for architecture, rejection of bad requirements, and executable `plan.md` / `todo.md` gating.
   - `$m-execute` for approved Task ID implementation and lightweight validation.
@@ -28,16 +29,18 @@ Use this skill as the umbrella entry for the staged `m-*` workflow. It routes th
 
 ## Workflow
 
-1. Start with `$m-discuss` unless the user explicitly enters a later phase with a valid artifact.
-2. Use `$m-plan` only after the requirement is coherent enough for architecture planning.
-3. Use `$m-execute` only after the plan is confirmed and the user approved implementation.
-4. Use `$m-go` only after the plan is confirmed and the user wants delegated implementation plus automatic `$m-test` looping.
-5. Use `$m-test` when heavy validation is needed, or record a justified skip. In `$m-go` flows, `$m-test` runs automatically unless the workflow blocks or the user changes path.
-6. Use `$m-archive` after validation to write governed archives and close the workflow by default.
-7. Stop after archive only when the user explicitly requested archive-only handling, no merge, or no cleanup.
+1. Use `$m-quick` only as an explicit standalone alternative when its own docs-first eligibility gate passes; it does not enter the staged workflow.
+2. For staged work, start with `$m-discuss` unless the user explicitly enters a later phase with a valid artifact.
+3. Use `$m-plan` only after the requirement is coherent enough for architecture planning.
+4. Use `$m-execute` only after the plan is confirmed and the user approved implementation.
+5. Use `$m-go` only after the plan is confirmed and the user wants delegated implementation plus automatic `$m-test` looping.
+6. Use `$m-test` when heavy validation is needed, or record a justified skip. In `$m-go` flows, `$m-test` runs automatically unless the workflow blocks or the user changes path.
+7. Use `$m-archive` after validation to write governed archives and close the staged workflow by default.
+8. Stop after archive only when the user explicitly requested archive-only handling, no merge, or no cleanup.
 
 ## Split Phase Mapping
 
+- Quick: use `$m-quick` as a standalone fast path outside the staged phase chain.
 - Discuss: use `$m-discuss` for discovery, optional research, and early workflow setup.
 - Plan: use `$m-plan` for architecture and executable planning.
 - Execute: use `$m-execute` for implementation and lightweight validation.
@@ -45,14 +48,14 @@ Use this skill as the umbrella entry for the staged `m-*` workflow. It routes th
 - Test: use `$m-test` for optional heavy validation and review.
 - Archive: use `$m-archive` for archive and workflow-end closeout.
 
-The phase skills are companion entry points. Keep `$m-autoflow` as the whole-workflow command.
+The phase and fast-path skills are companion entry points. Keep `$m-autoflow` as the collection and whole-workflow command.
 
 ## Guardrails
 
 - Only one stage may be active at a time.
 - Do not silently skip, merge, or reorder stages. `$m-test` may be explicitly skipped by the user or skipped with recorded low-risk rationale.
 - Do not assume missing business rules, data contracts, interfaces, environment details, dependency versions, acceptance criteria, or user preferences.
-- Do not write code without a dedicated worktree and confirmed `plan.md`.
+- Do not write code in the staged workflow without a dedicated worktree and confirmed `plan.md`. `$m-quick` is the sole explicit direct-edit exception and must follow its own docs-first low-risk gate.
 - Do not treat rollback as a silent action; state the reason and update the affected docs.
 - Do not dispatch sub-agents without a complete context package and an allowed phase.
 - Do not treat `docs/change` as the stable source of truth for intake, features, requirements, specs, or decisions.
@@ -75,6 +78,8 @@ The phase skills are companion entry points. Keep `$m-autoflow` as the whole-wor
   - compact templates for `plan.md`, blocker output, `docs/change`, and `docs/lessons`
 - `../m-discuss/SKILL.md`
   - discussion and optional research entry point
+- `../m-quick/SKILL.md`
+  - standalone guarded direct-edit entry point
 - `../m-plan/SKILL.md`
   - planning entry point
 - `../m-execute/SKILL.md`

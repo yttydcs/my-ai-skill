@@ -6,7 +6,7 @@ This repository stores reusable Codex skills as Git-managed source packages. It 
 
 ## Goal
 
-Provide a reusable `m-autoflow` workflow collection with focused phase skills for discussion, planning, execution, testing, and archive.
+Provide a reusable `m-autoflow` workflow collection with focused phase skills for discussion, planning, execution, testing, and archive, plus a guarded standalone fast path for bounded direct changes.
 
 ## Scope
 
@@ -15,12 +15,13 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - preserve `$m-autoflow` as the umbrella workflow entry point
 - provide canonical phase entries named `$m-discuss`, `$m-plan`, `$m-execute`, `$m-test`, and `$m-archive`
 - provide `$m-go` as a canonical high-automation execution entry after planning
+- provide `$m-quick` as a canonical standalone direct-edit entry for explicit low-risk work in one repository
 - keep the umbrella thin by routing to phase skills and shared references instead of duplicating phase instructions
 - let `$m-discuss` own discovery, brainstorming, option comparison, requirement shaping, optional current-practice research, and early worktree setup
 - let `$m-plan` own requirements consolidation, architecture design, execution planning, and approval gating
 - require `$m-plan` to reject unreasonable, unsafe, contradictory, or under-specified requirements and return to discussion with alternatives
-- require worktree-first execution before implementation, with worktree setup starting during discussion when project boundaries are clear
-- require `plan.md` or `todo.md` in the active worktree before implementation
+- require worktree-first staged execution before implementation, with worktree setup starting during discussion when project boundaries are clear
+- require `plan.md` or `todo.md` in the active worktree before staged implementation
 - require planning artifacts to explicitly separate tasks that will execute after approval from tasks that will not execute in the next execution phase, with a reason for every non-executed task
 - require `$m-plan` to directly output a concise task summary table after creating or confirming the active plan
 - require explicit blocker handling with `问题清单` and `阻塞：是`
@@ -41,6 +42,9 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - treat `$m-test` as optional heavy validation for integration, end-to-end flow, UI evidence, usability, security, and performance; allow the user to explicitly skip it and go to `$m-archive` when the reason and residual risk are recorded
 - require `$m-test`, when run for UI-impacting changes, to open the affected UI, operate the affected path, and provide screenshot evidence
 - require `$m-test` to directly output a concise pass/fail/blocked/skipped result table
+- require `$m-quick` to use `$m-docs` for minimum relevant context before eligibility or direct edits
+- require `$m-quick` to preserve existing changes, reject prohibited risk, run focused validation, and expose docs/gate/change/validation/risk results directly
+- keep `$m-quick` outside the staged phase chain and forbid it from weakening normal worktree, plan, review, and archive gates
 
 ### Optional
 
@@ -68,6 +72,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - The user wants a feature such as personnel management to be documented once as a complete feature dossier, even when several repos implement it.
 - The user wants to run only discussion, planning, execution, testing, or archive without loading the full umbrella workflow.
 - The user wants higher automation after planning, with implementation edits handled by sub-agents and testing run automatically.
+- The user wants to fix an explicit bounded bug or small requirement directly in one repository without creating staged workflow artifacts, while still reading governed docs first.
 - The user makes a small low-risk change where lightweight execution-stage validation is sufficient and heavyweight workflow testing should be skipped with a recorded reason.
 - The user changes UI and expects visual validation evidence instead of code-only review.
 - The user wants a compact test result summary in chat without opening markdown artifacts.
@@ -76,6 +81,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 ## Functional Requirements
 
 - `$m-autoflow` must route the user into the appropriate phase skills and shared references.
+- `$m-autoflow` must expose `$m-quick` as a standalone alternate route rather than a staged phase.
 - `$m-autoflow` must not duplicate full phase instructions that already belong to a phase skill.
 - `$m-discuss` must check project, docs, code-repo, and worktree boundaries when those affect the workflow.
 - `$m-discuss` must use web research only when current external facts, best practices, source-backed comparison, or the user's explicit request make research useful.
@@ -103,6 +109,13 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-go` must automatically run `$m-test` behavior after delegated implementation completes.
 - `$m-go` must return failed validation to delegated fixes and repeat the validation loop until acceptance passes or the blocker is explicit.
 - `$m-go` must stop before `$m-archive`, merge, cleanup, or push.
+- `$m-quick` must explicitly use `$m-docs` before it accepts eligibility or edits code.
+- `$m-quick` must select one target Git repository, inspect current status, preserve existing work, and use a risk-based gate rather than a hard file or line limit.
+- `$m-quick` must escalate conflicting docs, ambiguity, multi-repo work, architecture, public contracts, schema/migration, security, destructive data, production infrastructure, broad dependency changes, or broad validation needs.
+- `$m-quick` must edit the selected current checkout directly only after its gate passes, without creating a quick-request worktree, plan, or archive by default.
+- `$m-quick` must run focused validation and require actual UI operation plus screenshot evidence for UI-impacting quick changes.
+- `$m-quick` must use `$m-docs` to update canonical stable docs only when stable truth changed, and must not create workflow history artifacts merely because it ran.
+- `$m-quick` must output a compact direct result table and stop without automatic archive, merge, cleanup, push, publication, or deployment.
 - `$m-test` must decide whether heavy validation is needed, record skip rationale when skipped, and review usability, security, and performance when it runs.
 - `$m-test` must require actual UI opening, user-path operation, and screenshot evidence when it runs for UI-impacting changes.
 - `$m-test` must treat missing UI evidence during a run `$m-test` as `不通过` or `阻塞`, not as a pass.
@@ -142,6 +155,9 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - Current external facts may be stale or conflicting; online research must mark uncertainty instead of treating unverified findings as stable truth.
 - A lightweight execution check may be blocked by repo configuration; the workflow must record the reason and residual risk instead of hiding the gap.
 - Heavy testing may be unnecessary for low-risk changes; the workflow must record why it was skipped.
+- A quick request may lack matching docs; it may proceed only when local evidence keeps the work self-contained and unambiguous, and the missing context is reported.
+- A quick request may encounter conflicting docs or ambiguous repo ownership; it must escalate before implementation expands.
+- A quick request may reveal a prohibited risk after editing begins; it must stop broadening and report the partial state without overwriting user work.
 - A UI cannot be opened due environment, auth, build, dependency, or runtime problems; if `$m-test` is running, the UI validation must be failed or blocked.
 - UI responsive behavior may require both desktop and mobile screenshot evidence when affected.
 - Direct `$m-plan` invocation may skip discussion only when the plan records why discussion was unnecessary or already satisfied.
@@ -149,7 +165,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 ## Acceptance Criteria
 
 - `m-autoflow` exists as a valid umbrella skill package in this repository.
-- `m-discuss`, `m-plan`, `m-execute`, `m-go`, `m-test`, and `m-archive` exist as valid companion skill packages in this repository.
+- `m-discuss`, `m-plan`, `m-execute`, `m-go`, `m-quick`, `m-test`, and `m-archive` exist as valid companion skill packages in this repository.
 - The umbrella skill routes to the phase skills without removing the `$m-autoflow` entry point.
 - The phase skills enforce discussion, planning, execution, testing, archive, and blocker rules.
 - The plan artifact clearly states which Task IDs will execute after approval and which Task IDs will not execute in the next execution phase.
@@ -157,6 +173,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - Optional online research is controlled by discussion, supports source verification and citations, and routes stable-doc impact through `$m-docs`.
 - Lightweight validation is part of execution, while heavyweight integration/UI/usability/security/performance testing is optional and separately recorded.
 - `$m-go` performs delegated implementation and automatic `$m-test` looping for confirmed plans without making the main agent the implementer.
+- `$m-quick` restores governed docs context, correctly gates low-risk direct work, validates the affected behavior, and escalates prohibited requests without weakening staged commands.
 - UI-impacting changes tested by `$m-test` produce actual operation evidence and screenshot paths.
 - `$m-test` output includes a concise direct result table.
 - The archive can route reusable lessons into `docs/lessons` for later lookup.
@@ -166,15 +183,18 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 ## Related Features
 
 - [../features/m-autoflow-workflow.md](../features/m-autoflow-workflow.md)
+- [../features/m-quick-fast-path.md](../features/m-quick-fast-path.md)
 
 ## Related Specs
 
 - [../specs/m-autoflow-skill.md](../specs/m-autoflow-skill.md)
+- [../specs/m-quick-skill.md](../specs/m-quick-skill.md)
 
 ## Related Decisions
 
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
+- [../decisions/2026-07-10_m-quick-standalone-fast-path.md](../decisions/2026-07-10_m-quick-standalone-fast-path.md)
 
 ## Related Changes
 

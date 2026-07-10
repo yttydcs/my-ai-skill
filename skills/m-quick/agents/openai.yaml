@@ -1,0 +1,4 @@
+interface:
+  display_name: "m:quick"
+  short_description: "Apply small low-risk changes directly"
+  default_prompt: "Use $m-quick to make this small low-risk change directly after reading the relevant project docs."

@@ -54,4 +54,5 @@ Store long-lived capability intent, boundaries, scenarios, and acceptance criter
 
 - [m-docs-skill.md](m-docs-skill.md)
 - [m-autoflow-skill.md](m-autoflow-skill.md)
+- [m-quick-fast-path.md](m-quick-fast-path.md)
 - [m-thesis-aigc-revision-skill.md](m-thesis-aigc-revision-skill.md)

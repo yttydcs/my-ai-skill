@@ -2,7 +2,7 @@
 
 ## Architecture Overview
 
-`m-autoflow` is the umbrella entry point and shared reference host for a focused workflow skill family. Phase-specific behavior lives in short, separately invokable skills so the user can call only the stage they need.
+`m-autoflow` is the umbrella entry point and shared reference host for a focused workflow skill family. Phase-specific behavior lives in short, separately invokable skills, while `$m-quick` provides a guarded standalone fast path outside the stage chain.
 
 ## Package Contract
 
@@ -23,6 +23,10 @@
   - `manifests/m-go.json`
   - `manifests/m-test.json`
   - `manifests/m-archive.json`
+- Canonical standalone fast-path source package:
+  - `skills/m-quick`
+- Canonical standalone fast-path install metadata:
+  - `manifests/m-quick.json`
 - Install flow:
   - source -> `dist/codex/<skill-name>` -> `C:\Users\HelloWorld\.codex\skills\<skill-name>`
 - Historical archives may mention older phase names as source evidence, but current source packages, manifests, and stable contracts must use the canonical phase names above.
@@ -32,6 +36,7 @@
 The skill family supports explicit invocation and does not forbid host-side implicit selection in metadata.
 
 - Invoke `$m-autoflow` when the user wants the full workflow or wants the umbrella to choose the next phase.
+- Invoke `$m-quick` for an explicit bounded low-risk direct change in one repository after mandatory `$m-docs` context reading.
 - Invoke `$m-discuss` for discovery, requirement shaping, brainstorming, optional research, and early worktree setup.
 - Invoke `$m-plan` for architecture, executable planning, direct task summary, and approval gating.
 - Invoke `$m-execute` for confirmed Task ID implementation plus lightweight validation.
@@ -46,6 +51,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 
 ## Workflow Contract
 
+- `$m-quick` is an alternate standalone route and is not part of the default phase order.
 - Default phase order:
   - `discuss`
   - `plan`
@@ -53,6 +59,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
   - optional `test`
   - `archive`
 - Direct plan invocation is allowed only when the plan records why discussion was skipped or already satisfied.
+- `$m-quick` must apply its own docs-first eligibility gate before direct edits and must escalate unsuitable work before scope expands.
 - Only one phase may be active at a time.
 - Any rollback must state the reason and update the affected documents.
 - Discussion prioritizes relevant private-docs-root intake, feature, and requirement docs when they exist.
@@ -67,6 +74,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
   - `active_worktree`: the current implementation worktree
 - When the user keeps docs private, stable docs must be read from and written to `docs_root`, not inferred from code repo `docs/` directories.
 - Active workflow control stays in the worktree root as `plan.md` or `todo.md`.
+- The active workflow-control rule applies to staged execution. Eligible `$m-quick` requests do not create a root plan or dedicated worktree by default.
 - Planning artifacts must include an execution-scope split with `Will Execute` and `Will Not Execute Now` groups. Every known Task ID must appear in exactly one group, and non-executed tasks must include the reason.
 - After `$m-plan` creates or confirms the active `plan.md` / `todo.md`, the direct response must include a task summary table.
 - The task summary table must include `Task ID`, `Title`, `Scope`, `Files / Modules`, `Acceptance / Tests`, and `Risk / Notes`.
@@ -90,10 +98,13 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - If the user explicitly requests archive-only handling, no merge, no cleanup, or an equivalent pause, the workflow must stop after archive readiness and report retained branch/worktree state.
 - If archive produced lessons docs or lesson-index updates, workflow end must carry them back into the global docs tree.
 - Merge and worktree cleanup are forbidden until archive completion, status verification, and unrelated-dirt preservation checks pass.
+- `$m-quick` ends after focused validation and direct reporting; it does not create an archive, merge, clean, or push automatically.
 
 ## Docs Integration Contract
 
 - `$m-discuss`, `$m-plan`, and `$m-archive` must explicitly use `$m-docs` when they decide docs root, route stable docs, or change governed docs.
+- `$m-quick` must explicitly use `$m-docs` to read minimum relevant current context before eligibility or editing, and again only when stable-doc impact requires a write.
+- `$m-quick` must not create `intake`, `plan`, or `change` merely because it ran; it updates canonical feature, requirement, or spec docs only when stable truth changed.
 - Intake, feature, requirement, spec, and decision impact must be recorded in planning and archive artifacts when relevant.
 - Lesson impact and related lesson paths must be recorded in archive artifacts.
 - Feature docs are the home for current user-visible behavior and full workflow descriptions; change archives are historical evidence, not the only source of current truth.
@@ -103,6 +114,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 ## Sub-agent Contract
 
 - Implementation sub-agents are allowed only in execution and heavy review phases.
+- `$m-quick` uses direct main-agent implementation and does not dispatch implementation sub-agents.
 - `$m-go` requires implementation sub-agents for all file edits in its approved execution scope.
 - Research lanes may be used from discussion only when the user requested or the workflow needs source-backed current research and host policy permits delegation.
 - Research lanes are read-only: they cannot edit code, create plans, confirm requirements, validate implementation, archive changes, merge, or clean up.
@@ -121,15 +133,18 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - The umbrella skill must pass `tools/validate-skills.ps1 -Skill m-autoflow`.
 - Each canonical phase skill must pass `tools/validate-skills.ps1 -Skill <skill-name>`.
 - The `$m-go` skill must pass `tools/validate-skills.ps1 -Skill m-go`.
+- The `$m-quick` skill must pass `tools/validate-skills.ps1 -Skill m-quick`.
 - The umbrella skill must sync through `tools/sync-skills.ps1 -Skill m-autoflow`.
 - Each canonical phase skill must sync through `tools/sync-skills.ps1 -Skill <skill-name>`.
 - The `$m-go` skill must sync through `tools/sync-skills.ps1 -Skill m-go`.
+- The `$m-quick` skill must sync through `tools/sync-skills.ps1 -Skill m-quick`.
 - Validation must happen after final source content is written.
 - Stale installed copies of superseded phase names should be removed after the canonical skills sync, unless a future compatibility decision reintroduces aliases.
 
 ## Safety and Stability
 
 - Do not implement in the main repo path when a dedicated worktree is required.
+- Treat `$m-quick` as the sole explicit bounded direct-edit exception; its gate must reject multi-repo, architecture, public-contract, schema/migration, security, destructive-data, infrastructure, broad dependency, conflicting-doc, and broad-validation work.
 - Do not proceed past a blocked phase.
 - Do not perform web research by default during ordinary planning.
 - Do not allow plan-external code changes without returning to planning.
@@ -147,21 +162,25 @@ The skill family supports explicit invocation and does not forbid host-side impl
 ## Extension Points
 
 - Add new references for lighter or heavier workflow variants without rewriting the main skill.
+- Refine fast-path eligibility in `skills/m-quick/references/quick.md` without copying it into staged phase skills.
 - Add future platform wrappers without changing the phase contract.
 - Add future compatibility aliases only by explicit decision.
 
 ## Related Features
 
 - [../features/m-autoflow-workflow.md](../features/m-autoflow-workflow.md)
+- [../features/m-quick-fast-path.md](../features/m-quick-fast-path.md)
 
 ## Related Requirements
 
 - [../requirements/m-autoflow-skill.md](../requirements/m-autoflow-skill.md)
+- [../requirements/m-quick-fast-path.md](../requirements/m-quick-fast-path.md)
 
 ## Related Decisions
 
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
+- [../decisions/2026-07-10_m-quick-standalone-fast-path.md](../decisions/2026-07-10_m-quick-standalone-fast-path.md)
 
 ## Related Changes
 

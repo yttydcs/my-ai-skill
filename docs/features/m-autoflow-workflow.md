@@ -20,6 +20,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 ## Entry Points
 
 - `$m-autoflow`: umbrella entry for the whole workflow or next-phase routing.
+- `$m-quick`: standalone guarded direct-edit path for explicit low-risk work in one repository after mandatory `$m-docs` context reading.
 - `$m-discuss`: discovery, brainstorming, current-practice research when useful, requirement shaping, and early worktree setup.
 - `$m-plan`: architecture and execution planning.
 - `$m-execute`: confirmed Task ID implementation and lightweight validation.
@@ -44,10 +45,28 @@ Give the user one disciplined workflow family for turning an idea into discussio
 13. Archive closes the workflow by default through verified control-plane merge and worktree cleanup.
 14. The workflow stops after archive only when the user explicitly asks for archive-only handling, no merge, or no cleanup.
 
+## Standalone Quick Path
+
+`$m-quick` sits beside the staged workflow rather than inside it. The user explicitly selects it for a bounded small requirement or bug fix.
+
+1. The main agent reads project-local instructions and identifies the governed docs root plus one target code repository.
+2. The agent explicitly uses `$m-docs` to read the minimum relevant indexes and stable leaf docs before accepting fast-path eligibility.
+3. The agent checks risk, Git status, existing changes, rollback, and focused validation.
+4. Eligible work is edited directly in the selected current checkout without a quick-request worktree or plan.
+5. Ineligible work is routed to `$m-discuss` or `$m-plan` before scope expands.
+6. Focused validation runs; UI-impacting changes require actual operation and screenshot evidence.
+7. Stable docs are updated through `$m-docs` only when stable truth changed.
+8. The command returns a compact context/gate/change/validation/docs/risk table and stops without automatic archive, merge, cleanup, or push.
+
+The complete current behavior is maintained in [m-quick-fast-path.md](m-quick-fast-path.md).
+
 ## Artifacts And Layout
 
 - Active workflow control:
   - root-level `plan.md` or `todo.md` in the active worktree
+- Standalone quick requests:
+  - no root plan or workflow archive by default
+  - update only affected stable docs when current truth changes
 - Current feature truth:
   - `docs/features/<feature>.md`
 - Current requirement truth:
@@ -77,6 +96,8 @@ Give the user one disciplined workflow family for turning an idea into discussio
 - Execution must report lightweight validation.
 - `$m-go` must require a confirmed plan, delegate implementation edits to sub-agents, run safe parallel task execution when write sets allow it, and automatically run `$m-test` behavior after delegated execution.
 - `$m-go` must return failing validation to delegated fixes until acceptance passes or the blocker is explicit.
+- `$m-quick` must read governed docs before eligibility, operate on one selected repository, reject prohibited risk, preserve existing changes, run focused validation, and report a concise direct result table.
+- `$m-quick` is the sole explicit direct-edit exception to staged worktree and confirmed-plan gates; it must not weaken those gates for other commands.
 - Heavy validation must report either passed checks or skip rationale with residual risk.
 - UI-impacting changes tested through `$m-test` must include actual UI operation evidence and screenshot paths.
 - `$m-test` must include a concise direct pass/fail table so the user can understand results without opening archive markdown.
@@ -108,6 +129,14 @@ Given one user capability is implemented by several repos, when the workflow doc
 
 Given a low-risk small change passes execution checks, when heavy testing is unnecessary, then Codex records the skip reason and residual risk before archive.
 
+### Standalone Quick Change
+
+Given the user explicitly invokes `$m-quick` for a bounded low-risk request in one repository, when relevant docs support the request and focused validation is available, then Codex reads those docs, edits the current checkout directly, validates the affected behavior, updates stable docs only when needed, and returns the compact result table without starting a staged workflow.
+
+### Quick Change Escalation
+
+Given a quick request conflicts with docs or touches multiple repos, architecture, a public contract, schema, migration, security boundary, destructive data, production infrastructure, or broad validation, when eligibility is evaluated, then Codex performs no expanding implementation and recommends `$m-discuss` or `$m-plan` with the failed gate.
+
 ### Automated Delegated Execution
 
 Given the user invokes `$m-go` after a confirmed plan, when executable Task IDs have bounded write sets, then Codex delegates implementation edits to worker sub-agents, runs safe parallel lanes where possible, automatically runs `$m-test`, and loops delegated fixes until the acceptance checks pass or a blocker is explicit.
@@ -123,15 +152,18 @@ Given the user explicitly chooses to skip `$m-test`, when the workflow proceeds 
 ## Related Requirements
 
 - [../requirements/m-autoflow-skill.md](../requirements/m-autoflow-skill.md)
+- [../requirements/m-quick-fast-path.md](../requirements/m-quick-fast-path.md)
 
 ## Related Specs
 
 - [../specs/m-autoflow-skill.md](../specs/m-autoflow-skill.md)
+- [../specs/m-quick-skill.md](../specs/m-quick-skill.md)
 
 ## Related Decisions
 
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
+- [../decisions/2026-07-10_m-quick-standalone-fast-path.md](../decisions/2026-07-10_m-quick-standalone-fast-path.md)
 
 ## Related Changes
 

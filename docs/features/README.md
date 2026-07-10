@@ -27,3 +27,4 @@ Store current user-visible feature behavior as complete feature dossiers.
 ## Current Docs
 
 - [m-autoflow-workflow.md](m-autoflow-workflow.md)
+- [m-quick-fast-path.md](m-quick-fast-path.md) - guarded one-repo direct-edit path with mandatory governed-doc context
