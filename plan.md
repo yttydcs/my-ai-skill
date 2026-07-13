@@ -363,7 +363,7 @@ Do not use implementation sub-agents. The approved write sets are small and tigh
 
 ### Lightweight Validation
 
-- `python -m unittest discover -s tests -p 'test_m_context_loader.py' -v`: 11 tests passed with 1 environment-based skip; Windows denied unprivileged symlink creation, while the runtime root-escape guard remains implemented.
+- `python -m unittest discover -s tests -p 'test_m_context_loader.py' -v`: 11 tests ran, 10 passed, and 1 was skipped for the environment; Windows denied unprivileged symlink creation, while the runtime root-escape guard remains implemented.
 - `python -m py_compile skills/m-context/scripts/context_loader.py tests/test_m_context_loader.py`: passed.
 - `tools/validate-skills.ps1 -Skill m-context`: passed.
 - `tools/validate-skills.ps1 -Skill m-autoflow`: passed.
