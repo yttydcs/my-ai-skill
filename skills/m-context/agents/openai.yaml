@@ -1,0 +1,4 @@
+interface:
+  display_name: "m:context"
+  short_description: "Load reusable local Agent context"
+  default_prompt: "Use $m-context to load a saved local context before working."

@@ -1,0 +1,15 @@
+{
+  "name": "m-context",
+  "version": "0.1.0",
+  "install_mode": "copy",
+  "source_dir": "skills/m-context",
+  "dist_dir": "dist/codex/m-context",
+  "codex_install_root": "%USERPROFILE%/.codex/skills",
+  "depends_on_skills": [],
+  "reference_files": [
+    "references/context-format.md"
+  ],
+  "script_files": [
+    "scripts/context_loader.py"
+  ]
+}

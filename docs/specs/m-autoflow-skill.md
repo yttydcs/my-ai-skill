@@ -7,6 +7,7 @@
 ## Package Contract
 
 - Umbrella source package: `skills/m-autoflow`
+- Context companion package: `skills/m-context`
 - Umbrella UI metadata: `skills/m-autoflow/agents/openai.yaml`
 - Umbrella install metadata: `manifests/m-autoflow.json`
 - Canonical phase source packages:
@@ -51,6 +52,9 @@ The skill family supports explicit invocation and does not forbid host-side impl
 
 ## Workflow Contract
 
+- `$m-context` is a companion loader outside the staged phase chain and outside the `$m-quick` fast path.
+- Co-invocation loads every requested context before the consuming skill performs task actions.
+- Loaded plaintext context remains task-local and is not copied into workflow artifacts unless explicitly required.
 - `$m-quick` is an alternate standalone route and is not part of the default phase order.
 - Default phase order:
   - `discuss`
@@ -130,6 +134,8 @@ The skill family supports explicit invocation and does not forbid host-side impl
 
 ## Validation Contract
 
+- The `$m-context` skill must pass `tools/validate-skills.ps1 -Skill m-context` and its focused standard-library loader tests.
+- The `$m-context` skill must sync through `tools/sync-skills.ps1 -Skill m-context` after validation.
 - The umbrella skill must pass `tools/validate-skills.ps1 -Skill m-autoflow`.
 - Each canonical phase skill must pass `tools/validate-skills.ps1 -Skill <skill-name>`.
 - The `$m-go` skill must pass `tools/validate-skills.ps1 -Skill m-go`.

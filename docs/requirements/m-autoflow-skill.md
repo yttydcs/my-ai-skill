@@ -13,6 +13,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 ### Must
 
 - preserve `$m-autoflow` as the umbrella workflow entry point
+- expose `$m-context` as a companion loader that may run before any phase or fast path without becoming a workflow phase
 - provide canonical phase entries named `$m-discuss`, `$m-plan`, `$m-execute`, `$m-test`, and `$m-archive`
 - provide `$m-go` as a canonical high-automation execution entry after planning
 - provide `$m-quick` as a canonical standalone direct-edit entry for explicit low-risk work in one repository
@@ -61,6 +62,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 
 ## Scenarios
 
+- The user combines `$m-context nas配置` with `$m-test` so saved plaintext environment details and credentials are available before testing.
 - The user wants a strict implementation workflow rather than a direct code patch.
 - The user wants an early discussion phase that researches current best practices only when that would improve the requirement.
 - The user requires git worktree isolation before coding.
@@ -81,6 +83,8 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 ## Functional Requirements
 
 - `$m-autoflow` must route the user into the appropriate phase skills and shared references.
+- `$m-autoflow` must route `$m-context` as a context-first companion and must not treat it as a staged phase or fast-path replacement.
+- When `$m-context` is co-invoked, the requested context must load before the consuming `m-*` skill performs task actions.
 - `$m-autoflow` must expose `$m-quick` as a standalone alternate route rather than a staged phase.
 - `$m-autoflow` must not duplicate full phase instructions that already belong to a phase skill.
 - `$m-discuss` must check project, docs, code-repo, and worktree boundaries when those affect the workflow.

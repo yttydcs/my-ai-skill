@@ -20,6 +20,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 ## Entry Points
 
 - `$m-autoflow`: umbrella entry for the whole workflow or next-phase routing.
+- `$m-context`: companion loader for reusable user-local plaintext context; it may be combined with any phase or fast path and loads before task actions.
 - `$m-quick`: standalone guarded direct-edit path for explicit low-risk work in one repository after mandatory `$m-docs` context reading.
 - `$m-discuss`: discovery, brainstorming, current-practice research when useful, requirement shaping, and early worktree setup.
 - `$m-plan`: architecture and execution planning.
@@ -30,7 +31,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 
 ## User Workflow
 
-1. The user starts with `$m-autoflow` or a specific phase command.
+1. The user starts with `$m-autoflow` or a specific phase command, optionally adding `$m-context <name>` to load saved context first.
 2. Discussion clarifies the request, records open questions, compares options, rejects weak directions, and recommends a path.
 3. Discussion creates or confirms the dedicated worktree when project, docs, and code-repo boundaries are clear enough.
 4. Planning turns the discussion brief into requirements, architecture, and a handoff-ready `plan.md` / `todo.md`.
@@ -90,6 +91,7 @@ The complete current behavior is maintained in [m-quick-fast-path.md](m-quick-fa
 
 ## State And Validation
 
+- `$m-context` is not a workflow phase and does not change the active phase; a failed required context load blocks dependent actions.
 - A phase is blocked when unresolved questions remain or a required artifact is missing.
 - Blocked output uses `问题清单` and `阻塞：是`.
 - Planning must include a direct task summary table that reflects the active `plan.md` / `todo.md`.
@@ -104,6 +106,10 @@ The complete current behavior is maintained in [m-quick-fast-path.md](m-quick-fa
 - Archive must link related intake, feature, requirement, spec, decision, lessons, and plan artifacts.
 
 ## Acceptance Scenarios
+
+### Load Reusable Context Before A Phase
+
+Given a user-local `nas配置.md` exists, when the user invokes `$m-test $m-context nas配置`, then the context is loaded before `$m-test` performs validation actions and its plaintext contents are available to the Agent.
 
 ### Start From Discussion
 

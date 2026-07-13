@@ -9,7 +9,7 @@
 - Docs Root: `D:\project\my-ai-skills\worktrees\m-context\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-context`
-- Current Stage: `$m-plan`, awaiting user approval
+- Current Stage: `$m-execute`, MCTX-1 through MCTX-4 approved
 
 ## Stage Records
 
@@ -341,6 +341,7 @@ Do not use implementation sub-agents. The approved write sets are small and tigh
 
 ## Approval Gate
 
-- Blocked: yes
-- Do not enter execution until the user approves MCTX-1 through MCTX-4.
+- Approved: yes, by explicit `$m-execute` invocation on 2026-07-13
+- Blocked: no
+- Execute MCTX-1 through MCTX-4 only.
 - Do not dispatch implementation sub-agents.
