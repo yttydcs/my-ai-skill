@@ -25,6 +25,7 @@ Store original request evidence before it is refined into feature, requirement, 
 
 ## Current Docs
 
+- [2026-07-13_m-context.md](2026-07-13_m-context.md) - source: Codex chat, reusable plaintext Agent context loading and skill composition
 - [2026-07-10_m-quick-fast-path.md](2026-07-10_m-quick-fast-path.md) - source: Codex chat, guarded direct-edit fast path with mandatory docs context
 - [2026-07-09_m-go-automated-execution.md](2026-07-09_m-go-automated-execution.md) - source: Codex chat, delegated automated execution and test-loop command
 - [2026-07-09_docs-structure-sync.md](2026-07-09_docs-structure-sync.md) - source: Codex chat, docs tree synchronization request

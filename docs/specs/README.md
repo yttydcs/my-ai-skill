@@ -48,6 +48,7 @@ Store technical contracts, integration rules, architecture constraints, and work
 
 ## Current Docs
 
+- [m-context-skill.md](m-context-skill.md)
 - [m-docs-skill.md](m-docs-skill.md)
 - [m-autoflow-skill.md](m-autoflow-skill.md)
 - [m-quick-skill.md](m-quick-skill.md)

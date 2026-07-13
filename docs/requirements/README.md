@@ -52,6 +52,7 @@ Store long-lived capability intent, boundaries, scenarios, and acceptance criter
 
 ## Current Docs
 
+- [m-context-skill.md](m-context-skill.md)
 - [m-docs-skill.md](m-docs-skill.md)
 - [m-autoflow-skill.md](m-autoflow-skill.md)
 - [m-quick-fast-path.md](m-quick-fast-path.md)
