@@ -9,7 +9,7 @@
 - Docs Root: `D:\project\my-ai-skills\worktrees\m-context\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-context`
-- Current Stage: `$m-execute`, MCTX-1 through MCTX-4 approved
+- Current Stage: `$m-execute` complete; ready for `$m-archive`
 
 ## Stage Records
 
@@ -260,6 +260,7 @@ Using `$m-docs`, route original request evidence to intake, user-facing workflow
 
 ##### MCTX-1 - Create m-context Skill Package
 
+- Status: completed
 - Owner: main Agent during `$m-execute`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-context`
 - Plan Path: `D:\project\my-ai-skills\worktrees\m-context\plan.md`
@@ -272,6 +273,7 @@ Using `$m-docs`, route original request evidence to intake, user-facing workflow
 
 ##### MCTX-2 - Implement Deterministic Loader And Tests
 
+- Status: completed
 - Owner: main Agent during `$m-execute`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-context`
 - Plan Path: `D:\project\my-ai-skills\worktrees\m-context\plan.md`
@@ -284,6 +286,7 @@ Using `$m-docs`, route original request evidence to intake, user-facing workflow
 
 ##### MCTX-3 - Integrate With m-autoflow And Stable Docs
 
+- Status: completed
 - Owner: main Agent during `$m-execute`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-context`
 - Plan Path: `D:\project\my-ai-skills\worktrees\m-context\plan.md`
@@ -296,11 +299,12 @@ Using `$m-docs`, route original request evidence to intake, user-facing workflow
 
 ##### MCTX-4 - Validate, Sync, Verify, And Handoff
 
+- Status: completed
 - Owner: main Agent during `$m-execute`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-context`
 - Plan Path: `D:\project\my-ai-skills\worktrees\m-context\plan.md`
 - Goal: prove the package and integration are installable and prepare honest validation evidence for archive.
-- Files / Modules: `tools/validate-skills.ps1`, `tools/sync-skills.ps1`, `dist/codex/m-context/**`, installed `%USERPROFILE%/.codex/skills/m-context/**`, plan status
+- Files / Modules: `tools/validate-skills.ps1`, `tools/sync-skills.ps1`, `dist/codex/m-context/**`, `dist/codex/m-autoflow/**`, installed `%USERPROFILE%/.codex/skills/m-context/**`, installed `%USERPROFILE%/.codex/skills/m-autoflow/**`, plan status
 - Write Set: generated distribution/install copies and plan status; repository source changes only if validation exposes defects
 - Acceptance: focused tests pass; skill validation passes; umbrella validation passes; sync succeeds; post-sync source/install parity passes; `git diff --check` passes; all repository modifications are committed with an English message.
 - Test Points: run the commands named in the specification and record exact results; use line-ending-aware pre-sync drift checks.
@@ -308,6 +312,7 @@ Using `$m-docs`, route original request evidence to intake, user-facing workflow
 
 ##### MCTX-5 - Encrypted Or Remote Context Storage
 
+- Status: not executed; out of scope
 - Owner: none in this execution phase
 - Worktree: none
 - Plan Path: `D:\project\my-ai-skills\worktrees\m-context\plan.md`
@@ -345,3 +350,44 @@ Do not use implementation sub-agents. The approved write sets are small and tigh
 - Blocked: no
 - Execute MCTX-1 through MCTX-4 only.
 - Do not dispatch implementation sub-agents.
+
+## Execution Results
+
+### Task Status
+
+- MCTX-1: completed; created the `m-context` skill, UI metadata, format reference, and manifest.
+- MCTX-2: completed; implemented the standard-library loader and focused regression suite.
+- MCTX-3: completed; exposed context-first composition from the umbrella skill and stable docs.
+- MCTX-4: completed; validated and synchronized `m-context` and changed `m-autoflow`, then verified installed-source parity.
+- MCTX-5: not executed by design.
+
+### Lightweight Validation
+
+- `python -m unittest discover -s tests -p 'test_m_context_loader.py' -v`: 11 tests passed with 1 environment-based skip; Windows denied unprivileged symlink creation, while the runtime root-escape guard remains implemented.
+- `python -m py_compile skills/m-context/scripts/context_loader.py tests/test_m_context_loader.py`: passed.
+- `tools/validate-skills.ps1 -Skill m-context`: passed.
+- `tools/validate-skills.ps1 -Skill m-autoflow`: passed.
+- Installed `m-context` quick validation: passed.
+- Installed `m-autoflow` quick validation: passed.
+- Source/install exact parity excluding generated `.build-info.json`: passed for 4 `m-context` files and 7 `m-autoflow` files.
+- Targeted `$m-context` integration search: passed.
+- `git diff --check`: passed; Windows line-ending conversion warnings are informational and match the existing repository lesson.
+
+### Design Notes
+
+- Context files are intentionally plaintext and fully readable by the Agent.
+- Exact filename-stem loading prevents silent fuzzy selection.
+- Markdown heading extraction ignores fenced code, preserves nested subsections, and rejects duplicate matches.
+- Windows reserved names, path separators, drive-qualified names, traversal, and resolved root escapes are rejected.
+- No real context file or credential was added to Git or copied into the skill package.
+
+### Heavy Validation Decision
+
+- `$m-test` is not required for this implementation because it changes a local skill, standard-library loader, and documentation only; no UI, service integration, production data, authorization boundary, or external runtime flow changed.
+- Residual risk: symlink/junction escape could not be exercised on this Windows account because creating the test symlink requires a privilege the process does not have. The guard is covered by implementation review and the test remains ready to execute where symlink creation is permitted.
+
+### Rollback
+
+- Remove the installed `m-context` package if necessary.
+- Re-sync the prior `m-autoflow` source from `main` to restore its installed package.
+- Revert implementation commit `f14f701` and the final execution-status commit while preserving the planning record if the capability is withdrawn.
