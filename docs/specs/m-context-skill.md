@@ -158,4 +158,4 @@ These checks protect deterministic lookup and accidental file disclosure; they a
 
 ## Related Changes
 
-- To be added after implementation.
+- [2026-07-13_m-context.md](../change/2026-07-13_m-context.md)

@@ -202,6 +202,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 
 ## Related Changes
 
+- [../change/2026-07-13_m-context.md](../change/2026-07-13_m-context.md)
 - [../change/2026-07-08_m-plan-task-table.md](../change/2026-07-08_m-plan-task-table.md)
 - [../change/2026-07-08_m-test-ui-evidence.md](../change/2026-07-08_m-test-ui-evidence.md)
 - [../change/2026-07-08_m-archive-default-closeout.md](../change/2026-07-08_m-archive-default-closeout.md)

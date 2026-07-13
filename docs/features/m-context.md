@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Active.
 
 ## Goal
 
@@ -106,8 +106,9 @@ Given a context name attempts to escape the configured root, when loading is req
 
 ## Related Changes
 
-- To be added after implementation.
+- [2026-07-13_m-context.md](../change/2026-07-13_m-context.md)
 
 ## Related Lessons
 
 - [Windows skill parity and line endings](../lessons/windows-skill-parity-line-endings.md)
+- [Windows symlink test privilege](../lessons/windows-symlink-test-privilege.md)

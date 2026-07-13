@@ -98,4 +98,4 @@ Provide a lightweight, reusable, user-local context store that Agents can load b
 
 ## Related Changes
 
-- To be added after implementation.
+- [2026-07-13_m-context.md](../change/2026-07-13_m-context.md)

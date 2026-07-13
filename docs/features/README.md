@@ -26,6 +26,6 @@ Store current user-visible feature behavior as complete feature dossiers.
 
 ## Current Docs
 
-- [m-context.md](m-context.md) - planned reusable plaintext Agent context loading and skill composition
+- [m-context.md](m-context.md) - reusable plaintext Agent context loading and skill composition
 - [m-autoflow-workflow.md](m-autoflow-workflow.md)
 - [m-quick-fast-path.md](m-quick-fast-path.md) - guarded one-repo direct-edit path with mandatory governed-doc context
