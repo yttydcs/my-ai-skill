@@ -15,6 +15,7 @@ Use this skill before `$m-plan` when the work needs product discovery, technical
 - Read `references/research.md` when current external evidence, web search, vendor/library comparison, security/regulatory facts, or best-practice research would materially improve the discussion.
 - Read `../m-autoflow/references/initialization.md` before creating or confirming a branch/worktree.
 - Read `../m-autoflow/references/output-components.md` before presenting the discussion result.
+- Read `../m-autoflow/references/interactive-output-patterns.md` when option selection or a planning follow-up may materially benefit from official inline interaction.
 - Use `$m-docs` when discussion creates or changes intake, features, requirements, specs, or decisions.
 
 ## Workflow
@@ -41,5 +42,7 @@ End with:
 - whether the work may proceed to `$m-plan`
 
 Use a compact option comparison table when several directions were evaluated. Add Mermaid only when branches, dependencies, or ownership are difficult to understand linearly. Link any created brief, doc, branch, or worktree artifact using the shared output rules.
+
+When the interactive trigger passes, invoke `$visualize:visualize` for bounded option selection and a follow-up request to `$m-plan`. Keep the recommendation and handoff status in Markdown, and do not imply that selecting an option approved implementation.
 
 Do not produce the executable architecture plan, implement code, run heavy validation, create `docs/change`, merge branches, or clean worktrees from this phase.

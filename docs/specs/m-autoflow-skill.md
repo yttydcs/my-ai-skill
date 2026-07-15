@@ -118,18 +118,18 @@ The skill family supports explicit invocation and does not forbid host-side impl
 ## Visual Output Contract
 
 - `skills/m-autoflow/references/output-components.md` is the shared component-selection contract for the `m-autoflow` workflow family and companion utilities listed in that reference.
-- `skills/m-autoflow/references/interactive-output-patterns.md` owns workflow-specific rules for official inline interaction. It links conceptually to the official `visualize` capability but does not copy its complete HTML, design-system, or rendering instructions.
+- `skills/m-autoflow/references/interactive-output-patterns.md` owns workflow-specific rules for official inline interaction. It links conceptually to the official `$visualize:visualize` capability but does not copy its complete HTML, design-system, or rendering instructions.
 - Every covered workflow-family or companion-utility `SKILL.md` must route to that reference before composing a user-facing result. Domain-specific skills such as `m-thesis-aigc-revision` may keep a standalone output contract.
 - Responses must lead with the outcome and retain a readable plain-Markdown summary.
 - Tables are preferred for repeated exact mappings; Mermaid is limited to relationships whose meaning is materially clearer as a diagram.
 - Inline interaction is selected only when at least one meaningful local selection, drill-down, evidence-navigation, or next-phase action would be less convenient in static output.
 - `$m-discuss`, `$m-plan`, `$m-test`, and `$m-archive` are the initial explicit consumers of the interactive-output pattern reference.
-- A covered phase that selects inline interaction must invoke and obey the current official `visualize` skill by name. Distributed files must not reference a versioned plugin-cache path.
+- A covered phase that selects inline interaction must invoke and obey the current official `$visualize:visualize` skill by name. Distributed files must not reference a versioned plugin-cache path.
 - The official thread-scoped visualization directory and inline directive contract remain runtime concerns; generated fragments are ephemeral and must not be committed to this repository.
 - Local selection and presentation state remain inside the inline result. A Codex action uses `window.openai.sendFollowUpMessage` with the selected values and requested operation.
 - A follow-up action is a request, not proof of approval or completion. The receiving phase must re-check its entry gate and authorization.
 - Buttons use native controls and official utility classes; icons use the sandbox-provided Lucide integration and inherit accessible labels from visible text or `aria-label`.
-- If `visualize`, the host bridge, or required runtime support is unavailable, the phase emits the full Markdown result and next command without `::codex-inline-vis`.
+- If `$visualize:visualize`, the host bridge, or required runtime support is unavailable, the phase emits the full Markdown result and next command without `::codex-inline-vis`.
 - Inline data must exclude secrets and unrelated personal data, stay within the official size and network restrictions, and preserve a useful first render before interaction.
 - Local artifact and evidence links must use absolute paths; paths with spaces must use renderer-safe link syntax.
 - UI and rendered-document validation must embed one or two representative images and link additional evidence when safe.

@@ -9,7 +9,7 @@
 - Docs Root: `D:\project\my-ai-skills\worktrees\visualize-skill-output\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\visualize-skill-output`
-- Current Stage: `$m-plan` complete; awaiting user approval before execution
+- Current Stage: `$m-execute` complete for VIS-1 through VIS-3; VIS-4 awaits `$m-test`
 
 ## Stage Records
 
@@ -170,14 +170,14 @@ Make selected workflow results easier to decide and act on without weakening cor
 
 ##### Overall Solution
 
-Add `interactive-output-patterns.md` beside the existing shared component reference. Keep the official visualization implementation contract external and current by requiring consumers to load and obey `$visualize` when the trigger passes.
+Add `interactive-output-patterns.md` beside the existing shared component reference. Keep the official visualization implementation contract external and current by requiring consumers to load and obey `$visualize:visualize` when the trigger passes.
 
 The shared decision flow is:
 
 1. Compose the exact phase result and required Markdown fallback.
 2. Determine whether a meaningful interaction improves the result.
 3. If no, return the static result.
-4. If yes and the capability is available, invoke `$visualize` and create one focused inline result.
+4. If yes and the capability is available, invoke `$visualize:visualize` and create one focused inline result.
 5. Keep presentation state local; route Codex work through a follow-up message.
 6. The receiving phase revalidates its normal entry gate.
 
@@ -192,12 +192,12 @@ The shared decision flow is:
 - `output-components.md`: choose the smallest useful output family and route interactive cases.
 - `interactive-output-patterns.md`: define workflow-specific triggers, phase actions, approval boundaries, fallback, and sensitive-data rules.
 - Phase `SKILL.md` files: require the shared pattern reference and name the phase-specific interactive opportunity.
-- Official `$visualize`: own fragment structure, design system, icons, interaction implementation, rendering, and inline directive.
+- Official `$visualize:visualize`: own fragment structure, design system, icons, interaction implementation, rendering, and inline directive.
 - `test_visual_output_contract.py`: prevent missing routes, unsafe actions, hard-coded version paths, and fallback regressions.
 
 ##### Data / Call Flow
 
-`phase result -> shared output decision -> static result OR $visualize -> inline local selection -> follow-up request -> phase entry-gate validation`
+`phase result -> shared output decision -> static result OR $visualize:visualize -> inline local selection -> follow-up request -> phase entry-gate validation`
 
 ##### Interface Drafts
 
@@ -310,7 +310,7 @@ The shared decision flow is:
 - Write Set: only the three paths above.
 - Acceptance:
   - separates static and interactive selection clearly
-  - invokes `$visualize` by name without hard-coded plugin paths
+  - invokes `$visualize:visualize` by name without hard-coded plugin paths
   - preserves Markdown fallback, secret protection, and phase gates
   - defines local-state versus follow-up-action boundaries
 - Test Points:
@@ -448,14 +448,46 @@ The shared decision flow is:
 
 - None.
 
+### Execute - Contract And Phase Integration
+
+#### Completed Tasks
+
+- VIS-1: added the shared interactive-output contract and static-to-interactive routing.
+- VIS-2: integrated `$m-discuss`, `$m-plan`, `$m-test`, and `$m-archive` with bounded official inline interaction opportunities.
+- VIS-3: extended contract coverage, validated and synchronized the five changed skill packages, and verified installed-source parity.
+
+#### Deferred To Heavy Validation
+
+- VIS-4 remains pending for `$m-test` because it requires a representative live Codex inline render, desktop and narrow-width evidence, keyboard and local-selection checks, and primary follow-up-action validation.
+
+#### Validation Evidence
+
+- Full unit suite: 26 tests passed; 1 Windows symlink test skipped because the current process lacks symlink privilege (`WinError 1314`).
+- Skill validation: `m-autoflow`, `m-discuss`, `m-plan`, `m-test`, and `m-archive` all passed.
+- Synchronization: all five changed packages were synchronized to the local Codex skill installation.
+- Exact parity: source and installed file sets and SHA-256 content matched for all five packages, excluding generated build metadata.
+- Repository checks: `git diff --check` passed; no unscoped `$visualize` invocation or hard-coded versioned plugin-cache path remained in the changed contract.
+
+#### Execution Notes
+
+- The official capability is invoked as `$visualize:visualize`, without pinning an installed cache path or version.
+- Complete Markdown outcomes remain authoritative and usable when inline rendering or the host bridge is unavailable.
+- Inline controls may update local presentation state or send a follow-up request; they cannot directly approve, write files, mutate Git, merge, publish, archive, or clean up.
+- Every received follow-up must pass the destination phase's normal entry gate.
+
+#### Issue List
+
+- None for VIS-1 through VIS-3.
+- Archive remains gated on VIS-4 passing or on explicit acceptance of a recorded `$m-test` blocker or residual risk.
+
 ## Plan Status
 
 - Discussion: complete
 - Requirements: coherent
 - Architecture: complete
 - Docs routing: confirmed through `$m-docs`
-- Worktree: ready
+- Worktree: implementation complete for VIS-1 through VIS-3
 - Requirements / architecture blockers: none
-- Blocked: yes; execution approval has not been granted
-- Implementation authorization: not yet granted
-- Next action: user approves VIS-1 through VIS-4 and invokes `$m-execute`, or invokes `$m-go` for delegated execution
+- Blocked: no for `$m-execute`; archive is intentionally gated by pending VIS-4 heavy validation
+- Implementation authorization: granted through the user's `$m-execute` invocation
+- Next action: invoke `$m-test` to execute VIS-4 and validate the representative official inline interaction

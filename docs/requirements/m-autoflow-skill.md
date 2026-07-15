@@ -50,7 +50,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - require local artifacts to use absolute clickable links and representative UI evidence to be embedded when appearance is part of acceptance
 - require app-specific review and Git components to correspond only to actionable findings or actions that actually succeeded
 - require the first interactive-output rollout to cover `$m-discuss`, `$m-plan`, `$m-test`, and `$m-archive`
-- require covered phases to invoke the official `visualize` capability when selection, drill-down, evidence navigation, or a next-phase action materially benefits from inline interaction
+- require covered phases to invoke the official `$visualize:visualize` capability when selection, drill-down, evidence navigation, or a next-phase action materially benefits from inline interaction
 - require interactive controls to remain accessible, theme-aware, responsive, and paired with visible labels or accessible names
 - require follow-up action buttons to preserve approval, permission, and phase gates instead of executing privileged workflow actions directly
 
@@ -136,7 +136,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - Mermaid must be reserved for meaningful dependencies, branches, ownership, hierarchy, or state flow; it must not replace exact task or test tables.
 - Code-comment components must be limited to actionable line-specific findings with tight source ranges.
 - Git components must never be emitted for attempted, failed, skipped, or merely recommended actions.
-- `$m-discuss`, `$m-plan`, `$m-test`, and `$m-archive` must read the shared interactive-output pattern reference before deciding whether to invoke `visualize`.
+- `$m-discuss`, `$m-plan`, `$m-test`, and `$m-archive` must read the shared interactive-output pattern reference before deciding whether to invoke `$visualize:visualize`.
 - The workflow must not hard-code a versioned local path to the official visualization plugin; it must route by capability or skill name.
 - Presentation-only interactions must remain local to the inline result.
 - Drill-down, evidence, and next-phase actions must use a Codex follow-up request containing the selected state and intended action.

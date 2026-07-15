@@ -110,7 +110,7 @@ The complete current behavior is maintained in [m-quick-fast-path.md](m-quick-fa
 - Every workflow-family or companion-utility result leads with the outcome, decision, or blocker.
 - Repeated fields and status mappings use compact tables; simple one-off results remain prose.
 - Mermaid is reserved for dependencies, branches, ownership, or state flows that are materially harder to understand linearly.
-- When selection, drill-down, evidence browsing, or a next-phase action is materially easier through interaction, the workflow may invoke the official Codex `visualize` capability and present an inline interactive result.
+- When selection, drill-down, evidence browsing, or a next-phase action is materially easier through interaction, the workflow may invoke the official Codex `$visualize:visualize` capability and present an inline interactive result.
 - Interactive results use labeled native controls and Lucide icons. Icon-only controls require an accessible label.
 - Presentation-only selection stays local to the inline result. Actions that ask Codex to investigate, open evidence, or enter another phase send a follow-up request and remain subject to normal workflow gates.
 - The first rollout covers `$m-discuss`, `$m-plan`, `$m-test`, and `$m-archive`; other skills retain the shared static output contract until separately expanded.

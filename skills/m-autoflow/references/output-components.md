@@ -2,6 +2,19 @@
 
 Use this reference before composing a user-facing result from an `m-autoflow` workflow skill or companion utility listed in the phase recipes below. Prefer the smallest component that makes the result easier to scan, verify, or act on. Keep a plain-Markdown summary so the response remains useful when an app-specific component is unavailable.
 
+## Contents
+
+- [Default Composition](#default-composition)
+- [Component Selection](#component-selection)
+- [Official Inline Interaction](#official-inline-interaction)
+- [Tables And Status](#tables-and-status)
+- [Mermaid](#mermaid)
+- [Local Files And Media](#local-files-and-media)
+- [Code Review Comments](#code-review-comments)
+- [Git Components](#git-components)
+- [Phase Recipes](#phase-recipes)
+- [Final Check](#final-check)
+
 ## Default Composition
 
 1. Lead with the outcome, decision, or blocker in one sentence.
@@ -17,12 +30,21 @@ Do not repeat the same facts in prose, a table, and a diagram. Do not add a visu
 | --- | --- | --- |
 | Repeated fields, status, options, task mappings | Markdown table | Three or more items benefit from exact side-by-side comparison |
 | Dependencies, branches, ownership, or a multi-step state flow | Mermaid flowchart | The relationship is materially harder to understand in prose |
+| Selection, drill-down, evidence navigation, or next-phase request | Official `$visualize:visualize` inline interaction | A meaningful interaction is materially easier than static output |
 | Created or changed local artifacts | Clickable file links | The user may need to open or inspect the artifact |
 | UI or rendered-document evidence | Embedded image or video | Visual state is part of acceptance or diagnosis |
 | Actionable line-specific review finding | `::code-comment` | The finding maps to a tight source range |
 | Successful Git action | Git directive | The host supports the directive and the corresponding action actually succeeded |
 
 Use short prose for a single fact, one-step action, or simple edit.
+
+## Official Inline Interaction
+
+- For `$m-discuss`, `$m-plan`, `$m-test`, or `$m-archive`, read `interactive-output-patterns.md` when the result may benefit from interaction.
+- Keep the complete phase outcome and exact status in Markdown before adding an inline result.
+- Invoke `$visualize:visualize` only after the shared interaction trigger passes; let its current instructions own fragment implementation and presentation details.
+- Use inline interaction as a supplement, not a replacement for required task tables, test tables, evidence, blocker wording, or manual next commands.
+- If the capability is unavailable or unnecessary, keep the static result and emit no inline directive.
 
 ## Tables And Status
 
@@ -90,13 +112,13 @@ After an action succeeds, emit the matching directive on its own line in the fin
 
 - `$m-autoflow`: show the selected route and next gate; use Mermaid only when several valid workflow branches or phase transitions need comparison.
 - `$m-context`: show loaded context names and sections in a compact table only when several were requested; never echo secret values.
-- `$m-discuss`: use an option comparison table; add Mermaid only for a real branch, dependency, or ownership model.
-- `$m-plan`: link the active `plan.md` / `todo.md`, show the task table, and add Mermaid only when task dependencies or system flow need it.
+- `$m-discuss`: use an option comparison table; add Mermaid only for a real branch, dependency, or ownership model; consider the shared interactive pattern when direct option selection helps.
+- `$m-plan`: link the active `plan.md` / `todo.md`, show the task table, and add Mermaid only when task dependencies or system flow need it; consider the shared interactive pattern for bounded approval follow-up.
 - `$m-execute` and `$m-go`: map Task IDs to clickable changed files and validation status; visualize dependencies only when they affect sequencing.
 - `$m-quick`: keep the compact result table, link changed files, and embed representative UI evidence when UI acceptance was exercised.
-- `$m-test`: show the result table, embed representative screenshots or rendered pages, and use code comments only for actionable line findings.
+- `$m-test`: show the result table, embed representative screenshots or rendered pages, use code comments only for actionable line findings, and consider the shared interactive pattern for multi-item evidence navigation.
 - `$m-docs`: link created or updated docs and summarize category / impact / index status in one table when several artifacts changed.
-- `$m-archive`: summarize archive, merge, cleanup, and remaining-state status; emit Git components only for successful actions.
+- `$m-archive`: summarize archive, merge, cleanup, and remaining-state status; emit Git components only for successful actions; consider the shared interactive pattern for state inspection without adding a second closeout confirmation.
 - `$m-gitpush`: show remote, branch, pushed range, and final status; emit `::git-push` only after the push succeeds.
 
 ## Final Check

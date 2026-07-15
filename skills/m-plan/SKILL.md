@@ -16,6 +16,7 @@ Use this skill to convert a coherent requirement into an executable architecture
 - Do not perform broad discovery here. If the requirement is unclear, unreasonable, or needs current external research, return to `$m-discuss`.
 - When private docs are expected, identify `project_root`, `docs_root`, `code_repos`, and `active_worktree` before planning writes stable docs.
 - Read `../m-autoflow/references/output-components.md` before presenting the plan result.
+- Read `../m-autoflow/references/interactive-output-patterns.md` when Task ID review or an approval follow-up may materially benefit from official inline interaction.
 - Read the original canonical references only when needed:
   - `../m-autoflow/references/initialization.md` for worktree, branch, repo, and `guide.md` prerequisites.
   - `../m-autoflow/references/m-docs-integration.md` before editing `plan.md`, intake, features, requirements, specs, decisions, change, or lessons docs.
@@ -40,6 +41,7 @@ Use this skill to convert a coherent requirement into an executable architecture
 9. Explicitly separate tasks that will be executed after approval from tasks that will not be executed in the next execution phase. Every known task must appear in exactly one section, with the reason for any deferred, blocked, out-of-scope, or research-only task.
 10. After drafting or confirming the plan, output a concise task summary table directly to the user. The table summarizes the active `plan.md` / `todo.md`; it does not replace the detailed plan.
 11. Link the active plan artifact with an absolute clickable path. Add a Mermaid dependency or system-flow diagram only when it makes execution order or architecture materially easier to understand.
+12. When the interactive trigger passes, invoke `$visualize:visualize` only after the exact Markdown task table is complete. Any approval control must send the exact Task IDs in a follow-up request and must not directly enter execution.
 
 ## Private Docs Guardrails
 
