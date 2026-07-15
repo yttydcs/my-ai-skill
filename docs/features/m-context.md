@@ -2,9 +2,7 @@
 
 ## Status
 
-Active globally. The local/global scope extension is planned in `plan.md` and is not implemented yet.
-
-The scoped sections below define the proposed target behavior. Until execution completes, the current loader still resolves only the global root.
+Active with project-local and user-global scopes.
 
 ## Goal
 

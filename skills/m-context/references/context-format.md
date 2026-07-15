@@ -1,14 +1,18 @@
 # Context Format
 
-## Storage Root
+## Storage Roots
 
-The loader resolves one plaintext context root:
+The loader supports two plaintext scopes:
 
-1. `M_CONTEXT_HOME`
-2. `$CODEX_HOME/m-contexts`
-3. `~/.codex/m-contexts`
+- Local: `<docs_root>/context`
+- Global:
+  1. `M_CONTEXT_HOME`
+  2. `$CODEX_HOME/m-contexts`
+  3. `~/.codex/m-contexts`
 
-Set `M_CONTEXT_HOME` when a different local directory is needed. Context data does not belong inside the installed skill package.
+`docs_root` must be resolved explicitly from the active project or workflow. The loader does not search parent directories for it. Set `M_CONTEXT_HOME` when a different global directory is needed. Context data does not belong inside the installed skill package.
+
+An unqualified name checks local first and checks global only when the local root or exact file is absent. An existing local file that fails validation, reading, UTF-8 decoding, or section lookup blocks global fallback.
 
 ## Files
 
@@ -18,6 +22,7 @@ Set `M_CONTEXT_HOME` when a different local directory is needed. Context data do
 - Do not pass `.md` in `$m-context` load syntax.
 - Plaintext passwords, tokens, private keys, connection strings, and other sensitive values are allowed.
 - No YAML frontmatter is required.
+- Context files are ordinary user-controlled files. The skill does not add ignore rules or change Git state for them.
 
 Example:
 
@@ -52,6 +57,7 @@ Use an exact ATX heading name:
 
 ```text
 $m-context nas配置#测试方式
+$m-context local:nas配置#测试方式
 ```
 
 The loader returns the matched heading, its body, and nested headings. It stops at the next heading of the same or higher level. Duplicate exact heading names are ambiguous and fail explicitly.
@@ -62,3 +68,5 @@ The loader returns the matched heading, its body, and nested headings. It stops 
 - Put multiline private keys in fenced code blocks.
 - Keep environment-specific facts in contexts rather than copying them into reusable skill instructions.
 - Treat the directory as trusted local Agent memory. Files copied from untrusted sources should be reviewed before loading.
+- Use `local:` or `global:` when creating a new context. Unqualified updates are allowed only when exact auto resolution already selects an existing file.
+- Do not assume local context files are ignored or private from Git merely because they live under `docs_root/context`.

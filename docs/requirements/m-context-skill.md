@@ -10,7 +10,7 @@ Provide lightweight, reusable project-local and user-global context stores that 
 
 ## Delivery Status
 
-The global-only v1 behavior is active. The local/global requirements below are planned and await implementation approval through `plan.md`.
+The local/global scoped behavior is implemented and active.
 
 ## Scope
 

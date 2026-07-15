@@ -12,6 +12,8 @@ Use this file when deciding where a document should live.
 
 ## Category Decision Tree
 
+Before classifying content, check whether it is reusable Agent context explicitly intended for `$m-context`. If so, route it to `<docs_root>/context` only when the user selected local scope; do not treat it as intake, feature, requirement, spec, decision, plan, change, lesson, or index content.
+
 1. Ask whether the content is original request evidence, current feature truth, durable requirement, technical contract, architecture decision, workflow history, or troubleshooting lookup.
 2. If it is original request evidence:
    - route to `intake`
@@ -103,6 +105,7 @@ If one request touches several categories:
 - Do not add remotes, push docs, publish docs, or choose backup targets unless the user explicitly asks.
 - If the docs root is a Git repository, local commits may be used only when requested or when project-local rules require them.
 - Keep docs publication decisions separate from code repository branch, commit, and push decisions.
+- Exclude `context/` from normal governed-doc indexing, archival, staging, and commit write sets. Do not modify ignore configuration for it unless the user explicitly requests that separate Git action.
 
 ## Anti-patterns
 

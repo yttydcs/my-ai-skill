@@ -6,7 +6,7 @@ Define the package, storage, invocation, parsing, composition, validation, and i
 
 ## Delivery Status
 
-The single-global-root implementation is active. The scoped contract below is the proposed planning target and remains pending until execution completes.
+The scoped local/global contract is implemented and active.
 
 ## Package Contract
 

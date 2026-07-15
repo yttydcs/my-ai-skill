@@ -5,11 +5,12 @@ from __future__ import annotations
 
 import argparse
 import difflib
+from enum import Enum
 import os
 from pathlib import Path
 import re
 import sys
-from typing import Mapping, Sequence
+from typing import Mapping, NamedTuple, Sequence
 
 
 HEADING_RE = re.compile(r"^(#{1,6})[ \t]+(.+?)[ \t]*$")
@@ -26,6 +27,33 @@ WINDOWS_RESERVED_NAMES = {
 
 class ContextError(Exception):
     """An actionable context loading failure."""
+
+
+class ContextNotFoundError(ContextError):
+    """A missing root or exact context that may permit auto fallback."""
+
+
+class ContextScope(str, Enum):
+    AUTO = "auto"
+    LOCAL = "local"
+    GLOBAL = "global"
+
+
+class ContextLocation(NamedTuple):
+    scope: ContextScope
+    root: Path
+    path: Path
+
+
+class LoadedContext(NamedTuple):
+    location: ContextLocation
+    content: str
+
+
+class ContextEntry(NamedTuple):
+    scope: ContextScope
+    name: str
+    root: Path
 
 
 def resolve_context_root(
@@ -46,13 +74,35 @@ def resolve_context_root(
     return (user_home / ".codex" / "m-contexts").resolve(strict=False)
 
 
+def resolve_local_context_root(docs_root: Path | str | None) -> Path:
+    if docs_root is None or (isinstance(docs_root, str) and not docs_root.strip()):
+        raise ContextError(
+            "Local context scope requires an explicit docs root; "
+            "resolve docs_root and pass --docs-root."
+        )
+    return (Path(docs_root).expanduser().resolve(strict=False) / "context").resolve(
+        strict=False
+    )
+
+
+def parse_context_scope(scope: ContextScope | str) -> ContextScope:
+    if isinstance(scope, ContextScope):
+        return scope
+    try:
+        return ContextScope(scope.strip().casefold())
+    except (AttributeError, ValueError) as exc:
+        allowed = ", ".join(item.value for item in ContextScope)
+        raise ContextError(f"Invalid context scope {scope!r}; expected one of: {allowed}.") from exc
+
+
 def _require_root(root: Path) -> Path:
     try:
         resolved = root.resolve(strict=True)
     except FileNotFoundError as exc:
-        raise ContextError(
-            f"Context root does not exist: {root}. "
-            "Create it or set M_CONTEXT_HOME/CODEX_HOME."
+        if os.path.lexists(root):
+            raise ContextError(f"Cannot resolve existing context root {root}: {exc}") from exc
+        raise ContextNotFoundError(
+            f"Context root does not exist: {root}. Create it or configure the intended scope."
         ) from exc
     except OSError as exc:
         raise ContextError(f"Cannot resolve context root {root}: {exc}") from exc
@@ -95,6 +145,10 @@ def resolve_context_file(root: Path, name: str) -> Path:
     try:
         resolved = candidate.resolve(strict=True)
     except FileNotFoundError as exc:
+        if os.path.lexists(candidate):
+            raise ContextError(
+                f"Cannot resolve existing context {safe_name!r}: {exc}"
+            ) from exc
         suggestions = difflib.get_close_matches(
             safe_name,
             list_contexts(resolved_root),
@@ -102,7 +156,9 @@ def resolve_context_file(root: Path, name: str) -> Path:
             cutoff=0.4,
         )
         suffix = f" Nearby names: {', '.join(suggestions)}." if suggestions else ""
-        raise ContextError(f"Context not found: {safe_name!r} in {resolved_root}.{suffix}") from exc
+        raise ContextNotFoundError(
+            f"Context not found: {safe_name!r} in {resolved_root}.{suffix}"
+        ) from exc
     except OSError as exc:
         raise ContextError(f"Cannot resolve context {safe_name!r}: {exc}") from exc
 
@@ -113,8 +169,7 @@ def resolve_context_file(root: Path, name: str) -> Path:
     return resolved
 
 
-def list_contexts(root: Path) -> list[str]:
-    resolved_root = _require_root(root)
+def _list_contexts_in_root(resolved_root: Path) -> list[str]:
     names: list[str] = []
     try:
         candidates = resolved_root.glob("*.md")
@@ -128,6 +183,10 @@ def list_contexts(root: Path) -> list[str]:
     except OSError as exc:
         raise ContextError(f"Cannot list context root {resolved_root}: {exc}") from exc
     return sorted(names, key=str.casefold)
+
+
+def list_contexts(root: Path) -> list[str]:
+    return _list_contexts_in_root(_require_root(root))
 
 
 def find_contexts(root: Path, query: str) -> list[str]:
@@ -205,38 +264,239 @@ def load_context(root: Path, name: str, section: str | None = None) -> str:
     return content if section is None else extract_section(content, section)
 
 
+def _global_root(global_root: Path | str | None) -> Path:
+    if global_root is None:
+        return resolve_context_root()
+    return Path(global_root).expanduser().resolve(strict=False)
+
+
+def _location_for_scope(
+    scope: ContextScope,
+    name: str,
+    *,
+    docs_root: Path | str | None,
+    global_root: Path | str | None,
+) -> ContextLocation:
+    if scope is ContextScope.LOCAL:
+        root = resolve_local_context_root(docs_root)
+    elif scope is ContextScope.GLOBAL:
+        root = _global_root(global_root)
+    else:  # pragma: no cover - callers resolve auto before selecting a root
+        raise ContextError("Auto scope must be resolved before selecting a context root.")
+    return ContextLocation(scope, root, resolve_context_file(root, name))
+
+
+def resolve_scoped_context(
+    name: str,
+    *,
+    scope: ContextScope | str = ContextScope.AUTO,
+    docs_root: Path | str | None = None,
+    global_root: Path | str | None = None,
+) -> ContextLocation:
+    selected_scope = parse_context_scope(scope)
+    validate_context_name(name)
+
+    if selected_scope is not ContextScope.AUTO:
+        return _location_for_scope(
+            selected_scope,
+            name,
+            docs_root=docs_root,
+            global_root=global_root,
+        )
+
+    local_missing: ContextNotFoundError | None = None
+    local_root: Path | None = None
+    if docs_root is not None:
+        local_root = resolve_local_context_root(docs_root)
+        try:
+            return _location_for_scope(
+                ContextScope.LOCAL,
+                name,
+                docs_root=docs_root,
+                global_root=global_root,
+            )
+        except ContextNotFoundError as exc:
+            local_missing = exc
+
+    try:
+        return _location_for_scope(
+            ContextScope.GLOBAL,
+            name,
+            docs_root=docs_root,
+            global_root=global_root,
+        )
+    except ContextNotFoundError as global_missing:
+        if local_missing is None:
+            raise
+        raise ContextNotFoundError(
+            f"Context not found in local or global scope: {name!r}. "
+            f"Tried local root {local_root} and global root {_global_root(global_root)}."
+        ) from global_missing
+
+
+def load_scoped_context(
+    name: str,
+    section: str | None = None,
+    *,
+    scope: ContextScope | str = ContextScope.AUTO,
+    docs_root: Path | str | None = None,
+    global_root: Path | str | None = None,
+) -> LoadedContext:
+    location = resolve_scoped_context(
+        name,
+        scope=scope,
+        docs_root=docs_root,
+        global_root=global_root,
+    )
+    content = _read_context(location.path)
+    if section is not None:
+        content = extract_section(content, section)
+    return LoadedContext(location, content)
+
+
+def _list_scope(root: Path, scope: ContextScope) -> list[ContextEntry]:
+    resolved_root = _require_root(root)
+    return [
+        ContextEntry(scope, name, resolved_root)
+        for name in _list_contexts_in_root(resolved_root)
+    ]
+
+
+def list_scoped_contexts(
+    *,
+    scope: ContextScope | str = ContextScope.AUTO,
+    docs_root: Path | str | None = None,
+    global_root: Path | str | None = None,
+) -> list[ContextEntry]:
+    selected_scope = parse_context_scope(scope)
+    if selected_scope is ContextScope.LOCAL:
+        return _list_scope(resolve_local_context_root(docs_root), ContextScope.LOCAL)
+    if selected_scope is ContextScope.GLOBAL:
+        return _list_scope(_global_root(global_root), ContextScope.GLOBAL)
+
+    if docs_root is None:
+        return _list_scope(_global_root(global_root), ContextScope.GLOBAL)
+
+    entries: list[ContextEntry] = []
+    available_root = False
+    local_root = resolve_local_context_root(docs_root)
+    try:
+        entries.extend(_list_scope(local_root, ContextScope.LOCAL))
+        available_root = True
+    except ContextNotFoundError:
+        pass
+
+    resolved_global_root = _global_root(global_root)
+    try:
+        entries.extend(_list_scope(resolved_global_root, ContextScope.GLOBAL))
+        available_root = True
+    except ContextNotFoundError as global_missing:
+        if not available_root:
+            raise ContextNotFoundError(
+                "No context roots exist for auto discovery. "
+                f"Tried local root {local_root} and global root {resolved_global_root}."
+            ) from global_missing
+
+    return entries
+
+
+def find_scoped_contexts(
+    query: str,
+    *,
+    scope: ContextScope | str = ContextScope.AUTO,
+    docs_root: Path | str | None = None,
+    global_root: Path | str | None = None,
+) -> list[ContextEntry]:
+    value = query.strip()
+    if not value:
+        raise ContextError("Find query must not be empty.")
+    folded = value.casefold()
+    return [
+        entry
+        for entry in list_scoped_contexts(
+            scope=scope,
+            docs_root=docs_root,
+            global_root=global_root,
+        )
+        if folded in entry.name.casefold()
+    ]
+
+
+def _add_scope_arguments(
+    parser: argparse.ArgumentParser,
+    *,
+    default: ContextScope,
+    allow_auto: bool = True,
+) -> None:
+    choices = [ContextScope.LOCAL.value, ContextScope.GLOBAL.value]
+    if allow_auto:
+        choices.insert(0, ContextScope.AUTO.value)
+    parser.add_argument("--scope", choices=choices, default=default.value)
+    parser.add_argument("--docs-root")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
-    subparsers.add_parser("root", help="Print the resolved context root.")
-    subparsers.add_parser("list", help="List exact context names.")
+    root_parser = subparsers.add_parser("root", help="Print a resolved context root.")
+    _add_scope_arguments(
+        root_parser,
+        default=ContextScope.GLOBAL,
+        allow_auto=False,
+    )
+
+    list_parser = subparsers.add_parser("list", help="List exact context names and scopes.")
+    _add_scope_arguments(list_parser, default=ContextScope.AUTO)
 
     find_parser = subparsers.add_parser("find", help="Find context names by substring.")
     find_parser.add_argument("query")
+    _add_scope_arguments(find_parser, default=ContextScope.AUTO)
 
     load_parser = subparsers.add_parser("load", help="Load a complete context or one section.")
     load_parser.add_argument("name")
     load_parser.add_argument("--section")
+    _add_scope_arguments(load_parser, default=ContextScope.AUTO)
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    root = resolve_context_root()
 
     try:
         if args.command == "root":
-            print(root)
+            if args.scope == ContextScope.LOCAL.value:
+                print(resolve_local_context_root(args.docs_root))
+            else:
+                print(resolve_context_root())
         elif args.command == "list":
-            print("\n".join(list_contexts(root)))
+            entries = list_scoped_contexts(scope=args.scope, docs_root=args.docs_root)
+            print("\n".join(f"{entry.scope.value}:{entry.name}" for entry in entries))
         elif args.command == "find":
-            print("\n".join(find_contexts(root, args.query)))
+            entries = find_scoped_contexts(
+                args.query,
+                scope=args.scope,
+                docs_root=args.docs_root,
+            )
+            print("\n".join(f"{entry.scope.value}:{entry.name}" for entry in entries))
         elif args.command == "load":
-            content = load_context(root, args.name, args.section)
-            sys.stdout.write(content)
-            if content and not content.endswith(("\n", "\r")):
+            loaded = load_scoped_context(
+                args.name,
+                args.section,
+                scope=args.scope,
+                docs_root=args.docs_root,
+            )
+            sys.stdout.write(loaded.content)
+            if loaded.content and not loaded.content.endswith(("\n", "\r")):
                 sys.stdout.write("\n")
+            local_note = ""
+            if args.scope == ContextScope.AUTO.value and args.docs_root is None:
+                local_note = "local lookup unavailable (--docs-root not supplied); "
+            print(
+                f"m-context: {local_note}loaded {loaded.location.scope.value}:{args.name} "
+                f"from {loaded.location.path}",
+                file=sys.stderr,
+            )
         else:  # pragma: no cover - argparse owns command validation
             parser.error(f"Unknown command: {args.command}")
     except ContextError as exc:

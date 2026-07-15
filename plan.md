@@ -9,7 +9,7 @@
 - Docs Root: `D:\project\my-ai-skills\worktrees\m-context-scopes\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-context-scopes`
-- Current Stage: `3.1 - Planning`
+- Current Stage: `3.2 - Execution`
 
 ## Stage Records
 
@@ -387,7 +387,16 @@ The implementation is small and tightly coupled across one loader contract, one 
 
 ## Approval Gate
 
-- Plan status: ready for user review.
-- Blocked: yes, until explicit approval.
-- Do not enter execution.
-- Do not dispatch implementation sub-agents.
+- Plan status: approved by the user's `$m-execute` invocation.
+- Blocked: no.
+- Entered execution for `MCS-1` through `MCS-4`.
+- Implementation sub-agents were not used because the loader, instructions, tests, and validation share one tightly coupled contract and host policy did not authorize delegation.
+
+## Stage 3.2 - Execution Status
+
+- `MCS-1`: completed. Added scoped resolver models, local-root derivation, absence-only auto fallback, strict explicit scopes, source diagnostics, and scoped CLI discovery/loading.
+- `MCS-2`: completed. Updated `$m-context` usage and authoring rules plus `$m-docs` taxonomy/routing boundaries for non-governed `context/` data and no automatic Git mutations.
+- `MCS-3`: completed. Expanded focused coverage from 11 to 19 tests; 18 pass and the existing Windows symlink privilege case is skipped when unavailable.
+- `MCS-4`: completed. Stable docs are active, `m-context` and `m-docs` source/install copies are synchronized with exact post-sync parity, focused tests and skill validators pass, and the execution diff is clean. The repository commit is recorded by the execution handoff.
+- `MCS-5`: not executed as required. No Git ignore or context-data Git-state automation was added.
+- `MCS-6`: not executed as required. Normal loads select exactly one source and never merge bodies.

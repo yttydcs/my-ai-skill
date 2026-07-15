@@ -9,6 +9,7 @@ The recommended private docs tree is:
 ```text
 docs/
 ├── README.md
+├── context/        # optional non-governed m-context data
 ├── intake/
 ├── features/
 ├── requirements/
@@ -18,6 +19,8 @@ docs/
 ├── change/
 └── lessons/
 ```
+
+`context/` is an optional reserved companion directory, not a governed documentation category. Do not create, index, summarize, archive, stage, commit, publish, or copy its contents as part of normal `$m-docs` work. `$m-context` owns access to it, and it may contain plaintext secrets.
 
 ## Docs Root Model
 
@@ -57,6 +60,7 @@ When the user wants docs kept private, treat `docs_root` as the canonical source
 - `features`, `requirements`, `specs`, and `decisions` are long-lived truth layers.
 - `plan`, `change`, and `lessons` are workflow, archive, and explanatory layers.
 - Root and category `README.md` files are navigation layers, not truth layers.
+- `context` is user-controlled runtime context data, not a truth, workflow, archive, or navigation layer.
 
 ## Category Rules
 
@@ -172,3 +176,4 @@ Do not use lessons as a substitute for updating broken feature, requirement, spe
 - A docs root may be versioned with Git.
 - Do not add remotes, change remotes, push, publish, or choose a backup destination unless the user explicitly asks.
 - `.gitignore` is a useful backup guard, but the safer default is to keep private docs physically outside pushable code repositories.
+- The presence of `context/` does not authorize automatic `.gitignore`, `.git/info/exclude`, Git configuration, staging, commit, or push changes. Any Git treatment of context data requires an explicit user request.
