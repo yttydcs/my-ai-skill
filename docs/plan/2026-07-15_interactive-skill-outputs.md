@@ -1,4 +1,4 @@
-# Plan - Official Interactive Skill Outputs
+# Archived Plan - Official Interactive Skill Outputs
 
 ## Workflow Information
 
@@ -9,7 +9,7 @@
 - Docs Root: `D:\project\my-ai-skills\worktrees\visualize-skill-output\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\visualize-skill-output`
-- Current Stage: `$m-test` complete; VIS-1 through VIS-4 passed and the workflow may enter `$m-archive`
+- Current Stage: `$m-archive` documentation complete; control-plane merge and worktree cleanup pending
 
 ## Stage Records
 
@@ -531,15 +531,45 @@ The shared decision flow is:
 - Next phase: `$m-archive`.
 - No archive, merge, cleanup, or workflow closeout was performed by `$m-test`.
 
+### Archive - Documentation And Closeout Readiness
+
+#### Docs Governance
+
+- `$m-docs` routing and stable-doc impact checks: complete.
+- Docs root: `D:\project\my-ai-skills\worktrees\visualize-skill-output\docs` in the selected versioned repository.
+- Intake impact: updated with the completed interactive-output change link.
+- Feature impact: updated during planning and linked to the completed change.
+- Requirements impact: updated during planning and linked to the completed change.
+- Specs impact: updated during planning and linked to the completed change.
+- Decision impact: none; the hybrid interaction policy is localized, reversible, and already captured by feature / requirement / spec truth.
+- Lessons impact: updated with a reusable Codex visualization preview-limitations lesson.
+
+#### Archive Artifacts
+
+- Change archive: `docs/change/2026-07-15_interactive-skill-outputs.md`.
+- Plan archive: `docs/plan/2026-07-15_interactive-skill-outputs.md`.
+- Lesson: `docs/lessons/codex-visualization-preview-limitations.md`.
+- Indexes: change, plan, and lessons category indexes updated; root topology unchanged.
+- Publication: local repository only; no push, remote, backup, or publication action was requested.
+
+#### Closeout Readiness
+
+- Feature worktree: clean before archive edits.
+- Main control-plane checkout: clean and aligned with `origin/main` before merge.
+- Merge strategy: fast-forward only from the control-plane checkout after the archive commit and final status verification.
+- Cleanup strategy: remove the dedicated worktree, prune worktree metadata, and delete the local feature branch only after the merged commit is verified on `main`.
+- Sub-agents: none; the workflow stayed in one serial lane and no delegated write sets exist to reconcile.
+
 ## Plan Status
 
 - Discussion: complete
 - Requirements: coherent
 - Architecture: complete
 - Docs routing: confirmed through `$m-docs`
-- Worktree: implementation and heavy validation complete for VIS-1 through VIS-4
+- Worktree: implementation, heavy validation, and archive documentation complete for VIS-1 through VIS-4
 - Requirements / architecture blockers: none
 - Blocked: no
 - Implementation authorization: granted through the user's `$m-execute` invocation
 - Heavy validation: passed with the residual preview-environment notes recorded above
-- Next action: invoke `$m-archive` to close out documentation, merge, and cleanup under its normal gates
+- Archive artifacts: complete
+- Next action: commit archive artifacts, fast-forward `main`, then remove the dedicated worktree and local feature branch

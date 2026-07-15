@@ -215,6 +215,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 
 ## Related Changes
 
+- [../change/2026-07-15_interactive-skill-outputs.md](../change/2026-07-15_interactive-skill-outputs.md)
 - [../change/2026-07-15_visual-output-components.md](../change/2026-07-15_visual-output-components.md)
 - [../change/2026-07-13_m-context.md](../change/2026-07-13_m-context.md)
 - [../change/2026-07-08_m-plan-task-table.md](../change/2026-07-08_m-plan-task-table.md)

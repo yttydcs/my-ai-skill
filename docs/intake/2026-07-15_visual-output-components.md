@@ -40,4 +40,5 @@ Confirmed boundaries:
 
 ## Related Changes
 
+- [2026-07-15_interactive-skill-outputs.md](../change/2026-07-15_interactive-skill-outputs.md)
 - [2026-07-15_visual-output-components.md](../change/2026-07-15_visual-output-components.md)

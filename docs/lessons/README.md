@@ -26,6 +26,7 @@ Store reusable incident knowledge, query-friendly troubleshooting lessons, and p
 
 ## Current Docs
 
+- [codex-visualization-preview-limitations.md](codex-visualization-preview-limitations.md) - keywords: `$visualize:visualize`, sandboxed iframe, synthetic keyboard activation, `MutationObserver.observe`, preview host
 - [python-cache-skill-sync.md](python-cache-skill-sync.md) - keywords: `__pycache__`, `.pyc`, skill sync, extra installed file, parity mismatch, `PYTHONDONTWRITEBYTECODE`
 - [searchable-lessons-capture.md](searchable-lessons-capture.md) - keywords: archive, lessons, troubleshooting, recurring investigation
 - [skill-frontmatter-yaml-colon.md](skill-frontmatter-yaml-colon.md) - keywords: skill validator, YAML frontmatter, colon, description, mapping values are not allowed
