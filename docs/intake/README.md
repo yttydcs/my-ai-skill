@@ -25,6 +25,7 @@ Store original request evidence before it is refined into feature, requirement, 
 
 ## Current Docs
 
+- [2026-07-15_m-context-scopes.md](2026-07-15_m-context-scopes.md) - source: Codex chat, project-local and user-global context scopes with absence-only fallback
 - [2026-07-15_visual-output-components.md](2026-07-15_visual-output-components.md) - source: Codex chat, improve skill output with useful visual components and clickable evidence
 - [2026-07-13_m-context.md](2026-07-13_m-context.md) - source: Codex chat, reusable plaintext Agent context loading and skill composition
 - [2026-07-10_m-quick-fast-path.md](2026-07-10_m-quick-fast-path.md) - source: Codex chat, guarded direct-edit fast path with mandatory docs context
