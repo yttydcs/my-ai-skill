@@ -49,6 +49,10 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - require user-facing results to select the smallest useful visual component, keep readable Markdown fallback, and avoid decorative duplication
 - require local artifacts to use absolute clickable links and representative UI evidence to be embedded when appearance is part of acceptance
 - require app-specific review and Git components to correspond only to actionable findings or actions that actually succeeded
+- require the first interactive-output rollout to cover `$m-discuss`, `$m-plan`, `$m-test`, and `$m-archive`
+- require covered phases to invoke the official `visualize` capability when selection, drill-down, evidence navigation, or a next-phase action materially benefits from inline interaction
+- require interactive controls to remain accessible, theme-aware, responsive, and paired with visible labels or accessible names
+- require follow-up action buttons to preserve approval, permission, and phase gates instead of executing privileged workflow actions directly
 
 ### Optional
 
@@ -82,6 +86,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - The user changes UI and expects visual validation evidence instead of code-only review.
 - The user wants a compact test result summary in chat without opening markdown artifacts.
 - The user explicitly chooses to skip `$m-test` and proceed directly to `$m-archive`.
+- The user wants official Codex inline buttons and icons for high-value workflow decisions while keeping simple outputs lightweight.
 
 ## Functional Requirements
 
@@ -131,6 +136,13 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - Mermaid must be reserved for meaningful dependencies, branches, ownership, hierarchy, or state flow; it must not replace exact task or test tables.
 - Code-comment components must be limited to actionable line-specific findings with tight source ranges.
 - Git components must never be emitted for attempted, failed, skipped, or merely recommended actions.
+- `$m-discuss`, `$m-plan`, `$m-test`, and `$m-archive` must read the shared interactive-output pattern reference before deciding whether to invoke `visualize`.
+- The workflow must not hard-code a versioned local path to the official visualization plugin; it must route by capability or skill name.
+- Presentation-only interactions must remain local to the inline result.
+- Drill-down, evidence, and next-phase actions must use a Codex follow-up request containing the selected state and intended action.
+- Interactive controls must not directly mutate repository state, approve a plan, merge, push, archive, or delete worktrees.
+- When the official capability or host bridge is unavailable, the complete Markdown result and exact next command must remain available without a broken inline directive.
+- Inline results must not expose plaintext `$m-context` secrets, credentials, unrelated personal data, or untrusted markup.
 - The workflow must allow the user to skip `$m-test` and invoke `$m-archive`, while preserving the skipped-testing reason and residual risk in archive records.
 - `$m-archive` must record intake, feature, requirement, spec, decision, and lessons impact.
 - `$m-archive` must capture searchable lesson cues when the workflow produced reusable debugging knowledge.
@@ -148,6 +160,10 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - Readability:
   - use short phase names and explicit blocker wording
   - lead with outcomes and keep visual status understandable without color or component rendering
+- Accessibility:
+  - use semantic controls, native keyboard order, visible action labels, and accessible names for any icon-only control
+- Compatibility:
+  - keep output useful without the optional interactive host capability
 - Extensibility:
   - keep `m-docs` integration explicit instead of copying its full rule set
 - Maintainability:
@@ -190,6 +206,8 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-test` output includes a concise direct result table.
 - Every workflow skill routes user-facing output through the shared component-selection reference.
 - Output-contract tests cover component availability, phase routing, absolute links, and directive success guards.
+- Interactive-output tests cover phase routing, fallback behavior, approval boundaries, and the absence of versioned plugin paths.
+- A representative inline result is rendered and operated at desktop and narrow widths during `$m-test`; missing interaction evidence is blocked rather than treated as passed.
 - The archive can route reusable lessons into `docs/lessons` for later lookup.
 - Planning and archive respect private docs roots and do not publish docs without the user's explicit instruction.
 - All canonical skills validate and sync successfully.

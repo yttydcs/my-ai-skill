@@ -110,11 +110,15 @@ The complete current behavior is maintained in [m-quick-fast-path.md](m-quick-fa
 - Every workflow-family or companion-utility result leads with the outcome, decision, or blocker.
 - Repeated fields and status mappings use compact tables; simple one-off results remain prose.
 - Mermaid is reserved for dependencies, branches, ownership, or state flows that are materially harder to understand linearly.
+- When selection, drill-down, evidence browsing, or a next-phase action is materially easier through interaction, the workflow may invoke the official Codex `visualize` capability and present an inline interactive result.
+- Interactive results use labeled native controls and Lucide icons. Icon-only controls require an accessible label.
+- Presentation-only selection stays local to the inline result. Actions that ask Codex to investigate, open evidence, or enter another phase send a follow-up request and remain subject to normal workflow gates.
+- The first rollout covers `$m-discuss`, `$m-plan`, `$m-test`, and `$m-archive`; other skills retain the shared static output contract until separately expanded.
 - Local plans, changed files, docs, and evidence use absolute clickable links.
 - UI or rendered-document acceptance embeds representative visual evidence and links additional artifacts.
 - Actionable line-specific review findings may use code-comment components with tight source ranges.
 - Git components appear only after the matching branch, stage, commit, push, or pull-request action succeeds.
-- Plain Markdown continues to carry the result so the response remains readable when a component is unavailable.
+- Plain Markdown continues to carry the core outcome, exact task/test status, and next command so the response remains readable when an interactive component is unavailable.
 
 ## Acceptance Scenarios
 
@@ -169,6 +173,22 @@ Given a plan has meaningful task dependencies or branching system flow, when `$m
 ### Successful Git Action
 
 Given an authorized Git action succeeds, when the phase returns its final result in a supporting Codex host, then Codex emits the matching Git component and an ordinary text status. Failed or unperformed actions emit no component.
+
+### Interactive Discussion Choice
+
+Given `$m-discuss` has several viable directions, when choosing among them benefits from direct comparison, then Codex may present labeled option buttons with icons, keep selection local, and offer a follow-up action that requests `$m-plan` for the selected direction.
+
+### Interactive Plan Approval
+
+Given `$m-plan` is complete and unblocked, when an inline approval action is useful, then Codex may present the exact execution scope and a labeled approval button. Activating it sends a follow-up request containing the approved Task IDs; it does not directly edit files or bypass the user-approval gate.
+
+### Interactive Test And Archive Results
+
+Given `$m-test` or `$m-archive` has several statuses or evidence items, when an inline result improves navigation, then Codex may provide local selection and labeled follow-up actions while preserving the required Markdown result table and normal archive semantics.
+
+### Interactive Output Fallback
+
+Given the official interactive capability or host bridge is unavailable, when a phase composes its result, then Codex returns the complete Markdown outcome, evidence links, and next command without emitting a broken inline directive.
 
 ### User Skips Heavy Testing
 
