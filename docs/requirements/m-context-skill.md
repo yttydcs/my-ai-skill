@@ -123,6 +123,7 @@ The local/global scoped behavior is implemented and active.
 ## Related Changes
 
 - [2026-07-13_m-context.md](../change/2026-07-13_m-context.md)
+- [2026-07-15_m-context-scopes.md](../change/2026-07-15_m-context-scopes.md)
 
 ## Related Intake
 

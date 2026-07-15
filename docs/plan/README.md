@@ -23,6 +23,7 @@ Store archived workflow planning documents when they need to be retained beyond 
 
 ## Current Docs
 
+- [2026-07-15_m-context-scopes.md](2026-07-15_m-context-scopes.md) - `$m-context` local/global scoped context workflow plan
 - [2026-07-13_m-context.md](2026-07-13_m-context.md) - `$m-context` reusable plaintext Agent context workflow plan
 - [2026-07-10_m-quick-fast-path.md](2026-07-10_m-quick-fast-path.md) - `$m-quick` guarded direct-edit workflow plan
 - [2026-07-09_m-go-automated-execution.md](2026-07-09_m-go-automated-execution.md) - `$m-go` delegated execution workflow plan

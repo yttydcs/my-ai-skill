@@ -138,8 +138,10 @@ Given a context name attempts to escape the configured root, when loading is req
 ## Related Changes
 
 - [2026-07-13_m-context.md](../change/2026-07-13_m-context.md)
+- [2026-07-15_m-context-scopes.md](../change/2026-07-15_m-context-scopes.md)
 
 ## Related Lessons
 
+- [Python cache files during skill synchronization](../lessons/python-cache-skill-sync.md)
 - [Windows skill parity and line endings](../lessons/windows-skill-parity-line-endings.md)
 - [Windows symlink test privilege](../lessons/windows-symlink-test-privilege.md)

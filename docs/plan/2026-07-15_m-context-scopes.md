@@ -9,7 +9,7 @@
 - Docs Root: `D:\project\my-ai-skills\worktrees\m-context-scopes\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-context-scopes`
-- Current Stage: `3.2 - Execution`
+- Current Stage: `4 - Archived`
 
 ## Stage Records
 
@@ -400,3 +400,18 @@ The implementation is small and tightly coupled across one loader contract, one 
 - `MCS-4`: completed. Stable docs are active, `m-context` and `m-docs` source/install copies are synchronized with exact post-sync parity, focused tests and skill validators pass, and the execution diff is clean. The repository commit is recorded by the execution handoff.
 - `MCS-5`: not executed as required. No Git ignore or context-data Git-state automation was added.
 - `MCS-6`: not executed as required. Normal loads select exactly one source and never merge bodies.
+
+## Stage 4 - Archive Status
+
+- `$m-docs` routing and stable-doc impact checks: completed.
+- Intake impact: updated and linked to the completed change.
+- Feature impact: updated and active.
+- Requirements impact: updated and active.
+- Specs impact: updated and active.
+- Decision impact: none; no ADR was required.
+- Lessons impact: updated with `python-cache-skill-sync.md`; existing Windows parity and symlink lessons were reused.
+- Change archive: `docs/change/2026-07-15_m-context-scopes.md`.
+- Plan archive: `docs/plan/2026-07-15_m-context-scopes.md`.
+- Indexes: change, plan, and lessons indexes updated; root topology unchanged.
+- Heavy `$m-test`: skipped with accepted low residual risk because focused validation covers the standard-library, non-UI, non-service change.
+- Publication: local-only; no push, remote, backup, or publication action was requested.

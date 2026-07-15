@@ -39,8 +39,12 @@ The user explicitly rejected automatically adding `docs/context` to `.gitignore`
 - [Feature](../features/m-context.md)
 - [Requirements](../requirements/m-context-skill.md)
 - [Specification](../specs/m-context-skill.md)
-- [Active plan](../../plan.md)
+- [Archived plan](../plan/2026-07-15_m-context-scopes.md)
 
 ## Related Intake
 
 - [2026-07-13_m-context.md](2026-07-13_m-context.md)
+
+## Related Changes
+
+- [2026-07-15_m-context-scopes.md](../change/2026-07-15_m-context-scopes.md)
