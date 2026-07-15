@@ -9,7 +9,7 @@
 - Docs Root: `D:\project\my-ai-skills\worktrees\visualize-skill-output\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\visualize-skill-output`
-- Current Stage: `$m-execute` complete for VIS-1 through VIS-3; VIS-4 awaits `$m-test`
+- Current Stage: `$m-test` complete; VIS-1 through VIS-4 passed and the workflow may enter `$m-archive`
 
 ## Stage Records
 
@@ -456,9 +456,9 @@ The shared decision flow is:
 - VIS-2: integrated `$m-discuss`, `$m-plan`, `$m-test`, and `$m-archive` with bounded official inline interaction opportunities.
 - VIS-3: extended contract coverage, validated and synchronized the five changed skill packages, and verified installed-source parity.
 
-#### Deferred To Heavy Validation
+#### Heavy Validation Handoff
 
-- VIS-4 remains pending for `$m-test` because it requires a representative live Codex inline render, desktop and narrow-width evidence, keyboard and local-selection checks, and primary follow-up-action validation.
+- VIS-4 was handed to `$m-test` because it required a representative official render, desktop and narrow-width evidence, keyboard and local-selection checks, and primary follow-up-action validation. The validation completed successfully in the following stage record.
 
 #### Validation Evidence
 
@@ -478,7 +478,58 @@ The shared decision flow is:
 #### Issue List
 
 - None for VIS-1 through VIS-3.
-- Archive remains gated on VIS-4 passing or on explicit acceptance of a recorded `$m-test` blocker or residual risk.
+- VIS-4 was pending at the end of this stage and is resolved by the `$m-test` record below.
+
+### Test - Representative Inline Interaction Validation
+
+#### Scope And Environment
+
+- Task: VIS-4.
+- Preview: official `$visualize:visualize` render helper output opened and operated in the Codex in-app browser.
+- Source fragment: `C:\Users\HelloWorld\.codex\visualizations\2026\07\15\019f64f3-44a7-7ec3-b565-80969e1194b8\m-test-validation.html`.
+- Desktop evidence: `C:\Users\HelloWorld\.codex\visualizations\2026\07\15\019f64f3-44a7-7ec3-b565-80969e1194b8\m-test-validation-desktop.png`.
+- Narrow evidence: `C:\Users\HelloWorld\.codex\visualizations\2026\07\15\019f64f3-44a7-7ec3-b565-80969e1194b8\m-test-validation-narrow.png`.
+- Repository source remained clean before this plan update; runtime visualization and evidence stayed outside Git source and governed docs.
+
+#### Heavy Validation Results
+
+| Area | Check | Status | Evidence | Notes |
+| --- | --- | --- | --- | --- |
+| UI | Exact 736px inner viewport | Passed | desktop screenshot and measured `viewportWidth = scrollWidth = 736` | Four controls and four Lucide icons visible; no clipping or horizontal overflow |
+| UI | Exact 320px inner viewport | Passed | narrow screenshot and measured `viewportWidth = scrollWidth = 320` | Controls wrapped cleanly; all buttons remained visible |
+| Interaction | Local evidence selection | Passed | operated `回传边界` control | `aria-pressed` and the selected detail changed together |
+| Accessibility | Semantic controls and keyboard focus | Passed | browser accessibility snapshot | Four native labeled buttons, native tab order, focus acquisition, visible focus treatment, and pressed-state semantics confirmed |
+| Integration | Follow-up action boundary | Passed | captured preview-host payload | Button called `window.openai.sendFollowUpMessage` with `$m-archive`, VIS-1 through VIS-4 context, and an explicit gate-recheck instruction |
+| Safety | Direct mutation and external I/O review | Passed | fragment inspection | No file, Git, merge, archive, cleanup, `fetch`, XHR, or WebSocket action in the fragment |
+| Regression | Full unit-test discovery | Passed | 26 passed, 1 environment skip | Skip remained the Windows unprivileged symlink case (`WinError 1314`) |
+
+#### Mandatory Review Checklist
+
+- Requirements coverage: Passed.
+- Architecture reasonableness: Passed.
+- Performance risks (N+1 / repeated computation / excess I/O / lock contention): Passed; the fragment is 3.3 KB and uses four bounded controls with no network or repeated I/O.
+- Performance metrics / thresholds: Passed; fragment size is far below the 2 MB ceiling and no horizontal overflow occurred at either required width.
+- Usability / user path: Passed.
+- Readability and consistency: Passed.
+- Extensibility and configuration: Passed; the repository routes by capability name and keeps official rendering rules external.
+- Stability and security: Passed.
+- Security boundary / permissions / data exposure: Passed.
+- Test coverage: Passed.
+- Whole-flow / integration validation: Passed.
+- Subagent governance and audit: Passed; the serial plan required no delegation, so there was no subagent write set or result to reconcile.
+
+#### Residual Risk
+
+- The preview automation could focus native buttons but did not synthesize Enter / Space activation inside the sandboxed iframe. Native button semantics, focus acquisition, visible focus treatment, mouse activation, local state change, and exact follow-up payload were independently verified. A final inline rendering in the Codex conversation remains the host-level smoke check.
+- The preview host logged a `MutationObserver.observe` error on reload. The fragment contains no `MutationObserver`, all required UI and actions continued to work, and the error is attributed to preview infrastructure rather than repository or fragment code.
+
+#### Decision
+
+- Test phase: run.
+- Blocked: no.
+- VIS-4: complete.
+- Next phase: `$m-archive`.
+- No archive, merge, cleanup, or workflow closeout was performed by `$m-test`.
 
 ## Plan Status
 
@@ -486,8 +537,9 @@ The shared decision flow is:
 - Requirements: coherent
 - Architecture: complete
 - Docs routing: confirmed through `$m-docs`
-- Worktree: implementation complete for VIS-1 through VIS-3
+- Worktree: implementation and heavy validation complete for VIS-1 through VIS-4
 - Requirements / architecture blockers: none
-- Blocked: no for `$m-execute`; archive is intentionally gated by pending VIS-4 heavy validation
+- Blocked: no
 - Implementation authorization: granted through the user's `$m-execute` invocation
-- Next action: invoke `$m-test` to execute VIS-4 and validate the representative official inline interaction
+- Heavy validation: passed with the residual preview-environment notes recorded above
+- Next action: invoke `$m-archive` to close out documentation, merge, and cleanup under its normal gates
