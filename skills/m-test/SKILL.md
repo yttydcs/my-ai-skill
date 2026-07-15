@@ -15,6 +15,7 @@ When this phase runs for UI-impacting changes, the UI must be opened, the affect
 
 - Read `references/testing.md`.
 - Read `../m-autoflow/references/subagents.md` before parallel validation or delegated review.
+- Read `../m-autoflow/references/output-components.md` before presenting test evidence or review findings.
 - Use the active `plan.md` or `todo.md` as the source of acceptance criteria.
 
 ## Entry Gate
@@ -53,5 +54,7 @@ Output:
 - a concise pass/fail table in the direct user response
 - review checklist status
 - decision: return to execution or proceed to archive
+
+Embed one or two representative screenshots or rendered pages when visual evidence is required, then link any remaining evidence. Use `::code-comment` only for actionable line-specific findings and emit no review directive when there are no such findings.
 
 Do not create archives, merge, clean worktrees, or mark the workflow ended from this phase.

@@ -16,6 +16,7 @@ Invoking `$m-archive` means "archive and end this workflow". Stop after archive 
 - Read `references/archive.md`.
 - Read `../m-autoflow/references/m-docs-integration.md` before treating archive work as complete.
 - Read `../m-autoflow/references/templates.md` when creating `docs/change` or `docs/lessons` artifacts.
+- Read `../m-autoflow/references/output-components.md` before presenting archive and closeout status.
 - Explicitly invoke `$m-docs` for documentation routing, impact checks, lessons, and indexes.
 - Do not infer docs remote, push, publication, or backup strategy.
 
@@ -49,5 +50,7 @@ End with:
 - validation summary
 - merge and cleanup status, or retained branch/worktree status when archive-only handling was explicitly requested
 - remaining local state, including unpushed commits or unrelated dirt
+
+Link archive artifacts with absolute clickable paths and summarize archive / merge / cleanup / remaining state in a compact table when several states must be compared. Emit Git components only for successful actions completed during closeout.
 
 Do not merge or remove worktrees before archive completion, status verification, and unrelated-dirt preservation checks.

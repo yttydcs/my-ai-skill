@@ -86,3 +86,11 @@ Before finishing a revision task with this skill, confirm:
 - unsupported claims were narrowed instead of hidden
 - terminology remains consistent across the chapter
 - the revision preserves factual accuracy
+
+## Output
+
+- Lead with the revision outcome and the highest-priority remaining issue, if any.
+- When several segments were handled, use a compact table with segment or source location, risk signal, revision status, and evidence used.
+- Link the source draft, report, and revised artifact with absolute clickable paths when local files are available.
+- Keep full before/after passages in the edited document or a focused revision section; do not force long prose into table cells.
+- Use a compact priority table or Mermaid only when segment ordering or chapter dependencies are genuinely difficult to follow. Do not add a decorative visualization to a straightforward paragraph revision.

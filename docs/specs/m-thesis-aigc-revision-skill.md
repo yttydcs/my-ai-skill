@@ -52,6 +52,14 @@ The skill workflow must require these steps:
   - print index, ratio, word count, and a preview
   - use only the Python standard library
 
+## Output Contract
+
+- Lead with the revision outcome and highest-priority remaining issue.
+- For several revised segments, use a compact source-location / risk-signal / status / evidence table.
+- Link local source, report, and revised artifacts with absolute clickable paths.
+- Keep full before/after prose outside table cells.
+- Use Mermaid only when ordering or chapter dependencies are genuinely difficult to follow.
+
 ## Validation Contract
 
 - The skill must pass `tools/validate-skills.ps1 -Skill m-thesis-aigc-revision`.
@@ -60,3 +68,7 @@ The skill workflow must require these steps:
 ## Related Requirements
 
 - [../requirements/m-thesis-aigc-revision-skill.md](../requirements/m-thesis-aigc-revision-skill.md)
+
+## Related Changes
+
+- [2026-07-15 visual output components](../change/2026-07-15_visual-output-components.md)

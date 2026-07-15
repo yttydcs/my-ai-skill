@@ -115,6 +115,18 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - The root-level active `plan.md` is a workflow-control exception and does not replace `docs/plan/` as an archive category.
 - Docs remote configuration, push target, publication, and backup strategy are user-owned and must not be inferred by the workflow.
 
+## Visual Output Contract
+
+- `skills/m-autoflow/references/output-components.md` is the shared component-selection contract for the `m-autoflow` workflow family and companion utilities listed in that reference.
+- Every covered workflow-family or companion-utility `SKILL.md` must route to that reference before composing a user-facing result. Domain-specific skills such as `m-thesis-aigc-revision` may keep a standalone output contract.
+- Responses must lead with the outcome and retain a readable plain-Markdown summary.
+- Tables are preferred for repeated exact mappings; Mermaid is limited to relationships whose meaning is materially clearer as a diagram.
+- Local artifact and evidence links must use absolute paths; paths with spaces must use renderer-safe link syntax.
+- UI and rendered-document validation must embed one or two representative images and link additional evidence when safe.
+- Line-specific code review findings may emit `::code-comment`; non-actionable or non-line-specific findings remain prose.
+- Git directives may be emitted only after the corresponding action succeeds and only when the active host supports them.
+- No response may duplicate the same facts across prose, table, and diagram merely for decoration.
+
 ## Sub-agent Contract
 
 - Implementation sub-agents are allowed only in execution and heavy review phases.
@@ -140,6 +152,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - Each canonical phase skill must pass `tools/validate-skills.ps1 -Skill <skill-name>`.
 - The `$m-go` skill must pass `tools/validate-skills.ps1 -Skill m-go`.
 - The `$m-quick` skill must pass `tools/validate-skills.ps1 -Skill m-quick`.
+- `tests/test_visual_output_contract.py` must verify shared-reference routing, supported component coverage, success guards, and the standalone thesis output contract.
 - The umbrella skill must sync through `tools/sync-skills.ps1 -Skill m-autoflow`.
 - Each canonical phase skill must sync through `tools/sync-skills.ps1 -Skill <skill-name>`.
 - The `$m-go` skill must sync through `tools/sync-skills.ps1 -Skill m-go`.
@@ -190,6 +203,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 
 ## Related Changes
 
+- [../change/2026-07-15_visual-output-components.md](../change/2026-07-15_visual-output-components.md)
 - [../change/2026-07-13_m-context.md](../change/2026-07-13_m-context.md)
 - [../change/2026-07-08_m-plan-task-table.md](../change/2026-07-08_m-plan-task-table.md)
 - [../change/2026-07-08_m-test-ui-evidence.md](../change/2026-07-08_m-test-ui-evidence.md)

@@ -27,6 +27,7 @@ Use this skill as the umbrella entry for the `m-*` workflow collection. It route
 - Read `references/m-docs-integration.md` before editing `plan.md`, intake, features, requirements, specs, decisions, `docs/change`, or `docs/lessons`.
 - Read `references/subagents.md` before any parallelism assessment or delegation.
 - Read `references/templates.md` when creating `plan.md`, `docs/change`, or `docs/lessons` artifacts.
+- Read `references/output-components.md` before composing a user-facing phase result.
 
 ## Workflow
 
@@ -80,6 +81,8 @@ The phase and fast-path skills are companion entry points. Keep `$m-autoflow` as
   - parallelism assessment, delegation gates, and audit requirements
 - `references/templates.md`
   - compact templates for `plan.md`, blocker output, `docs/change`, and `docs/lessons`
+- `references/output-components.md`
+  - shared selection rules for tables, Mermaid, clickable artifacts, visual evidence, review comments, and Git components
 - `../m-discuss/SKILL.md`
   - discussion and optional research entry point
 - `../m-context/SKILL.md`

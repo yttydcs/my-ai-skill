@@ -48,6 +48,7 @@ When `$m-test` runs and the change affects UI, visible layout, components, style
 - include desktop viewport evidence at minimum
 - include mobile viewport evidence when responsive behavior or mobile layout may be affected
 - record the URL, viewport, operation path, screenshot path, findings, and conclusion
+- embed one or two representative screenshots in the direct response with concise alt text, then link additional evidence
 
 If the UI cannot be opened or operated because of environment, auth, dependency, build, or runtime issues, mark the UI validation as `不通过` or `阻塞`. Do not count it as a skipped pass.
 
@@ -65,14 +66,14 @@ Minimum columns:
 - Evidence
 - Notes
 
-For UI-impacting changes where `$m-test` runs, include at least one row for actual UI operation and screenshot evidence.
+For UI-impacting changes where `$m-test` runs, include at least one row for actual UI operation and screenshot evidence. Use an absolute clickable path in the row and embed representative evidence below the table.
 
 Example:
 
 ```md
 | Area | Check | Status | Evidence | Notes |
 | --- | --- | --- | --- | --- |
-| UI | Open affected page and operate key path | 通过 | `artifacts/ui/personnel-edit-desktop.png` | Desktop path verified |
+| UI | Open affected page and operate key path | 通过 | [desktop evidence](/absolute/worktree/artifacts/ui/personnel-edit-desktop.png) | Desktop path verified |
 | UI | Mobile responsive state | 跳过 | none | Not affected by this change |
 | Security | Permission boundary | 通过 | review | No auth surface changed |
 ```

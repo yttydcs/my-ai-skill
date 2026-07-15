@@ -14,6 +14,7 @@ Use this skill after `$m-plan` when the user wants high-automation execution. `$
 - Read `references/go.md`.
 - Read `../m-autoflow/references/subagents.md` before dispatching workers.
 - Read `../m-test/references/testing.md` before the automatic validation loop.
+- Read `../m-autoflow/references/output-components.md` before presenting orchestration or validation results.
 - Confirm the active worktree root has an approved `plan.md` or `todo.md`.
 - Treat `$m-go` invocation as user authorization to use worker sub-agents for the approved execution scope when host policy permits delegation.
 
@@ -59,5 +60,7 @@ End with:
 - failed or blocked items, if any
 - risks and rollback notes
 - decision to return to delegated execution or proceed to `$m-archive`
+
+Use clickable changed-file links and compact worker / Task ID / validation tables. Embed representative visual evidence when UI acceptance was exercised; use Mermaid only when worker dependencies or execution lanes are otherwise unclear.
 
 Do not create `docs/change`, merge branches, clean worktrees, push, or claim workflow completion from this phase.

@@ -96,7 +96,7 @@ For UI-impacting changes:
 - start or open the actual affected application, page, preview, or story
 - operate the affected user path rather than checking only initial render
 - capture screenshot evidence for the acceptance state
-- include the screenshot path or rendered evidence in the result
+- embed one or two representative screenshots with concise alt text and link any additional evidence with absolute paths
 - escalate or report `Blocked` when the UI cannot be started, authenticated, or operated within the bounded quick path
 
 Separate pre-existing failures from failures introduced by the patch. Never report skipped or unavailable checks as passed.
@@ -135,3 +135,5 @@ Return this table directly to the user:
 ```
 
 For escalation, add the failed gate and recommend `$m-discuss` or `$m-plan`. Do not create a staged workflow automatically unless the user asks to continue with it.
+
+Make every user-relevant docs, changed-file, and evidence path clickable. If a project-local rule or explicit request caused a successful branch, stage, commit, push, or pull-request action, emit the corresponding supported Git component only after success.

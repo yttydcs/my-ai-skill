@@ -62,6 +62,8 @@ After creating or confirming the active `plan.md` / `todo.md`, output a concise 
 
 The table is a readable summary of the active plan artifact. It must not redefine scope, omit known tasks, or conflict with `plan.md` / `todo.md`.
 
+Link the active plan artifact with an absolute clickable path. Add a Mermaid dependency or system-flow diagram only when it materially clarifies execution order, branching, or ownership; the task table remains the source for exact scope and status.
+
 Minimum columns:
 
 - Task ID

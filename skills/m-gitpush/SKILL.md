@@ -9,6 +9,10 @@ description: Git push workflow with a safe temporary local proxy fallback. Use w
 
 Push the current Git branch safely. Try the normal remote first; if GitHub is unreachable, retry once through the local proxy at `127.0.0.1:7897` using command-local Git `-c` options only.
 
+## Quick Start
+
+- Read `../m-autoflow/references/output-components.md` before presenting push status.
+
 ## Workflow
 
 1. Confirm repository state:
@@ -61,3 +65,9 @@ Push the current Git branch safely. Try the normal remote first; if GitHub is un
 - Never store proxy settings in repo config unless the user explicitly asks for persistent config.
 - Prefer `git -c http.proxy=... -c https.proxy=... push ...` over setting `HTTP_PROXY` or `HTTPS_PROXY`.
 - Keep unrelated local changes untouched. If the worktree is dirty, push commits only if they already exist; do not auto-commit unless the user requested it.
+
+## Output
+
+- Lead with whether the push succeeded or is blocked.
+- Report remote, branch, pushed range, proxy use, and final ahead/behind state in a compact table when several fields matter.
+- Emit `::git-push` on its own line only after the push actually succeeds and the active host supports the component.

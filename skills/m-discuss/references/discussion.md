@@ -51,3 +51,10 @@ Proceed to `$m-plan` only when:
 - worktree status is known
 
 If these are not true, continue discussion or ask the user for clarification.
+
+## User-facing Output
+
+- Lead with the recommended direction or the unresolved blocker.
+- Compare three or more viable options in a compact criteria / tradeoff / decision table.
+- Use Mermaid only when branches, dependencies, or ownership boundaries are materially clearer as a diagram.
+- Link created briefs, governed docs, and worktree artifacts using absolute clickable paths.

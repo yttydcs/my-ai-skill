@@ -18,6 +18,7 @@ Use this skill to treat project documentation as a governed system with private 
 - For postmortems, pitfalls, and recurring failure patterns, read `references/lessons-rules.md`.
 - For troubleshooting, "have we seen this before?", or direct problem lookup, start from `references/lessons-rules.md` and the relevant `docs/lessons` entry before scanning `change` logs.
 - For standard section layouts, read `references/templates.md`.
+- Read `../m-autoflow/references/output-components.md` before presenting created, updated, or routed docs.
 
 ## Workflow
 
@@ -99,3 +100,5 @@ Before finishing a docs task with this skill, confirm:
 - requirement/spec impact is explicitly recorded when needed
 - all required indexes were updated
 - protected or generated content was not edited unsafely
+
+Link every user-relevant created or updated doc with an absolute clickable path. When several artifacts changed, use one compact category / impact / index-status table instead of repeating the same paths in prose.

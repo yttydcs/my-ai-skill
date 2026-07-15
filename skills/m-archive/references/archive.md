@@ -64,3 +64,10 @@ Default closeout sequence:
 6. remove junctions or path-scoped processes when needed for Windows worktree cleanup
 7. remove/prune the worktree and delete the local feature branch when safe
 8. report whether the result is local-only or pushed
+
+## User-facing Closeout
+
+- Lead with whether archive and closeout completed or where they stopped.
+- Link archive and lessons artifacts with absolute clickable paths.
+- Use a compact archive / merge / cleanup / remaining-state table when several repositories or states are involved.
+- Emit supported Git components only for successful actions completed during this closeout; never emit them for planned or failed actions.

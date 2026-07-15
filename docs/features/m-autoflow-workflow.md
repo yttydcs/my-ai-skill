@@ -105,6 +105,17 @@ The complete current behavior is maintained in [m-quick-fast-path.md](m-quick-fa
 - `$m-test` must include a concise direct pass/fail table so the user can understand results without opening archive markdown.
 - Archive must link related intake, feature, requirement, spec, decision, lessons, and plan artifacts.
 
+## User-facing Output Experience
+
+- Every workflow-family or companion-utility result leads with the outcome, decision, or blocker.
+- Repeated fields and status mappings use compact tables; simple one-off results remain prose.
+- Mermaid is reserved for dependencies, branches, ownership, or state flows that are materially harder to understand linearly.
+- Local plans, changed files, docs, and evidence use absolute clickable links.
+- UI or rendered-document acceptance embeds representative visual evidence and links additional artifacts.
+- Actionable line-specific review findings may use code-comment components with tight source ranges.
+- Git components appear only after the matching branch, stage, commit, push, or pull-request action succeeds.
+- Plain Markdown continues to carry the result so the response remains readable when a component is unavailable.
+
 ## Acceptance Scenarios
 
 ### Load Reusable Context Before A Phase
@@ -151,6 +162,14 @@ Given the user invokes `$m-go` after a confirmed plan, when executable Task IDs 
 
 Given a workflow changes UI, when `$m-test` runs, then Codex opens the affected interface, operates the affected user path, captures screenshot evidence, and summarizes pass/fail status in a direct table.
 
+### Complex Plan Visualization
+
+Given a plan has meaningful task dependencies or branching system flow, when `$m-plan` presents the result, then Codex links the plan artifact, shows the exact task table, and may add a focused Mermaid diagram without duplicating flat checklist content.
+
+### Successful Git Action
+
+Given an authorized Git action succeeds, when the phase returns its final result in a supporting Codex host, then Codex emits the matching Git component and an ordinary text status. Failed or unperformed actions emit no component.
+
 ### User Skips Heavy Testing
 
 Given the user explicitly chooses to skip `$m-test`, when the workflow proceeds to `$m-archive`, then Codex records the skipped testing, missing evidence, and residual risk instead of fabricating validation.
@@ -173,6 +192,7 @@ Given the user explicitly chooses to skip `$m-test`, when the workflow proceeds 
 
 ## Related Changes
 
+- [../change/2026-07-15_visual-output-components.md](../change/2026-07-15_visual-output-components.md)
 - [../change/2026-07-13_m-context.md](../change/2026-07-13_m-context.md)
 - [../change/2026-07-08_m-plan-task-table.md](../change/2026-07-08_m-plan-task-table.md)
 - [../change/2026-07-08_m-test-ui-evidence.md](../change/2026-07-08_m-test-ui-evidence.md)

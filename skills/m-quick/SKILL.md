@@ -13,6 +13,7 @@ Use this skill for small, uncontroversial changes whose expected result, write s
 
 - Read `references/quick.md` completely before deciding eligibility or editing.
 - Read project-local instructions such as `AGENTS.md` and `guide.md`.
+- Read `../m-autoflow/references/output-components.md` before presenting the quick-path result.
 - Explicitly use `$m-docs` to locate `docs_root` and read the minimum relevant current docs before inspecting the implementation deeply.
 - Treat explicit `$m-quick` invocation as authorization for direct edits only after the fast-path gate passes.
 
@@ -65,5 +66,7 @@ End with:
 | Validation | Checks and evidence with honest status |
 | Docs Impact | None or updated stable-doc paths |
 | Residual Risk | None or a concise remaining risk |
+
+Make docs and changed-file values clickable. For UI work, embed one or two representative acceptance screenshots and link any additional evidence. Emit Git components only when project-local instructions or the user authorized the corresponding successful action.
 
 When escalation is required, include the concrete failed gate and the recommended next command.

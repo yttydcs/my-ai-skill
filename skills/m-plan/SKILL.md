@@ -15,6 +15,7 @@ Use this skill to convert a coherent requirement into an executable architecture
 - If invoking as part of the full workflow, keep `$m-autoflow` as the umbrella context and use this skill after `$m-discuss`.
 - Do not perform broad discovery here. If the requirement is unclear, unreasonable, or needs current external research, return to `$m-discuss`.
 - When private docs are expected, identify `project_root`, `docs_root`, `code_repos`, and `active_worktree` before planning writes stable docs.
+- Read `../m-autoflow/references/output-components.md` before presenting the plan result.
 - Read the original canonical references only when needed:
   - `../m-autoflow/references/initialization.md` for worktree, branch, repo, and `guide.md` prerequisites.
   - `../m-autoflow/references/m-docs-integration.md` before editing `plan.md`, intake, features, requirements, specs, decisions, change, or lessons docs.
@@ -38,6 +39,7 @@ Use this skill to convert a coherent requirement into an executable architecture
 8. Create or confirm root `plan.md` or `todo.md` in the active worktree. Include docs root, code repos, task IDs, file/module scope, acceptance, tests, rollback points, dependencies, risks, and parallelism notes.
 9. Explicitly separate tasks that will be executed after approval from tasks that will not be executed in the next execution phase. Every known task must appear in exactly one section, with the reason for any deferred, blocked, out-of-scope, or research-only task.
 10. After drafting or confirming the plan, output a concise task summary table directly to the user. The table summarizes the active `plan.md` / `todo.md`; it does not replace the detailed plan.
+11. Link the active plan artifact with an absolute clickable path. Add a Mermaid dependency or system-flow diagram only when it makes execution order or architecture materially easier to understand.
 
 ## Private Docs Guardrails
 

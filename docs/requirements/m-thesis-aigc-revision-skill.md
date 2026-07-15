@@ -20,6 +20,7 @@ Provide a reusable skill that helps Codex revise flagged thesis passages into mo
 - preserve factual accuracy and current implementation boundaries
 - reduce boilerplate summary tone, repetitive cadence, and generic wording
 - explicitly forbid fabricated data, fake references, and hidden overclaims
+- present multi-segment work with a compact risk / status / evidence mapping and clickable local artifacts
 
 ### Should
 
@@ -47,6 +48,11 @@ Provide a reusable skill that helps Codex revise flagged thesis passages into mo
 - The skill includes durable rewrite guidance that emphasizes specificity, scope control, and factual grounding.
 - The skill includes a script that extracts suspicious segment summaries from a report HTML without extra dependencies.
 - The repository requirements and specs indexes include this capability.
+- The user-facing result keeps long before/after prose out of table cells and avoids decorative visualization.
+
+## Related Changes
+
+- [2026-07-15 visual output components](../change/2026-07-15_visual-output-components.md)
 
 ## Related Specs
 

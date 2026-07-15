@@ -13,6 +13,7 @@ Load named local Markdown as user-provided task context. Keep personal context d
 
 - Read `references/context-format.md` before creating or updating a context.
 - Run `scripts/context_loader.py` for deterministic root resolution, discovery, and loading.
+- Read `../m-autoflow/references/output-components.md` before presenting context discovery or load status.
 - Load every requested context before a co-invoked skill performs task actions.
 
 Examples:
@@ -65,3 +66,10 @@ Deletion requires an explicit user request naming the context. Do not infer dele
 - Surface missing roots, contexts, sections, decoding failures, ambiguous headings, and unsafe paths explicitly.
 - Never silently load a partial filename match or choose among duplicate headings.
 - Do not bypass loader path validation with ad hoc reads when normal loading fails.
+
+## Output
+
+- Lead with the load, discovery, or update outcome.
+- Use a compact name / section / status table only when multiple contexts or sections were involved.
+- Link context files only when the user asked to locate or edit them and the link does not expose secret values.
+- Never include loaded secret values merely to make the result table complete.

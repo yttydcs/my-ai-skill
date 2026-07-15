@@ -46,6 +46,9 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - require `$m-quick` to use `$m-docs` for minimum relevant context before eligibility or direct edits
 - require `$m-quick` to preserve existing changes, reject prohibited risk, run focused validation, and expose docs/gate/change/validation/risk results directly
 - keep `$m-quick` outside the staged phase chain and forbid it from weakening normal worktree, plan, review, and archive gates
+- require user-facing results to select the smallest useful visual component, keep readable Markdown fallback, and avoid decorative duplication
+- require local artifacts to use absolute clickable links and representative UI evidence to be embedded when appearance is part of acceptance
+- require app-specific review and Git components to correspond only to actionable findings or actions that actually succeeded
 
 ### Optional
 
@@ -124,6 +127,10 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-test` must require actual UI opening, user-path operation, and screenshot evidence when it runs for UI-impacting changes.
 - `$m-test` must treat missing UI evidence during a run `$m-test` as `不通过` or `阻塞`, not as a pass.
 - `$m-test` must output a concise direct result table showing checks and pass/fail/blocked/skipped status.
+- Each workflow-family or companion-utility skill covered by this requirement must read the shared visual-output reference before composing its user-facing result.
+- Mermaid must be reserved for meaningful dependencies, branches, ownership, hierarchy, or state flow; it must not replace exact task or test tables.
+- Code-comment components must be limited to actionable line-specific findings with tight source ranges.
+- Git components must never be emitted for attempted, failed, skipped, or merely recommended actions.
 - The workflow must allow the user to skip `$m-test` and invoke `$m-archive`, while preserving the skipped-testing reason and residual risk in archive records.
 - `$m-archive` must record intake, feature, requirement, spec, decision, and lessons impact.
 - `$m-archive` must capture searchable lesson cues when the workflow produced reusable debugging knowledge.
@@ -140,6 +147,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
   - keep each `SKILL.md` concise and load details from references only when needed
 - Readability:
   - use short phase names and explicit blocker wording
+  - lead with outcomes and keep visual status understandable without color or component rendering
 - Extensibility:
   - keep `m-docs` integration explicit instead of copying its full rule set
 - Maintainability:
@@ -180,6 +188,8 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-quick` restores governed docs context, correctly gates low-risk direct work, validates the affected behavior, and escalates prohibited requests without weakening staged commands.
 - UI-impacting changes tested by `$m-test` produce actual operation evidence and screenshot paths.
 - `$m-test` output includes a concise direct result table.
+- Every workflow skill routes user-facing output through the shared component-selection reference.
+- Output-contract tests cover component availability, phase routing, absolute links, and directive success guards.
 - The archive can route reusable lessons into `docs/lessons` for later lookup.
 - Planning and archive respect private docs roots and do not publish docs without the user's explicit instruction.
 - All canonical skills validate and sync successfully.
@@ -202,6 +212,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 
 ## Related Changes
 
+- [../change/2026-07-15_visual-output-components.md](../change/2026-07-15_visual-output-components.md)
 - [../change/2026-07-13_m-context.md](../change/2026-07-13_m-context.md)
 - [../change/2026-07-08_m-plan-task-table.md](../change/2026-07-08_m-plan-task-table.md)
 - [../change/2026-07-08_m-test-ui-evidence.md](../change/2026-07-08_m-test-ui-evidence.md)

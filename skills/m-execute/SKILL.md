@@ -13,6 +13,7 @@ Use this skill to implement confirmed plan tasks inside the active worktree. It 
 
 - Read `references/execution.md`.
 - Read `../m-autoflow/references/subagents.md` before any parallelism assessment or delegation.
+- Read `../m-autoflow/references/output-components.md` before presenting the execution result.
 - Confirm the active `plan.md` or `todo.md` is complete, current, and approved by the user.
 
 ## Entry Gate
@@ -48,5 +49,7 @@ End with:
 - lightweight validation already run
 - heavier validation or review still needed
 - risks and rollback notes
+
+Use a compact Task ID / changed-file / validation table when several mappings exist, and make changed files clickable. Emit Git components only for successful Git actions that were actually part of the authorized execution.
 
 Do not create `docs/change`, merge branches, clean worktrees, or claim workflow completion from this phase.
