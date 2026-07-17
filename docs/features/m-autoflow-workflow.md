@@ -222,6 +222,7 @@ Given the user explicitly chooses to skip `$m-test`, when the workflow proceeds 
 
 ## Related Changes
 
+- [../change/2026-07-17_m-continue-loop.md](../change/2026-07-17_m-continue-loop.md)
 - [../change/2026-07-15_interactive-skill-outputs.md](../change/2026-07-15_interactive-skill-outputs.md)
 - [../change/2026-07-15_visual-output-components.md](../change/2026-07-15_visual-output-components.md)
 - [../change/2026-07-13_m-context.md](../change/2026-07-13_m-context.md)

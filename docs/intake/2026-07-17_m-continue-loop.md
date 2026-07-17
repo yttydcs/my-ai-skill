@@ -61,4 +61,4 @@ Invocation authorizes every continued edit and validation pass within the existi
 
 ## Related Changes
 
-- No implementation or change archive exists yet.
+- [m-continue implementation archive](../change/2026-07-17_m-continue-loop.md)

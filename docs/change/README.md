@@ -25,6 +25,7 @@ Store completed workflow result documents for this repository.
 
 ## Current Docs
 
+- [2026-07-17_m-continue-loop.md](2026-07-17_m-continue-loop.md)
 - [2026-07-15_interactive-skill-outputs.md](2026-07-15_interactive-skill-outputs.md)
 - [2026-07-15_m-context-scopes.md](2026-07-15_m-context-scopes.md)
 - [2026-07-15_visual-output-components.md](2026-07-15_visual-output-components.md)

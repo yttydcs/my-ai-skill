@@ -9,7 +9,7 @@
 - Docs Root: `D:\project\my-ai-skills\worktrees\m-continue\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-continue`
-- Current Stage: `$m-execute` complete; MC1-MC4 implemented and validated
+- Current Stage: `$m-archive` documentation complete; ready for control-plane merge and cleanup
 - Plan Path: `D:\project\my-ai-skills\worktrees\m-continue\plan.md`
 
 ## Stage Records
@@ -482,3 +482,39 @@ Using `$m-docs`:
 #### Rollback
 
 - Revert this execution commit, remove the generated/installed `m-continue` package, and resync the prior `m-autoflow` source if rollback is required.
+
+### Stage 4 - Archive And Closeout
+
+#### Archive Records
+
+- Change archive: `docs/change/2026-07-17_m-continue-loop.md`
+- Retained plan target: `docs/plan/2026-07-17_m-continue-loop.md`
+- Reusable lesson: `docs/lessons/python-unittest-discovery-nonpackage-tests.md`
+
+#### Docs Impact
+
+- Intake impact: updated; linked the completed change.
+- Feature impact: updated; current `$m-continue` behavior and change link are present.
+- Requirements impact: updated; durable authorization, progress, termination, and boundary requirements are present.
+- Specs impact: updated; package, workflow, test, sync, and installation contracts are present.
+- Decision impact: updated; accepted decision links the completed change.
+- Lessons impact: updated; unittest discovery for non-package tests is now searchable.
+- Root docs index impact: none; no category topology or reading order changed.
+- Category indexes: change, plan, and lessons updated.
+
+#### Validation Decision
+
+- Heavy `$m-test`: skipped with accepted low residual risk.
+- Reason: only Skill/Markdown/manifest/test contracts changed; no UI, application runtime, service, data, auth, infrastructure, or external integration path changed.
+- Evidence retained: 13 focused contract tests passed; 32 full tests passed with 1 established Windows permission skip; both Skills validated and synced; source/dist/install parity and `git diff --check` passed.
+
+#### Lessons Decision
+
+- Added `python-unittest-discovery-nonpackage-tests.md` because the import failure occurred during this workflow, is non-obvious, and is likely to recur in future plan commands.
+- Reused existing frontmatter and Windows parity lessons; no additional lesson is needed.
+
+#### Publication And Closeout
+
+- Docs changes are local/versioned only; no remote, push, publication, or backup action was authorized.
+- Default `$m-archive` closeout is authorized by invocation.
+- After committing these archive records, merge `feat/m-continue-loop` from the control-plane checkout, preserve unrelated line-ending dirt, remove/prune the worktree, and delete the local feature branch when safe.
