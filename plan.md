@@ -9,7 +9,7 @@
 - Docs Root: `D:\project\my-ai-skills\worktrees\m-continue\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-continue`
-- Current Stage: `$m-plan` complete; awaiting user approval before execution
+- Current Stage: `$m-execute` complete; MC1-MC4 implemented and validated
 - Plan Path: `D:\project\my-ai-skills\worktrees\m-continue\plan.md`
 
 ## Stage Records
@@ -344,7 +344,7 @@ Using `$m-docs`:
 - Acceptance:
   - Tests verify package files, manifest dependency/reference shape, execute/test authority links, full-loop authorization, no-confirmation rule, progress signature/reset, three-cycle threshold, hard blockers, and archive exclusion.
   - Shared output routing and recipe coverage include `m-continue`.
-- Test Points: `python -m unittest tests.test_m_continue_contract tests.test_visual_output_contract`.
+- Test Points: `python -m unittest discover -s tests -p "test_*contract.py"`.
 - Rollback: remove the focused test and revert the visual-output test addition.
 
 ##### MC4 - Validate, sync, and verify source/install parity
@@ -365,7 +365,7 @@ Using `$m-docs`:
 - Test Points:
   - `tools\validate-skills.ps1 -Skill m-continue`
   - `tools\validate-skills.ps1 -Skill m-autoflow`
-  - `python -m unittest tests.test_m_continue_contract tests.test_visual_output_contract`
+  - `python -m unittest discover -s tests -p "test_*contract.py"`
   - `tools\sync-skills.ps1 -Skill m-continue`
   - `tools\sync-skills.ps1 -Skill m-autoflow`
   - `git diff --check`
@@ -409,5 +409,76 @@ Using `$m-docs`:
 
 #### Issue List
 
-- Blocked: yes, pending user approval of MC1-MC4.
-- Do not enter execution or dispatch implementation sub-agents before approval.
+- Approved: yes, through the user's explicit `$m-execute` invocation.
+- Blocked: no for MC1-MC4.
+
+### Stage 3.2 - Execution Results
+
+#### Approved And Executed Task IDs
+
+- MC1 - Completed. Created the canonical `m-continue` Skill package, reference, UI metadata, and manifest using the standard `skill-creator` initializer.
+- MC2 - Completed. Integrated `$m-continue` into umbrella discovery, stage routing, delegation governance, output recipes, and manifest dependencies.
+- MC3 - Completed. Added focused continuation contract tests and shared visual-output coverage.
+- MC4 - Completed. Validated, tested, synced, and hash-verified source, distribution, and installed copies.
+
+#### Deferred Task IDs
+
+- MC5 - Not executed. Archive, merge, and worktree cleanup remain owned by `$m-archive`.
+- MC6 - Not executed. Push remains owned by an explicit `$m-gitpush` request.
+
+#### Parallelism Result
+
+- MC1-MC3 had separable write sets, but the user invoked ordinary `$m-execute` without authorizing implementation sub-agents and host policy does not permit proactive delegation.
+- The main agent implemented MC1-MC3 serially and ran MC4 after all source changes converged.
+- No sub-agents were used.
+
+#### Changed Files By Task ID
+
+- MC1:
+  - `skills/m-continue/SKILL.md`
+  - `skills/m-continue/references/continue.md`
+  - `skills/m-continue/agents/openai.yaml`
+  - `manifests/m-continue.json`
+- MC2:
+  - `skills/m-autoflow/SKILL.md`
+  - `skills/m-autoflow/references/stages.md`
+  - `skills/m-autoflow/references/subagents.md`
+  - `skills/m-autoflow/references/output-components.md`
+  - `manifests/m-autoflow.json`
+- MC3:
+  - `tests/test_m_continue_contract.py`
+  - `tests/test_visual_output_contract.py`
+- MC4:
+  - ignored generated copies under `dist/codex/m-continue` and `dist/codex/m-autoflow`
+  - installed copies under `C:\Users\HelloWorld\.codex\skills\m-continue` and `C:\Users\HelloWorld\.codex\skills\m-autoflow`
+  - `plan.md` execution record
+
+#### Key Design Decisions
+
+- Keep `SKILL.md` concise and route detailed state recovery, progress signatures, and terminal rules to `references/continue.md`.
+- Treat one invocation as authorization for every in-scope execute/test iteration without broadening Task IDs, write sets, external authority, or archive ownership.
+- Define progress from Task completion, relevant diff, validation results, and evidence; reset the counter for any measurable improvement or changed failure signature.
+- Stop a repeated loop only after three comparable complete repair/test cycles have the same signature and no progress; use no separate small total-iteration limit.
+- Preserve `$m-execute` optional delegation instead of adopting `$m-go` mandatory workers.
+
+#### Validation Results
+
+- `tools\validate-skills.ps1 -Skill m-continue`: passed.
+- `tools\validate-skills.ps1 -Skill m-autoflow`: passed.
+- `python -m unittest discover -s tests -p "test_*contract.py"`: 13 passed.
+- `python -m unittest discover -s tests`: 32 passed, 1 existing platform-permission test skipped.
+- `tools\sync-skills.ps1 -Skill m-continue`: passed.
+- `tools\sync-skills.ps1 -Skill m-autoflow`: passed.
+- Source/dist/install SHA-256 parity for both synced skills: passed, excluding generated `.build-info.json`.
+- `git diff --check`: passed with expected Windows line-ending warnings only.
+
+#### Residual Risk And Heavier Validation
+
+- No application runtime, UI, service, data, authorization, or external integration changed; heavy UI/integration testing is not required for the execution implementation itself.
+- A future real workflow invocation remains the best behavioral forward test of the Agent instructions. Independent sub-agent forward testing was skipped because no sub-agent authorization was provided.
+- Main-checkout `output-components.md` remains content-equivalent dirty from line endings and was not modified from this worktree.
+- `$m-test` may still perform an optional final contract review before `$m-archive`.
+
+#### Rollback
+
+- Revert this execution commit, remove the generated/installed `m-continue` package, and resync the prior `m-autoflow` source if rollback is required.

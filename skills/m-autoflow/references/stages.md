@@ -10,6 +10,7 @@ Use this file to coordinate the `m-autoflow` phases.
 - `$m-plan` owns architecture and executable planning.
 - `$m-execute` owns implementation and lightweight validation.
 - `$m-go` owns delegated implementation orchestration and automatic `$m-test` looping after planning.
+- `$m-continue` owns unattended state recovery and repeated reuse of `$m-execute` and `$m-test` after either phase has already run.
 - `$m-test` owns optional heavy validation and review.
 - `$m-archive` owns change archive, lessons, default workflow closeout, merge, and cleanup.
 - Do not run web research by default; use it from `$m-discuss` only when current external facts or best practices matter.
@@ -147,6 +148,7 @@ Execution entry choices:
 
 - `$m-execute` is the normal implementation entry and may use sub-agents when the parallelism assessment allows it.
 - `$m-go` is the high-automation implementation entry; it requires worker sub-agents for all implementation edits and automatically enters `$m-test` behavior after delegated execution converges.
+- `$m-continue` is the continuation entry after an `$m-execute` or `$m-test` pass. It preserves `$m-execute` delegation policy, automatically alternates execute repairs and test evaluation, and does not ask whether to continue after ordinary failures.
 - `$m-quick` is not a stage `3.2` entry and does not weaken the worktree or confirmed-plan gates in this section.
 
 Rules:
@@ -215,6 +217,8 @@ When UI is impacted and `$m-test` runs:
 If any item fails, return to `3.2`.
 
 In `$m-go` flows, failed review or test items return to delegated fixes, then the review loop runs again until all acceptance checks pass or a blocker is explicit.
+
+In `$m-continue` flows, one invocation authorizes every iteration inside the existing approved Task IDs and write sets. Any measurable Task, diff, validation, or evidence improvement resets the non-progress count. Stop only after acceptance converges, a hard out-of-scope/external blocker is proven, or three complete repair/test cycles repeat the same failure signature without measurable progress. `$m-continue` stops before archive and reports readiness for `$m-archive` on success.
 
 ## Stage 4 - Change Archive
 

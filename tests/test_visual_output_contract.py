@@ -12,6 +12,7 @@ WORKFLOW_SKILLS = {
     "m-plan": "../m-autoflow/references/output-components.md",
     "m-execute": "../m-autoflow/references/output-components.md",
     "m-go": "../m-autoflow/references/output-components.md",
+    "m-continue": "../m-autoflow/references/output-components.md",
     "m-quick": "../m-autoflow/references/output-components.md",
     "m-test": "../m-autoflow/references/output-components.md",
     "m-archive": "../m-autoflow/references/output-components.md",

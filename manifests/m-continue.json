@@ -1,0 +1,16 @@
+{
+  "name": "m-continue",
+  "version": "0.1.0",
+  "install_mode": "copy",
+  "source_dir": "skills/m-continue",
+  "dist_dir": "dist/codex/m-continue",
+  "codex_install_root": "%USERPROFILE%/.codex/skills",
+  "depends_on_skills": [
+    "m-autoflow",
+    "m-execute",
+    "m-test"
+  ],
+  "reference_files": [
+    "references/continue.md"
+  ]
+}

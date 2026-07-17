@@ -115,6 +115,7 @@ After an action succeeds, emit the matching directive on its own line in the fin
 - `$m-discuss`: use an option comparison table; add Mermaid only for a real branch, dependency, or ownership model; consider the shared interactive pattern when direct option selection helps.
 - `$m-plan`: link the active `plan.md` / `todo.md`, show the task table, and add Mermaid only when task dependencies or system flow need it; consider the shared interactive pattern for bounded approval follow-up.
 - `$m-execute` and `$m-go`: map Task IDs to clickable changed files and validation status; visualize dependencies only when they affect sequencing.
+- `$m-continue`: summarize iterations, Task IDs, validation changes, and the terminal reason in a compact table; link changed files and show whether the result is archive-ready or blocked by a repeated signature or hard dependency.
 - `$m-quick`: keep the compact result table, link changed files, and embed representative UI evidence when UI acceptance was exercised.
 - `$m-test`: show the result table, embed representative screenshots or rendered pages, use code comments only for actionable line findings, and consider the shared interactive pattern for multi-item evidence navigation.
 - `$m-docs`: link created or updated docs and summarize category / impact / index status in one table when several artifacts changed.

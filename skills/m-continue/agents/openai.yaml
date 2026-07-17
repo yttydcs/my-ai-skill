@@ -1,0 +1,4 @@
+interface:
+  display_name: "m:continue"
+  short_description: "Continue execution and testing unattended"
+  default_prompt: "Use $m-continue to keep an approved execution and test workflow running until it converges or cannot progress."

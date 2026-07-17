@@ -1,6 +1,6 @@
 ---
 name: m-autoflow
-description: Umbrella collection for the m-* engineering workflow. Use when the user wants the full staged flow or needs routing among the $m-context companion loader, standalone $m-quick fast path, and $m-discuss, $m-plan, $m-execute, $m-go, $m-test, and $m-archive phases.
+description: Umbrella collection for the m-* engineering workflow. Use when the user wants the full staged flow or needs routing among the $m-context companion loader, standalone $m-quick fast path, and $m-discuss, $m-plan, $m-execute, $m-go, $m-continue, $m-test, and $m-archive phases.
 ---
 
 # m:autoflow
@@ -19,6 +19,7 @@ Use this skill as the umbrella entry for the `m-*` workflow collection. It route
   - `$m-plan` for architecture, rejection of bad requirements, and executable `plan.md` / `todo.md` gating.
   - `$m-execute` for approved Task ID implementation and lightweight validation.
   - `$m-go` for delegated approved Task ID implementation and automatic `$m-test` looping.
+  - `$m-continue` after an `$m-execute` or `$m-test` pass for unattended reuse of both behaviors until acceptance converges or progress is genuinely impossible.
   - `$m-test` for optional heavy validation, integration testing, usability review, security review, and performance review.
   - `$m-archive` for `docs/change`, lessons, default workflow closeout, merge, and cleanup.
 - If governed docs exist, prioritize `docs/intake`, `docs/features`, `docs/requirements`, `docs/specs`, and `docs/decisions` before relying on code-only inference.
@@ -39,8 +40,9 @@ Use this skill as the umbrella entry for the `m-*` workflow collection. It route
 5. Use `$m-execute` only after the plan is confirmed and the user approved implementation.
 6. Use `$m-go` only after the plan is confirmed and the user wants delegated implementation plus automatic `$m-test` looping.
 7. Use `$m-test` when heavy validation is needed, or record a justified skip. In `$m-go` flows, `$m-test` runs automatically unless the workflow blocks or the user changes path.
-8. Use `$m-archive` after validation to write governed archives and close the staged workflow by default.
-9. Stop after archive only when the user explicitly requested archive-only handling, no merge, or no cleanup.
+8. Use `$m-continue` after an execute or test pass when the user wants one invocation to keep alternating both existing behaviors without continuation questions until acceptance converges or progress is genuinely impossible.
+9. Use `$m-archive` after validation to write governed archives and close the staged workflow by default.
+10. Stop after archive only when the user explicitly requested archive-only handling, no merge, or no cleanup.
 
 ## Split Phase Mapping
 
@@ -50,6 +52,7 @@ Use this skill as the umbrella entry for the `m-*` workflow collection. It route
 - Plan: use `$m-plan` for architecture and executable planning.
 - Execute: use `$m-execute` for implementation and lightweight validation.
 - Go: use `$m-go` for delegated implementation and automatic `$m-test` looping.
+- Continue: use `$m-continue` to resume an existing execute/test workflow unattended without adopting `$m-go` mandatory delegation.
 - Test: use `$m-test` for optional heavy validation and review.
 - Archive: use `$m-archive` for archive and workflow-end closeout.
 
@@ -98,6 +101,8 @@ The phase and fast-path skills are companion entry points. Keep `$m-autoflow` as
   - execution entry point
 - `../m-go/SKILL.md`
   - delegated execution and automatic test-loop entry point
+- `../m-continue/SKILL.md`
+  - unattended post-execute/test convergence entry point
 - `../m-test/SKILL.md`
   - split validation and review entry point
 - `../m-archive/SKILL.md`

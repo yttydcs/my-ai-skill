@@ -11,6 +11,7 @@
     "m-plan",
     "m-execute",
     "m-go",
+    "m-continue",
     "m-quick",
     "m-test",
     "m-archive"

@@ -8,6 +8,7 @@ Use this file only in stages `3.2` and `3.3`.
 - Exception: `$m-discuss` may use read-only research sub-agents when the user explicitly asks for web research or current external facts and host policy permits delegation.
 - The research exception does not allow code edits, worktree changes, plan confirmation, implementation, validation, archive, merge, or cleanup delegation.
 - `$m-go` is a strict delegated execution entry for stages `3.2` and `3.3`: implementation edits must be done by worker sub-agents, while the main agent coordinates and audits.
+- `$m-continue` preserves the delegation policy of the `$m-execute` and `$m-test` behavior it applies. Invoking `$m-continue` authorizes repeated in-scope iterations, not mandatory sub-agent use.
 
 ## Mandatory Parallelism Assessment
 
@@ -30,6 +31,8 @@ If sub-agents are not used, state why, such as:
 For `$m-discuss` research, assess whether the research can be split into independent read-only lanes. Use parallel research sub-agents only when this split is clear, and record the lanes plus synthesis responsibility.
 
 For `$m-go`, do not skip sub-agents for implementation edits. If delegation is unavailable or unsafe, block `$m-go` instead of falling back to main-agent implementation.
+
+For `$m-continue`, reassess parallelism when returning to execution or review, but do not infer `$m-go` worker-only authorization. Continue directly when delegation is not authorized and the applied `$m-execute` or `$m-test` rules permit main-agent work.
 
 ## Hard Preconditions
 
