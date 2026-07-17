@@ -16,6 +16,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - expose `$m-context` as a companion loader that may run before any phase or fast path without becoming a workflow phase
 - provide canonical phase entries named `$m-discuss`, `$m-plan`, `$m-execute`, `$m-test`, and `$m-archive`
 - provide `$m-go` as a canonical high-automation execution entry after planning
+- provide `$m-continue` as a canonical unattended continuation entry after an `$m-execute` or `$m-test` pass
 - provide `$m-quick` as a canonical standalone direct-edit entry for explicit low-risk work in one repository
 - keep the umbrella thin by routing to phase skills and shared references instead of duplicating phase instructions
 - let `$m-discuss` own discovery, brainstorming, option comparison, requirement shaping, optional current-practice research, and early worktree setup
@@ -40,6 +41,10 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - keep execution responsible for implementation plus lightweight local validation such as syntax checks, type checks, focused lint, touched-file formatting checks, focused unit tests, and `git diff --check`
 - require `$m-go` to keep plan gating, delegate all implementation edits to sub-agents, run safe parallel execution where write sets allow it, and automatically run `$m-test` after delegated execution
 - require `$m-go` to delegate bounded fixes and repeat validation until all acceptance items pass or a blocker is explicit
+- require one `$m-continue` invocation to authorize all subsequent execute/test iterations inside the already approved Task IDs and write sets
+- require `$m-continue` to reuse `$m-execute` and `$m-test` as authorities, transition automatically after ordinary failures, and never ask whether to continue during a progressing loop
+- require `$m-continue` to stop successfully only after acceptance converges and to stop unsuccessfully only for genuine hard blockers or three consecutive complete cycles with the same failure signature and no measurable progress
+- require `$m-continue` to stop before archive, merge, cleanup, publication, or push
 - treat `$m-test` as optional heavy validation for integration, end-to-end flow, UI evidence, usability, security, and performance; allow the user to explicitly skip it and go to `$m-archive` when the reason and residual risk are recorded
 - require `$m-test`, when run for UI-impacting changes, to open the affected UI, operate the affected path, and provide screenshot evidence
 - require `$m-test` to directly output a concise pass/fail/blocked/skipped result table
@@ -121,6 +126,11 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-go` must automatically run `$m-test` behavior after delegated implementation completes.
 - `$m-go` must return failed validation to delegated fixes and repeat the validation loop until acceptance passes or the blocker is explicit.
 - `$m-go` must stop before `$m-archive`, merge, cleanup, or push.
+- `$m-continue` must require an approved active plan plus evidence of a prior `$m-execute` or `$m-test` pass.
+- `$m-continue` must preserve `$m-execute` delegation rules and must not impose `$m-go` mandatory worker-only edits.
+- `$m-continue` must compare Task completion, code-diff, and validation evidence across complete cycles; any measurable improvement resets its same-failure counter.
+- `$m-continue` must not use a small arbitrary total-iteration cap or treat one failed pass as terminal.
+- `$m-continue` must report the repeated failure signature, attempted cycles, and required handoff when it cannot progress.
 - `$m-quick` must explicitly use `$m-docs` before it accepts eligibility or edits code.
 - `$m-quick` must select one target Git repository, inspect current status, preserve existing work, and use a risk-based gate rather than a hard file or line limit.
 - `$m-quick` must escalate conflicting docs, ambiguity, multi-repo work, architecture, public contracts, schema/migration, security, destructive data, production infrastructure, broad dependency changes, or broad validation needs.
@@ -193,7 +203,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 ## Acceptance Criteria
 
 - `m-autoflow` exists as a valid umbrella skill package in this repository.
-- `m-discuss`, `m-plan`, `m-execute`, `m-go`, `m-quick`, `m-test`, and `m-archive` exist as valid companion skill packages in this repository.
+- `m-discuss`, `m-plan`, `m-execute`, `m-go`, `m-continue`, `m-quick`, `m-test`, and `m-archive` exist as valid companion skill packages in this repository.
 - The umbrella skill routes to the phase skills without removing the `$m-autoflow` entry point.
 - The phase skills enforce discussion, planning, execution, testing, archive, and blocker rules.
 - The plan artifact clearly states which Task IDs will execute after approval and which Task IDs will not execute in the next execution phase.
@@ -201,6 +211,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - Optional online research is controlled by discussion, supports source verification and citations, and routes stable-doc impact through `$m-docs`.
 - Lightweight validation is part of execution, while heavyweight integration/UI/usability/security/performance testing is optional and separately recorded.
 - `$m-go` performs delegated implementation and automatic `$m-test` looping for confirmed plans without making the main agent the implementer.
+- `$m-continue` resumes after execute/test with no repeated confirmation, continues through ordinary failures, and terminates only on full acceptance or proven inability to progress.
 - `$m-quick` restores governed docs context, correctly gates low-risk direct work, validates the affected behavior, and escalates prohibited requests without weakening staged commands.
 - UI-impacting changes tested by `$m-test` produce actual operation evidence and screenshot paths.
 - `$m-test` output includes a concise direct result table.
@@ -226,6 +237,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
+- [../decisions/2026-07-17_m-continue-loop.md](../decisions/2026-07-17_m-continue-loop.md)
 - [../decisions/2026-07-10_m-quick-standalone-fast-path.md](../decisions/2026-07-10_m-quick-standalone-fast-path.md)
 
 ## Related Changes

@@ -27,6 +27,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 - `$m-execute`: confirmed Task ID implementation and lightweight validation.
 - `$m-go`: high-automation delegated execution and automatic `$m-test` loop for confirmed plans.
 - `$m-test`: optional heavy validation and review.
+- `$m-continue`: unattended continuation after an execute or test pass, alternating the existing `$m-execute` and `$m-test` behaviors until acceptance converges or progress is genuinely impossible.
 - `$m-archive`: change archive, lessons, default workflow closeout, merge decision, and cleanup routing.
 
 ## User Workflow
@@ -42,9 +43,11 @@ Give the user one disciplined workflow family for turning an idea into discussio
 9. Heavy testing runs when risk justifies it, when `$m-go` automatically invokes it, or when the user requests it; the user may explicitly skip `$m-test` only outside the normal `$m-go` path and proceed to archive with residual risk recorded.
 10. When heavy testing runs for UI changes, Codex opens and operates the affected interface and provides screenshot evidence.
 11. `$m-test` reports a concise pass/fail table directly in the user response.
-12. Archive records the change, stable-doc impact, lessons impact, validation, rollback, and sub-agent trace.
-13. Archive closes the workflow by default through verified control-plane merge and worktree cleanup.
-14. The workflow stops after archive only when the user explicitly asks for archive-only handling, no merge, or no cleanup.
+12. After an execute or test pass, the user may invoke `$m-continue` once to authorize automatic execute/test iteration without further continuation questions.
+13. `$m-continue` stops successfully only after approved acceptance converges, or unsuccessfully when new authority/external state is required or three complete cycles repeat the same failure without measurable progress.
+14. Archive records the change, stable-doc impact, lessons impact, validation, rollback, and sub-agent trace.
+15. Archive closes the workflow by default through verified control-plane merge and worktree cleanup.
+16. The workflow stops after archive only when the user explicitly asks for archive-only handling, no merge, or no cleanup.
 
 ## Standalone Quick Path
 
@@ -98,6 +101,8 @@ The complete current behavior is maintained in [m-quick-fast-path.md](m-quick-fa
 - Execution must report lightweight validation.
 - `$m-go` must require a confirmed plan, delegate implementation edits to sub-agents, run safe parallel task execution when write sets allow it, and automatically run `$m-test` behavior after delegated execution.
 - `$m-go` must return failing validation to delegated fixes until acceptance passes or the blocker is explicit.
+- `$m-continue` must treat one invocation as authorization for all approved-scope execute/test iterations, must not ask whether to continue between ordinary passes, and must preserve `$m-execute` delegation policy rather than requiring `$m-go` workers.
+- `$m-continue` must stop only after complete acceptance or genuine inability to progress; the default non-progress threshold is three complete repair/test cycles with the same failure signature and no Task, diff, or validation improvement.
 - `$m-quick` must read governed docs before eligibility, operate on one selected repository, reject prohibited risk, preserve existing changes, run focused validation, and report a concise direct result table.
 - `$m-quick` is the sole explicit direct-edit exception to staged worktree and confirmed-plan gates; it must not weaken those gates for other commands.
 - Heavy validation must report either passed checks or skip rationale with residual risk.
@@ -162,6 +167,10 @@ Given a quick request conflicts with docs or touches multiple repos, architectur
 
 Given the user invokes `$m-go` after a confirmed plan, when executable Task IDs have bounded write sets, then Codex delegates implementation edits to worker sub-agents, runs safe parallel lanes where possible, automatically runs `$m-test`, and loops delegated fixes until the acceptance checks pass or a blocker is explicit.
 
+### Unattended Execute Test Continuation
+
+Given an approved workflow has completed an `$m-execute` or `$m-test` pass, when the user invokes `$m-continue`, then Codex automatically alternates the existing execute and test behaviors without asking whether to continue, resets its non-progress count whenever Task/diff/test evidence improves, and stops only after acceptance converges or further in-scope progress is genuinely impossible.
+
 ### UI Change Validation
 
 Given a workflow changes UI, when `$m-test` runs, then Codex opens the affected interface, operates the affected user path, captures screenshot evidence, and summarizes pass/fail status in a direct table.
@@ -208,6 +217,7 @@ Given the user explicitly chooses to skip `$m-test`, when the workflow proceeds 
 
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
+- [../decisions/2026-07-17_m-continue-loop.md](../decisions/2026-07-17_m-continue-loop.md)
 - [../decisions/2026-07-10_m-quick-standalone-fast-path.md](../decisions/2026-07-10_m-quick-standalone-fast-path.md)
 
 ## Related Changes

@@ -15,6 +15,7 @@
   - `skills/m-plan`
   - `skills/m-execute`
   - `skills/m-go`
+  - `skills/m-continue`
   - `skills/m-test`
   - `skills/m-archive`
 - Canonical phase install metadata:
@@ -22,6 +23,7 @@
   - `manifests/m-plan.json`
   - `manifests/m-execute.json`
   - `manifests/m-go.json`
+  - `manifests/m-continue.json`
   - `manifests/m-test.json`
   - `manifests/m-archive.json`
 - Canonical standalone fast-path source package:
@@ -42,6 +44,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - Invoke `$m-plan` for architecture, executable planning, direct task summary, and approval gating.
 - Invoke `$m-execute` for confirmed Task ID implementation plus lightweight validation.
 - Invoke `$m-go` for confirmed Task ID implementation through worker sub-agents plus an automatic `$m-test` loop.
+- Invoke `$m-continue` after an `$m-execute` or `$m-test` pass to authorize unattended reuse of both behaviors until acceptance converges or progress is genuinely impossible.
 - Invoke `$m-test` for optional heavy validation and review, including UI operation evidence when UI changes are tested.
 - Invoke `$m-archive` for change archive, lessons, and workflow closeout.
 - Web research must be initiated from `$m-discuss` only when current external facts, best-practice comparison, explicit user request, or source-backed investigation is needed.
@@ -88,6 +91,13 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - During `$m-go`, the main agent owns scheduling, context packaging, conflict handling, diff review, command execution, validation synthesis, external status reporting, and final acceptance. The main agent must not directly edit implementation files.
 - If `$m-go` validation fails, the main agent must delegate bounded fixes and repeat the test loop until acceptance passes or a blocker is explicit.
 - `$m-go` stops before archive, merge, cleanup, and push.
+- `$m-continue` is a post-execute/test orchestrator, not an alternate implementation authority. It must load the existing execute/test Skill and reference contracts rather than copying their detailed procedures.
+- One `$m-continue` invocation authorizes every subsequent iteration within existing approved Task IDs and write sets. Intermediate commentary may report progress but must not request ordinary continuation confirmation.
+- `$m-continue` classifies the current state from the active plan, worktree/diff, and latest available phase evidence. Ambiguous validation is rerun rather than inferred as passed.
+- A complete continuation cycle consists of the required execute repair followed by test evaluation. The cycle records normalized failing acceptance/test identifiers plus Task, diff, and validation progress evidence.
+- Any measurable improvement resets the repeated-failure count. Three consecutive complete cycles with the same failure signature and no measurable improvement terminate as a non-progress loop.
+- New scope, new authority, user-only information, or an unavailable external-state dependency terminates only after safe in-scope alternatives are exhausted. The result must state the blocker and required handoff.
+- `$m-continue` stops successfully only when all approved Task IDs and acceptance criteria are satisfied and `$m-test` passes or records a justified skip under its existing rules. It reports readiness for `$m-archive` but does not invoke archive, merge, cleanup, publication, or push.
 - Heavy validation is optional. It may be skipped for low-risk small changes when execution-stage validation is sufficient and the skip reason plus residual risk are recorded.
 - The user may explicitly skip `$m-test` and proceed directly to `$m-archive`; the archive must record skipped validation, missing evidence, and residual risk.
 - When heavy validation runs, it must cover integration or end-to-end flow, usability, security boundaries, and performance indicators when applicable.
@@ -161,6 +171,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - The umbrella skill must pass `tools/validate-skills.ps1 -Skill m-autoflow`.
 - Each canonical phase skill must pass `tools/validate-skills.ps1 -Skill <skill-name>`.
 - The `$m-go` skill must pass `tools/validate-skills.ps1 -Skill m-go`.
+- The `$m-continue` skill must pass `tools/validate-skills.ps1 -Skill m-continue` and focused contract tests for unattended authorization, phase transitions, progress reset, non-progress termination, and archive exclusion.
 - The `$m-quick` skill must pass `tools/validate-skills.ps1 -Skill m-quick`.
 - `tests/test_visual_output_contract.py` must verify shared-reference routing, supported component coverage, success guards, and the standalone thesis output contract.
 - The same test module must verify interactive-reference routing for the four initial phases, Markdown fallback, follow-up-only action boundaries, secret protection, and the absence of versioned plugin-cache paths.
@@ -168,6 +179,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - The umbrella skill must sync through `tools/sync-skills.ps1 -Skill m-autoflow`.
 - Each canonical phase skill must sync through `tools/sync-skills.ps1 -Skill <skill-name>`.
 - The `$m-go` skill must sync through `tools/sync-skills.ps1 -Skill m-go`.
+- The `$m-continue` skill must sync through `tools/sync-skills.ps1 -Skill m-continue`.
 - The `$m-quick` skill must sync through `tools/sync-skills.ps1 -Skill m-quick`.
 - Validation must happen after final source content is written.
 - Stale installed copies of superseded phase names should be removed after the canonical skills sync, unless a future compatibility decision reintroduces aliases.
@@ -211,6 +223,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
+- [../decisions/2026-07-17_m-continue-loop.md](../decisions/2026-07-17_m-continue-loop.md)
 - [../decisions/2026-07-10_m-quick-standalone-fast-path.md](../decisions/2026-07-10_m-quick-standalone-fast-path.md)
 
 ## Related Changes
