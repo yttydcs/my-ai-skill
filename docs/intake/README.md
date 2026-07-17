@@ -25,6 +25,7 @@ Store original request evidence before it is refined into feature, requirement, 
 
 ## Current Docs
 
+- [2026-07-17_m-continue-loop.md](2026-07-17_m-continue-loop.md) - source: Codex chat, resume an existing execute/test workflow through a reusable convergence loop
 - [2026-07-15_m-context-scopes.md](2026-07-15_m-context-scopes.md) - source: Codex chat, project-local and user-global context scopes with absence-only fallback
 - [2026-07-15_visual-output-components.md](2026-07-15_visual-output-components.md) - source: Codex chat, improve skill output with useful visual components and clickable evidence
 - [2026-07-13_m-context.md](2026-07-13_m-context.md) - source: Codex chat, reusable plaintext Agent context loading and skill composition
