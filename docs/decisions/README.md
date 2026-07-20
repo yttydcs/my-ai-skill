@@ -24,6 +24,7 @@ Store append-only architecture decision records for choices that shape structure
 
 ## Current Docs
 
+- [2026-07-20_m-discuss-grill-mode.md](2026-07-20_m-discuss-grill-mode.md)
 - [2026-07-17_m-continue-loop.md](2026-07-17_m-continue-loop.md)
 - [2026-07-10_m-quick-standalone-fast-path.md](2026-07-10_m-quick-standalone-fast-path.md)
 - [2026-07-09_m-go-automated-execution.md](2026-07-09_m-go-automated-execution.md)
