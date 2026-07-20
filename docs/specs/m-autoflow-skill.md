@@ -26,6 +26,10 @@
   - `manifests/m-continue.json`
   - `manifests/m-test.json`
   - `manifests/m-archive.json`
+- `$m-discuss` conditional interview protocol:
+  - `skills/m-discuss/references/grilling.md`
+  - packaged by `manifests/m-discuss.json`
+  - copied through the normal source -> dist -> installed flow with no external skill dependency
 - Canonical standalone fast-path source package:
   - `skills/m-quick`
 - Canonical standalone fast-path install metadata:
@@ -41,6 +45,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - Invoke `$m-autoflow` when the user wants the full workflow or wants the umbrella to choose the next phase.
 - Invoke `$m-quick` for an explicit bounded low-risk direct change in one repository after mandatory `$m-docs` context reading.
 - Invoke `$m-discuss` for discovery, requirement shaping, brainstorming, optional research, and early worktree setup.
+- Inside `$m-discuss`, activate Grill Mode only for an explicit request to be grilled, pressure-test thinking through hard questions, or resolve decisions one at a time. A vague request alone keeps the standard flow.
 - Invoke `$m-plan` for architecture, executable planning, direct task summary, and approval gating.
 - Invoke `$m-execute` for confirmed Task ID implementation plus lightweight validation.
 - Invoke `$m-go` for confirmed Task ID implementation through worker sub-agents plus an automatic `$m-test` loop.
@@ -71,6 +76,13 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - Any rollback must state the reason and update the affected documents.
 - Discussion prioritizes relevant private-docs-root intake, feature, and requirement docs when they exist.
 - Discussion may create or confirm the dedicated worktree once project boundaries are clear.
+- `skills/m-discuss/SKILL.md` owns Grill Mode trigger detection and conditionally loads `references/grilling.md`; it must not inline the complete interview protocol into the always-loaded entry file.
+- `references/grilling.md` owns the task-local decision snapshot, discoverable-fact lookup, depth-first single-question loop, recommended-answer format, early wrap-up, explicit confirmation, and prohibition on automatic next-phase actions.
+- `references/discussion.md` remains authoritative for the required brief, worktree status, blockers, and `$m-plan` handoff after either standard discussion or Grill Mode.
+- The decision snapshot distinguishes confirmed, rejected, deferred, and open decisions. Parent-decision changes invalidate only affected child branches.
+- Every Grill Mode turn contains exactly one judgment question plus a recommended answer and rationale, then waits for user feedback. Structured host controls are optional; a plain-text question is the portable fallback.
+- Grill Mode has no hard numeric question limit, but it must avoid redundant questions and honor natural-language stop or wrap-up requests.
+- Completion requires explicit shared-understanding confirmation. Early wrap-up or confirmation never authorizes `$m-plan`, implementation, archive, merge, push, publication, or cleanup automatically.
 - Planning prioritizes relevant private-docs-root specs and decisions when they exist.
 - Planning rejects unreasonable, unsafe, contradictory, or under-specified requirements and returns to discussion with alternatives.
 - Optional research is read-only and may feed only verified, cited findings into requirements, architecture, `plan.md`, or stable docs.
@@ -172,12 +184,14 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - Each canonical phase skill must pass `tools/validate-skills.ps1 -Skill <skill-name>`.
 - The `$m-go` skill must pass `tools/validate-skills.ps1 -Skill m-go`.
 - The `$m-continue` skill must pass `tools/validate-skills.ps1 -Skill m-continue` and focused contract tests for unattended authorization, phase transitions, progress reset, non-progress termination, and archive exclusion.
+- The `$m-discuss` skill must pass `tools/validate-skills.ps1 -Skill m-discuss` and `tests/test_m_discuss_grill_contract.py` for explicit activation, normal-mode preservation, package inclusion, decision-state semantics, single-question sequencing, completion gates, and stable-doc alignment.
 - The `$m-quick` skill must pass `tools/validate-skills.ps1 -Skill m-quick`.
 - `tests/test_visual_output_contract.py` must verify shared-reference routing, supported component coverage, success guards, and the standalone thesis output contract.
 - The same test module must verify interactive-reference routing for the four initial phases, Markdown fallback, follow-up-only action boundaries, secret protection, and the absence of versioned plugin-cache paths.
 - Heavy `$m-test` must render a representative inline result, inspect desktop and narrow layouts, operate the primary selection and follow-up controls, and report screenshot evidence.
 - The umbrella skill must sync through `tools/sync-skills.ps1 -Skill m-autoflow`.
 - Each canonical phase skill must sync through `tools/sync-skills.ps1 -Skill <skill-name>`.
+- After `$m-discuss` sync, source, dist, and installed copies must contain `references/grilling.md` and match apart from generated build metadata.
 - The `$m-go` skill must sync through `tools/sync-skills.ps1 -Skill m-go`.
 - The `$m-continue` skill must sync through `tools/sync-skills.ps1 -Skill m-continue`.
 - The `$m-quick` skill must sync through `tools/sync-skills.ps1 -Skill m-quick`.
@@ -199,7 +213,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 ## Performance Considerations
 
 - Keep `SKILL.md` concise.
-- Load references selectively.
+- Load references selectively; `references/grilling.md` is conditional on explicit Grill Mode intent.
 - Avoid redundant scans when repository state is already known.
 
 ## Extension Points
@@ -221,6 +235,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 
 ## Related Decisions
 
+- [../decisions/2026-07-20_m-discuss-grill-mode.md](../decisions/2026-07-20_m-discuss-grill-mode.md)
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
 - [../decisions/2026-07-17_m-continue-loop.md](../decisions/2026-07-17_m-continue-loop.md)

@@ -22,7 +22,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 - `$m-autoflow`: umbrella entry for the whole workflow or next-phase routing.
 - `$m-context`: companion loader for reusable user-local plaintext context; it may be combined with any phase or fast path and loads before task actions.
 - `$m-quick`: standalone guarded direct-edit path for explicit low-risk work in one repository after mandatory `$m-docs` context reading.
-- `$m-discuss`: discovery, brainstorming, current-practice research when useful, requirement shaping, and early worktree setup.
+- `$m-discuss`: discovery, brainstorming, current-practice research when useful, requirement shaping, early worktree setup, and an explicit Grill Mode for one-question-at-a-time decision pressure-testing.
 - `$m-plan`: architecture and execution planning.
 - `$m-execute`: confirmed Task ID implementation and lightweight validation.
 - `$m-go`: high-automation delegated execution and automatic `$m-test` loop for confirmed plans.
@@ -33,7 +33,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 ## User Workflow
 
 1. The user starts with `$m-autoflow` or a specific phase command, optionally adding `$m-context <name>` to load saved context first.
-2. Discussion clarifies the request, records open questions, compares options, rejects weak directions, and recommends a path.
+2. Discussion clarifies the request, records open questions, compares options, rejects weak directions, and recommends a path. When the user explicitly requests Grill Mode, it resolves judgment calls one at a time before producing the same discussion brief.
 3. Discussion creates or confirms the dedicated worktree when project, docs, and code-repo boundaries are clear enough.
 4. Planning turns the discussion brief into requirements, architecture, and a handoff-ready `plan.md` / `todo.md`.
 5. `$m-plan` shows a concise task summary table directly in the user response.
@@ -48,6 +48,19 @@ Give the user one disciplined workflow family for turning an idea into discussio
 14. Archive records the change, stable-doc impact, lessons impact, validation, rollback, and sub-agent trace.
 15. Archive closes the workflow by default through verified control-plane merge and worktree cleanup.
 16. The workflow stops after archive only when the user explicitly asks for archive-only handling, no merge, or no cleanup.
+
+### Explicit Grill Mode
+
+Grill Mode is an opt-in behavior inside `$m-discuss`, not a separate phase. It activates only when the user explicitly asks to be grilled, pressure-test a plan through hard questions, or resolve decisions one at a time. Ambiguity alone does not activate it.
+
+1. Codex inspects the repository, filesystem, available tools, and authorized external sources for discoverable facts before asking the user.
+2. Codex selects the highest-risk unresolved parent decision and asks exactly one judgment question with a recommended answer and rationale.
+3. Codex waits for the answer, records confirmed, rejected, deferred, and open decisions, and revisits affected child branches when a parent decision changes.
+4. The user may ask to stop or wrap up at any time; Codex then emits the normal discussion brief with unresolved blockers preserved.
+5. When no blocking decision remains, Codex asks the user to confirm shared understanding explicitly.
+6. Confirmation permits the normal `$m-plan` readiness check but never starts planning or implementation automatically.
+
+The interview protocol lives in `skills/m-discuss/references/grilling.md`; the standard brief and handoff rules remain owned by `references/discussion.md`.
 
 ## Standalone Quick Path
 
@@ -96,6 +109,7 @@ The complete current behavior is maintained in [m-quick-fast-path.md](m-quick-fa
 
 - `$m-context` is not a workflow phase and does not change the active phase; a failed required context load blocks dependent actions.
 - A phase is blocked when unresolved questions remain or a required artifact is missing.
+- In Grill Mode, a recommendation, silence, ambiguous answer, or absence of more questions is not user confirmation; blocking open decisions prevent the `$m-plan` handoff.
 - Blocked output uses `问题清单` and `阻塞：是`.
 - Planning must include a direct task summary table that reflects the active `plan.md` / `todo.md`.
 - Execution must report lightweight validation.
@@ -134,6 +148,10 @@ Given a user-local `nas配置.md` exists, when the user invokes `$m-test $m-cont
 ### Start From Discussion
 
 Given the user invokes `$m-discuss`, when the request is still broad, then Codex records options, assumptions, open questions, rejected directions, recommended direction, and worktree/docs-root status before planning.
+
+### Pressure-test A Plan With Grill Mode
+
+Given the user explicitly asks `$m-discuss` to grill them about a plan, when decisions depend on one another, then Codex researches discoverable facts, asks one recommended judgment question at a time, waits for each answer, preserves unresolved branches in the standard brief, and does not enter `$m-plan` or implementation automatically.
 
 ### Reject Weak Requirements
 
@@ -215,6 +233,7 @@ Given the user explicitly chooses to skip `$m-test`, when the workflow proceeds 
 
 ## Related Decisions
 
+- [../decisions/2026-07-20_m-discuss-grill-mode.md](../decisions/2026-07-20_m-discuss-grill-mode.md)
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
 - [../decisions/2026-07-17_m-continue-loop.md](../decisions/2026-07-17_m-continue-loop.md)

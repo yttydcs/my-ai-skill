@@ -304,7 +304,7 @@ Current `$m-discuss` supports broad discovery and handoff but lacks a strict one
 - Requirements: `docs/requirements/m-autoflow-skill.md`
 - Spec: `docs/specs/m-autoflow-skill.md`
 - Decision: `docs/decisions/2026-07-20_m-discuss-grill-mode.md`
-- Lessons: none known at planning time.
+- Lessons: `docs/lessons/python-unittest-discovery-nonpackage-tests.md` applies to focused test invocation.
 
 #### Stable Docs Impact
 
@@ -313,7 +313,7 @@ Current `$m-discuss` supports broad discovery and handoff but lacks a strict one
 - Requirements impact: clarify during execution.
 - Specs impact: clarify during execution.
 - Decision impact: add; completed during planning.
-- Lessons impact: none known at planning time.
+- Lessons impact: none; reuse the existing non-package unittest discovery lesson.
 
 #### Executable Task List
 
@@ -370,7 +370,7 @@ Current `$m-discuss` supports broad discovery and handoff but lacks a strict one
   - manifest version reflects the additive capability and lists `references/grilling.md`;
   - tests cover explicit activation, normal-mode preservation, single-question sequencing, recommended answers, fact lookup, decision dependencies, wrap-up, confirmation, standard brief, and phase boundary;
   - no external skill dependency is declared.
-- Test Points: `python -m unittest tests.test_m_discuss_grill_contract`.
+- Test Points: `python -m unittest discover -s tests -p "test_m_discuss_grill_contract.py"`.
 - Rollback: revert manifest/test changes; the source reference then remains unshipped and must also be rolled back through `GM-1`.
 
 ##### GM-3 - Align Stable Documentation
@@ -410,7 +410,7 @@ Current `$m-discuss` supports broad discovery and handoff but lacks a strict one
   - source, dist, and installed copies contain the new reference and match apart from generated build metadata;
   - unrelated installed skills and repository files remain untouched.
 - Test Points:
-  - `python -m unittest tests.test_m_discuss_grill_contract`
+  - `python -m unittest discover -s tests -p "test_m_discuss_grill_contract.py"`
   - `python -m unittest discover -s tests -p "test_*.py"`
   - `powershell -File tools/validate-skills.ps1 -Skill m-discuss`
   - `powershell -File tools/sync-skills.ps1 -Skill m-discuss`

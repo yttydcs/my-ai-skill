@@ -20,6 +20,9 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - provide `$m-quick` as a canonical standalone direct-edit entry for explicit low-risk work in one repository
 - keep the umbrella thin by routing to phase skills and shared references instead of duplicating phase instructions
 - let `$m-discuss` own discovery, brainstorming, option comparison, requirement shaping, optional current-practice research, and early worktree setup
+- provide an explicit Grill Mode inside `$m-discuss` for users who request one-question-at-a-time pressure-testing without changing ordinary discussion behavior
+- require Grill Mode to research discoverable facts, ask only judgment calls, include a recommendation and rationale, resolve parent decisions before child branches, and wait after each question
+- require Grill Mode to preserve the standard discussion brief and block automatic planning or implementation even after shared understanding is confirmed
 - let `$m-plan` own requirements consolidation, architecture design, execution planning, and approval gating
 - require `$m-plan` to reject unreasonable, unsafe, contradictory, or under-specified requirements and return to discussion with alternatives
 - require worktree-first staged execution before implementation, with worktree setup starting during discussion when project boundaries are clear
@@ -77,6 +80,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - The user combines `$m-context nas配置` with `$m-test` so saved plaintext environment details and credentials are available before testing.
 - The user wants a strict implementation workflow rather than a direct code patch.
 - The user wants an early discussion phase that researches current best practices only when that would improve the requirement.
+- The user explicitly wants a plan pressure-tested through a depth-first sequence of one recommended judgment question at a time.
 - The user requires git worktree isolation before coding.
 - The user requires handoff-ready `plan.md` artifacts before any coding or delegation.
 - The user wants a compact task summary in chat after planning without opening `plan.md` for the basic scope review.
@@ -104,6 +108,13 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-discuss` must use web research only when current external facts, best practices, source-backed comparison, or the user's explicit request make research useful.
 - `$m-discuss` must verify and cite external research before feeding it into requirements, planning, or stable docs.
 - `$m-discuss` must produce a handoff-ready brief covering goal, scope, assumptions, open questions, options considered, rejected options, recommended direction, and worktree/docs-root status.
+- `$m-discuss` must enter explicit Grill Mode only when the user asks to be grilled, requests hard-question pressure-testing, or asks to resolve decisions one at a time; ambiguity alone must not trigger it.
+- Grill Mode must track confirmed, rejected, deferred, and open decisions, and must invalidate affected child decisions when a parent decision changes.
+- Grill Mode must resolve discoverable facts through the environment or authorized research before asking the user, and must ask the user only for judgment calls or genuinely undiscoverable information.
+- Grill Mode must ask exactly one judgment question per turn, include a recommended answer and concise rationale, and wait for the user's response before continuing.
+- Grill Mode must avoid redundant questions, permit the user to stop and request a summary, and must not impose a fixed numeric question limit.
+- Grill Mode must require explicit user confirmation before declaring shared understanding complete; silence, ambiguity, a recommendation, or the absence of more questions is not confirmation.
+- Grill Mode must always return to the standard `$m-discuss` brief. Blocking open decisions prevent the `$m-plan` handoff, while a successful handoff reports readiness without automatically entering planning or implementation.
 - `$m-plan` must consume the discussion brief when it exists.
 - `$m-plan` must check for `guide.md` before planning when the file exists.
 - `$m-plan` must read relevant intake, feature, requirement, spec, and decision docs before changing stable workflow truth.
@@ -199,6 +210,8 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - A UI cannot be opened due environment, auth, build, dependency, or runtime problems; if `$m-test` is running, the UI validation must be failed or blocked.
 - UI responsive behavior may require both desktop and mobile screenshot evidence when affected.
 - Direct `$m-plan` invocation may skip discussion only when the plan records why discussion was unnecessary or already satisfied.
+- Ordinary `$m-discuss` requests without an explicit Grill Mode trigger must keep the existing discovery and option-comparison flow.
+- If the user wraps up Grill Mode early, deferred and open decisions must remain distinguishable and any blocking decision must prevent planning readiness.
 
 ## Acceptance Criteria
 
@@ -209,6 +222,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - The plan artifact clearly states which Task IDs will execute after approval and which Task IDs will not execute in the next execution phase.
 - `$m-plan` responses include a concise direct task summary table.
 - Optional online research is controlled by discussion, supports source verification and citations, and routes stable-doc impact through `$m-docs`.
+- Explicit Grill Mode performs a depth-first, one-question-at-a-time decision interview with recommendations, fact lookup, early wrap-up, confirmation, and no automatic planning or implementation.
 - Lightweight validation is part of execution, while heavyweight integration/UI/usability/security/performance testing is optional and separately recorded.
 - `$m-go` performs delegated implementation and automatic `$m-test` looping for confirmed plans without making the main agent the implementer.
 - `$m-continue` resumes after execute/test with no repeated confirmation, continues through ordinary failures, and terminates only on full acceptance or proven inability to progress.
@@ -235,6 +249,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 
 ## Related Decisions
 
+- [../decisions/2026-07-20_m-discuss-grill-mode.md](../decisions/2026-07-20_m-discuss-grill-mode.md)
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)
 - [../decisions/2026-07-17_m-continue-loop.md](../decisions/2026-07-17_m-continue-loop.md)
