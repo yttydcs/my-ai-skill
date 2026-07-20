@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted for planning
+Accepted
 
 ## Context
 
@@ -73,4 +73,4 @@ High. The chosen design preserves existing phase ownership and directly addresse
 
 ## Related Changes
 
-- To be added by `$m-archive` after implementation and validation.
+- [m-discuss Grill Mode implementation archive](../change/2026-07-20_m-discuss-grill-mode.md)

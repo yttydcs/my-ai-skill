@@ -58,4 +58,4 @@ The user asked for a detailed investigation of the public `grill-me` skill and w
 
 ## Related Changes
 
-- To be added by `$m-archive` after implementation and validation.
+- [m-discuss Grill Mode implementation archive](../change/2026-07-20_m-discuss-grill-mode.md)

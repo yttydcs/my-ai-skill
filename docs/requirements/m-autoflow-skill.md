@@ -257,6 +257,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 
 ## Related Changes
 
+- [../change/2026-07-20_m-discuss-grill-mode.md](../change/2026-07-20_m-discuss-grill-mode.md)
 - [../change/2026-07-17_m-continue-loop.md](../change/2026-07-17_m-continue-loop.md)
 - [../change/2026-07-15_interactive-skill-outputs.md](../change/2026-07-15_interactive-skill-outputs.md)
 - [../change/2026-07-15_visual-output-components.md](../change/2026-07-15_visual-output-components.md)
