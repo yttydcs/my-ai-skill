@@ -1,6 +1,6 @@
 ---
 name: m-discuss
-description: Discussion and discovery phase for the m-autoflow workflow. Use when Codex needs to clarify a vague request, brainstorm feasible options, challenge unreasonable requirements, compare approaches, search current best practices when useful, create or confirm the workflow worktree early, and produce a decision-ready brief before $m-plan.
+description: Discussion and discovery phase for the m-autoflow workflow. Use when Codex needs to clarify a vague request, brainstorm feasible options, challenge unreasonable requirements, compare approaches, search current best practices when useful, run an explicitly requested one-question-at-a-time Grill Mode, create or confirm the workflow worktree early, and produce a decision-ready brief before $m-plan.
 ---
 
 # m:discuss
@@ -12,6 +12,7 @@ Use this skill before `$m-plan` when the work needs product discovery, technical
 ## Quick Start
 
 - Read `references/discussion.md`.
+- Read `references/grilling.md` only when the user explicitly asks to be grilled, pressure-test a plan through hard questions, or resolve decisions one at a time. Do not enter Grill Mode merely because a request is vague.
 - Read `references/research.md` when current external evidence, web search, vendor/library comparison, security/regulatory facts, or best-practice research would materially improve the discussion.
 - Read `../m-autoflow/references/initialization.md` before creating or confirming a branch/worktree.
 - Read `../m-autoflow/references/output-components.md` before presenting the discussion result.
@@ -25,8 +26,9 @@ Use this skill before `$m-plan` when the work needs product discovery, technical
 3. Create or confirm the dedicated worktree when this discussion starts a full workflow.
 4. Explore viable options, tradeoffs, constraints, risks, and rejected ideas.
 5. Search the web only when current external evidence or best practices matter; cite sources and separate facts from inference.
-6. Challenge unreasonable, unsafe, contradictory, or under-specified requirements and propose better alternatives.
-7. Produce a discussion brief that `$m-plan` can consume without chat-only context.
+6. When the explicit Grill Mode trigger passes, use `references/grilling.md` to resolve judgment calls and then return to the normal discussion brief. Otherwise keep the standard discussion flow.
+7. Challenge unreasonable, unsafe, contradictory, or under-specified requirements and propose better alternatives.
+8. Produce a discussion brief that `$m-plan` can consume without chat-only context.
 
 ## Exit Gate
 
@@ -44,5 +46,7 @@ End with:
 Use a compact option comparison table when several directions were evaluated. Add Mermaid only when branches, dependencies, or ownership are difficult to understand linearly. Link any created brief, doc, branch, or worktree artifact using the shared output rules.
 
 When the interactive trigger passes, invoke `$visualize:visualize` for bounded option selection and a follow-up request to `$m-plan`. Keep the recommendation and handoff status in Markdown, and do not imply that selecting an option approved implementation.
+
+Grill Mode does not replace this exit gate. If the user wraps up with blocking decisions unresolved, preserve them in the brief and block the `$m-plan` handoff. Even after the user confirms shared understanding, report readiness only; do not enter planning or implementation automatically.
 
 Do not produce the executable architecture plan, implement code, run heavy validation, create `docs/change`, merge branches, or clean worktrees from this phase.

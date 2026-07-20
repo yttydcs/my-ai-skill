@@ -34,6 +34,14 @@ Capture:
 - When rejecting a requirement, explain the reason and offer a safer or simpler alternative.
 - Mark assumptions clearly and avoid turning guesses into requirements.
 
+## Grill Mode Compatibility
+
+- Use `grilling.md` only after an explicit request to be grilled, pressure-test thinking through hard questions, or resolve decisions one at a time.
+- Do not infer Grill Mode from ambiguity alone; ordinary `$m-discuss` keeps its existing discovery and option-comparison behavior.
+- The interview feeds this reference's required discussion brief rather than replacing it.
+- If the user requests an early wrap-up, preserve unresolved and deferred decisions in the brief instead of inventing agreement.
+- Blocking open decisions prevent the `$m-plan` handoff. Confirmed shared understanding permits the normal handoff check but never authorizes planning or implementation automatically.
+
 ## Worktree Rule
 
 - If this discussion starts a full workflow, create or confirm the dedicated worktree before handing off to `$m-plan`.
