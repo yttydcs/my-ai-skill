@@ -9,7 +9,7 @@
 - Docs Root: `D:\project\my-ai-skills\worktrees\m-discuss-grill-mode\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\m-discuss-grill-mode`
-- Current Stage: `$m-plan` awaiting user approval
+- Current Stage: `$m-execute` complete; awaiting optional `$m-test` or `$m-archive`
 
 ## Stage Records
 
@@ -454,6 +454,37 @@ Current `$m-discuss` supports broad discovery and handoff but lacks a strict one
 
 ## Plan Confirmation Gate
 
-- Plan status: ready for user review.
-- Blocked before approval: yes.
-- Do not enter `$m-execute`, edit skill behavior, add tests, or sync installed copies until the user approves `GM-1` through `GM-4`.
+- Plan status: approved by the user's `$m-execute` invocation.
+- Execution status: `GM-1` through `GM-4` completed.
+- Archive status: not started; `GM-5` remains outside this execution phase.
+
+## Execution Record - 2026-07-20
+
+### Completed Tasks
+
+- `GM-1`: completed in `ee906f6` (`feat: add m-discuss grill mode`).
+- `GM-2`: completed in `6698149` (`test: protect m-discuss grill contract`).
+- `GM-3`: completed in `2174254` (`docs: define m-discuss grill mode`).
+- `GM-4`: completed after source validation, exact sync, installed validation, and hash parity checks.
+- `GM-5`: not executed; retained for `$m-archive`.
+
+### Validation Evidence
+
+- Focused contract discovery: 8 tests passed.
+- Full repository discovery: 40 tests passed, 1 existing conditional test skipped.
+- Source skill validation: passed for `m-discuss`.
+- Installed skill validation: passed for `C:\Users\HelloWorld\.codex\skills\m-discuss`.
+- `git diff --check`: passed.
+- Source -> dist parity: 5 files matched by SHA-256, excluding generated `.build-info.json`.
+- Source -> installed parity: 5 files matched by SHA-256, excluding generated `.build-info.json`.
+- Dist and installed build metadata: version `0.2.0`.
+- Dist is intentionally ignored by `.gitignore`; sync produced no repository-tracked dist change.
+
+### Validation Note
+
+The first dotted unittest invocation failed before loading any test because this repository's `tests/` directory is not a Python package. The existing `docs/lessons/python-unittest-discovery-nonpackage-tests.md` guidance was applied, the plan commands were corrected to discovery syntax, and the focused and full suites then passed.
+
+### Residual Validation
+
+- No heavy `$m-test` run occurred. The change is a prompt/package/documentation contract with deterministic tests and no runtime UI, schema, network, security-boundary, or performance behavior.
+- A live conversational Grill Mode trial remains optional if model-behavior evidence is desired before archive.
