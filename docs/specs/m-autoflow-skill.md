@@ -218,6 +218,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 
 ## Extension Points
 
+- Add project-level scheduling companions such as `$m-orchestrator` without changing the single-task phase authorities.
 - Add new references for lighter or heavier workflow variants without rewriting the main skill.
 - Refine fast-path eligibility in `skills/m-quick/references/quick.md` without copying it into staged phase skills.
 - Add future platform wrappers without changing the phase contract.
@@ -225,16 +226,19 @@ The skill family supports explicit invocation and does not forbid host-side impl
 
 ## Related Features
 
+- [../features/m-project-orchestrator.md](../features/m-project-orchestrator.md)
 - [../features/m-autoflow-workflow.md](../features/m-autoflow-workflow.md)
 - [../features/m-quick-fast-path.md](../features/m-quick-fast-path.md)
 
 ## Related Requirements
 
+- [../requirements/m-project-orchestrator.md](../requirements/m-project-orchestrator.md)
 - [../requirements/m-autoflow-skill.md](../requirements/m-autoflow-skill.md)
 - [../requirements/m-quick-fast-path.md](../requirements/m-quick-fast-path.md)
 
 ## Related Decisions
 
+- [../decisions/2026-07-31_project-orchestrator.md](../decisions/2026-07-31_project-orchestrator.md)
 - [../decisions/2026-07-20_m-discuss-grill-mode.md](../decisions/2026-07-20_m-discuss-grill-mode.md)
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)

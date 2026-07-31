@@ -20,6 +20,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 ## Entry Points
 
 - `$m-autoflow`: umbrella entry for the whole workflow or next-phase routing.
+- `$m-orchestrator`: project-level companion that keeps one Planner available while temporary background Workers run independent approved workflows through bounded Tester and integration admission.
 - `$m-context`: companion loader for reusable user-local plaintext context; it may be combined with any phase or fast path and loads before task actions.
 - `$m-quick`: standalone guarded direct-edit path for explicit low-risk work in one repository after mandatory `$m-docs` context reading.
 - `$m-discuss`: discovery, brainstorming, current-practice research when useful, requirement shaping, early worktree setup, and an explicit Grill Mode for one-question-at-a-time decision pressure-testing.
@@ -223,16 +224,19 @@ Given the user explicitly chooses to skip `$m-test`, when the workflow proceeds 
 
 ## Related Requirements
 
+- [../requirements/m-project-orchestrator.md](../requirements/m-project-orchestrator.md)
 - [../requirements/m-autoflow-skill.md](../requirements/m-autoflow-skill.md)
 - [../requirements/m-quick-fast-path.md](../requirements/m-quick-fast-path.md)
 
 ## Related Specs
 
+- [../specs/m-project-orchestrator.md](../specs/m-project-orchestrator.md)
 - [../specs/m-autoflow-skill.md](../specs/m-autoflow-skill.md)
 - [../specs/m-quick-skill.md](../specs/m-quick-skill.md)
 
 ## Related Decisions
 
+- [../decisions/2026-07-31_project-orchestrator.md](../decisions/2026-07-31_project-orchestrator.md)
 - [../decisions/2026-07-20_m-discuss-grill-mode.md](../decisions/2026-07-20_m-discuss-grill-mode.md)
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)

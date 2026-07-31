@@ -239,16 +239,19 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 
 ## Related Features
 
+- [../features/m-project-orchestrator.md](../features/m-project-orchestrator.md)
 - [../features/m-autoflow-workflow.md](../features/m-autoflow-workflow.md)
 - [../features/m-quick-fast-path.md](../features/m-quick-fast-path.md)
 
 ## Related Specs
 
+- [../specs/m-project-orchestrator.md](../specs/m-project-orchestrator.md)
 - [../specs/m-autoflow-skill.md](../specs/m-autoflow-skill.md)
 - [../specs/m-quick-skill.md](../specs/m-quick-skill.md)
 
 ## Related Decisions
 
+- [../decisions/2026-07-31_project-orchestrator.md](../decisions/2026-07-31_project-orchestrator.md)
 - [../decisions/2026-07-20_m-discuss-grill-mode.md](../decisions/2026-07-20_m-discuss-grill-mode.md)
 - [../decisions/2026-07-08_m-skill-phase-naming.md](../decisions/2026-07-08_m-skill-phase-naming.md)
 - [../decisions/2026-07-09_m-go-automated-execution.md](../decisions/2026-07-09_m-go-automated-execution.md)

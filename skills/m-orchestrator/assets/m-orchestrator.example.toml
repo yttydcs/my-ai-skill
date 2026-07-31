@@ -1,0 +1,47 @@
+schema_version = 1
+project_id = "example-project"
+docs_root = "docs"
+base_branch = "main"
+
+[commands.discuss]
+skill = "m-discuss"
+contexts = ["local:planner"]
+
+[commands.plan]
+skill = "m-plan"
+contexts = ["local:planner"]
+
+[commands.execute]
+skill = "m-execute"
+contexts = ["local:worker"]
+require_lightweight_gate = true
+
+[commands.test]
+skill = "m-test"
+contexts = ["local:tester"]
+pool = "tester"
+
+[commands.archive]
+skill = "m-archive"
+contexts = ["local:archive"]
+pool = "merge"
+
+[pools.tester]
+capacity = 2
+queue = "fifo"
+lease_timeout_seconds = 3600
+
+[pools.merge]
+capacity = 1
+queue = "fifo"
+lease_timeout_seconds = 1800
+
+[environment]
+namespace = "example-project"
+
+[host_budget]
+enabled = false
+host_id = "local"
+resource = "testers"
+capacity = 3
+lease_timeout_seconds = 3600

@@ -13,6 +13,7 @@ Use this skill as the umbrella entry for the `m-*` workflow collection. It route
 
 - Invoke `$m-autoflow` when the user wants the full workflow.
 - Route to companion skills:
+  - `$m-orchestrator` for one persistent project Planner, temporary background Workers using `$m-execute`, bounded temporary Testers using `$m-test`, and serialized archive admission across independent task workflows.
   - `$m-context` to load reusable user-local plaintext context before another skill acts; it is a companion loader, not a phase.
   - `$m-quick` for an explicit, bounded, low-risk one-repo direct change after mandatory `$m-docs` context reading; it is a standalone fast path, not a phase.
   - `$m-discuss` for discovery, brainstorming, optional current research, and early worktree setup.
@@ -34,18 +35,20 @@ Use this skill as the umbrella entry for the `m-*` workflow collection. It route
 ## Workflow
 
 1. When `$m-context` is co-invoked, load every requested context before the selected workflow or fast-path skill performs task actions.
-2. Use `$m-quick` only as an explicit standalone alternative when its own docs-first eligibility gate passes; it does not enter the staged workflow.
-3. For staged work, start with `$m-discuss` unless the user explicitly enters a later phase with a valid artifact.
-4. Use `$m-plan` only after the requirement is coherent enough for architecture planning.
-5. Use `$m-execute` only after the plan is confirmed and the user approved implementation.
-6. Use `$m-go` only after the plan is confirmed and the user wants delegated implementation plus automatic `$m-test` looping.
-7. Use `$m-test` when heavy validation is needed, or record a justified skip. In `$m-go` flows, `$m-test` runs automatically unless the workflow blocks or the user changes path.
-8. Use `$m-continue` after an execute or test pass when the user wants one invocation to keep alternating both existing behaviors without continuation questions until acceptance converges or progress is genuinely impossible.
-9. Use `$m-archive` after validation to write governed archives and close the staged workflow by default.
-10. Stop after archive only when the user explicitly requested archive-only handling, no merge, or no cleanup.
+2. Use `$m-orchestrator` only as a project-level control plane around separate task workflows; it does not become a phase or weaken any task plan, worktree, execution, test, or archive gate.
+3. Use `$m-quick` only as an explicit standalone alternative when its own docs-first eligibility gate passes; it does not enter the staged workflow.
+4. For staged work, start with `$m-discuss` unless the user explicitly enters a later phase with a valid artifact.
+5. Use `$m-plan` only after the requirement is coherent enough for architecture planning.
+6. Use `$m-execute` only after the plan is confirmed and the user approved implementation.
+7. Use `$m-go` only after the plan is confirmed and the user wants delegated implementation plus automatic `$m-test` looping.
+8. Use `$m-test` when heavy validation is needed, or record a justified skip. In `$m-go` flows, `$m-test` runs automatically unless the workflow blocks or the user changes path.
+9. Use `$m-continue` after an execute or test pass when the user wants one invocation to keep alternating both existing behaviors without continuation questions until acceptance converges or progress is genuinely impossible.
+10. Use `$m-archive` after validation to write governed archives and close the staged workflow by default.
+11. Stop after archive only when the user explicitly requested archive-only handling, no merge, or no cleanup.
 
 ## Split Phase Mapping
 
+- Project Orchestration: use `$m-orchestrator` above independent task workflows; its normal Worker route is `$m-execute`, and Tester or archive admission never replaces `$m-test` or `$m-archive` behavior.
 - Context: use `$m-context` as a companion loader before any selected phase or fast path.
 - Quick: use `$m-quick` as a standalone fast path outside the staged phase chain.
 - Discuss: use `$m-discuss` for discovery, optional research, and early workflow setup.
@@ -66,6 +69,7 @@ The phase and fast-path skills are companion entry points. Keep `$m-autoflow` as
 - Do not write code in the staged workflow without a dedicated worktree and confirmed `plan.md`. `$m-quick` is the sole explicit direct-edit exception and must follow its own docs-first low-risk gate.
 - Do not treat rollback as a silent action; state the reason and update the affected docs.
 - Do not dispatch sub-agents without a complete context package and an allowed phase.
+- Do not share project orchestration contexts, queues, Tester leases, or environment namespaces merely because projects run on one host.
 - Do not copy plaintext `$m-context` contents into plans, governed docs, archives, screenshots, reports, or final responses unless the user explicitly needs that content there.
 - Do not treat `docs/change` as the stable source of truth for intake, features, requirements, specs, or decisions.
 - Do not leave reusable lessons only in `docs/change`; promote them into `docs/lessons` when they should be queried later.
@@ -91,6 +95,8 @@ The phase and fast-path skills are companion entry points. Keep `$m-autoflow` as
   - bounded official `$visualize:visualize` triggers, phase recipes, follow-up-only actions, safety, and Markdown fallback
 - `../m-discuss/SKILL.md`
   - discussion and optional research entry point
+- `../m-orchestrator/SKILL.md`
+  - project-scoped Planner, Worker, Tester-pool, and archive-admission control plane
 - `../m-context/SKILL.md`
   - reusable user-local plaintext context loader
 - `../m-quick/SKILL.md`
