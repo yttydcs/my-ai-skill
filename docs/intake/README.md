@@ -25,6 +25,7 @@ Store original request evidence before it is refined into feature, requirement, 
 
 ## Current Docs
 
+- [2026-07-31_project-orchestrator.md](2026-07-31_project-orchestrator.md) - source: Codex chat, persistent per-project Planner with temporary Workers and bounded Tester Pools
 - [2026-07-20_m-discuss-grill-mode.md](2026-07-20_m-discuss-grill-mode.md) - source: Codex chat, explicitly triggered Grill Mode inside `$m-discuss`
 - [2026-07-17_m-continue-loop.md](2026-07-17_m-continue-loop.md) - source: Codex chat, resume an existing execute/test workflow through a reusable convergence loop
 - [2026-07-15_m-context-scopes.md](2026-07-15_m-context-scopes.md) - source: Codex chat, project-local and user-global context scopes with absence-only fallback
