@@ -58,6 +58,7 @@ The automation layer must assist the existing `m-*` skills rather than replace t
 
 - [Decision](../decisions/2026-07-31_project-orchestrator.md)
 - [Workflow feature](../features/m-autoflow-workflow.md)
-- Planned feature: `docs/features/m-project-orchestrator.md`
-- Planned requirements: `docs/requirements/m-project-orchestrator.md`
-- Planned spec: `docs/specs/m-project-orchestrator.md`
+- [Project orchestrator feature](../features/m-project-orchestrator.md)
+- [Project orchestrator requirements](../requirements/m-project-orchestrator.md)
+- [Project orchestrator specification](../specs/m-project-orchestrator.md)
+- [Completed change](../change/2026-07-31_project-orchestrator.md)

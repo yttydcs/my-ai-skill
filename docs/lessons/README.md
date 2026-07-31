@@ -27,6 +27,7 @@ Store reusable incident knowledge, query-friendly troubleshooting lessons, and p
 ## Current Docs
 
 - [codex-visualization-preview-limitations.md](codex-visualization-preview-limitations.md) - keywords: `$visualize:visualize`, sandboxed iframe, synthetic keyboard activation, `MutationObserver.observe`, preview host
+- [orchestrator-lease-recovery.md](orchestrator-lease-recovery.md) - keywords: stale lease, orphan host lease, `pool reclaim`, `reclaim-host`, `active_lease`, premature release, two-phase audit
 - [python-unittest-discovery-nonpackage-tests.md](python-unittest-discovery-nonpackage-tests.md) - keywords: `ModuleNotFoundError`, `tests.test_`, `unittest discover`, missing `tests/__init__.py`, non-package tests
 - [python-cache-skill-sync.md](python-cache-skill-sync.md) - keywords: `__pycache__`, `.pyc`, skill sync, extra installed file, parity mismatch, `PYTHONDONTWRITEBYTECODE`
 - [searchable-lessons-capture.md](searchable-lessons-capture.md) - keywords: archive, lessons, troubleshooting, recurring investigation

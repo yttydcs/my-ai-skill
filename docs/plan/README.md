@@ -23,6 +23,7 @@ Store archived workflow planning documents when they need to be retained beyond 
 
 ## Current Docs
 
+- [2026-07-31_project-orchestrator.md](2026-07-31_project-orchestrator.md) - project-scoped persistent Planner, temporary Workers, bounded Testers, and isolated runtime orchestration
 - [2026-07-20_m-discuss-grill-mode.md](2026-07-20_m-discuss-grill-mode.md) - explicit Grill Mode integration for `$m-discuss`
 - [2026-07-17_m-continue-loop.md](2026-07-17_m-continue-loop.md) - `$m-continue` unattended execute/test convergence workflow plan
 - [2026-07-15_interactive-skill-outputs.md](2026-07-15_interactive-skill-outputs.md) - official Codex inline interaction rollout plan

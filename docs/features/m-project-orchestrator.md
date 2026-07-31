@@ -97,3 +97,11 @@ Given `$m-test` fails, when the result is persisted, then all Tester permits are
 ## Related Decisions
 
 - [2026-07-31_project-orchestrator.md](../decisions/2026-07-31_project-orchestrator.md)
+
+## Related Changes
+
+- [2026-07-31_project-orchestrator.md](../change/2026-07-31_project-orchestrator.md)
+
+## Related Lessons
+
+- [orchestrator-lease-recovery.md](../lessons/orchestrator-lease-recovery.md)

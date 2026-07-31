@@ -109,3 +109,11 @@ The skill uses available Codex project/task tools for background Worker creation
 ## Related Decision
 
 - [2026-07-31_project-orchestrator.md](../decisions/2026-07-31_project-orchestrator.md)
+
+## Related Change
+
+- [2026-07-31_project-orchestrator.md](../change/2026-07-31_project-orchestrator.md)
+
+## Related Lesson
+
+- [orchestrator-lease-recovery.md](../lessons/orchestrator-lease-recovery.md)

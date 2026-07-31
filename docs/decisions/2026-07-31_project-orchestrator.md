@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted for implementation planning.
+Accepted and implemented.
 
 ## Context
 
@@ -57,12 +57,20 @@ High for the skill and local runtime contracts. Live background-task creation st
 ## Related Features
 
 - [m-autoflow-workflow.md](../features/m-autoflow-workflow.md)
-- Planned: `docs/features/m-project-orchestrator.md`
+- [m-project-orchestrator.md](../features/m-project-orchestrator.md)
 
 ## Related Requirements
 
-- Planned: `docs/requirements/m-project-orchestrator.md`
+- [m-project-orchestrator.md](../requirements/m-project-orchestrator.md)
 
 ## Related Specs
 
-- Planned: `docs/specs/m-project-orchestrator.md`
+- [m-project-orchestrator.md](../specs/m-project-orchestrator.md)
+
+## Related Change
+
+- [2026-07-31_project-orchestrator.md](../change/2026-07-31_project-orchestrator.md)
+
+## Related Lesson
+
+- [orchestrator-lease-recovery.md](../lessons/orchestrator-lease-recovery.md)
