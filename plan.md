@@ -435,6 +435,24 @@ The host path stores only numeric capacity, owner IDs, lease IDs, and timestamps
 
 Execution-stage lightweight validation passed. Heavy independent review remains owned by `$m-test`; this execution phase does not create `docs/change`, merge, or clean the Worktree.
 
+### m-continue Iteration 1 Repair
+
+- ORCH-3: serialized host-pool metadata initialization, rejected stale lease reuse, and required Task/lease state consistency for idempotent acquisition.
+- ORCH-4: enforced a recorded resolution when leaving `BLOCKED` and clarified Tester result/release transition ordering.
+- Added focused regression coverage for fresh idempotent acquisition, stale project and host leases, conflicting host-pool initialization, inconsistent Task/lease state, and blocked-state recovery.
+- Heavy review follow-up: constrained lease IDs at the CLI boundary, prevented premature normal release, and added audited stale reclaim that blocks the affected Task before any later resume.
+- Interrupted host admission follow-up: surfaced stale host-only leases and added audited orphan reclaim that is valid only while the Task remains queued without a project lease.
+- Recovery durability follow-up: made project stale reclaim resumable through a two-phase audit record across interruption points.
+
+### m-continue Convergence Evidence
+
+- Four execute/test cycles converged; each changed the failure signature or added measurable recovery evidence, so the non-progress count remained zero.
+- 29 orchestrator-focused tests passed, including concurrency, FIFO, state/lease consistency, malformed lease IDs, premature release, stale project reclaim, stale host reuse, orphan host reclaim, and interrupted reclaim resumption.
+- Full discovery passed 69 tests with one existing Windows symbolic-link privilege skip.
+- Source `m-orchestrator` and `m-autoflow` validators passed; the installed `m-orchestrator` validator passed.
+- Source, dist, and installed parity passed for all 10 `m-orchestrator` files and all 9 `m-autoflow` files; `git diff --check` passed.
+- Heavy review found no remaining in-scope blocker. The workflow is ready for `$m-archive`; no archive, merge, push, or Worktree cleanup was performed here.
+
 ## Execution Scope After Approval
 
 ### Will Execute

@@ -26,7 +26,7 @@ Each lease records only:
 - acquired and heartbeat timestamps
 - configured expiry threshold
 
-Heartbeat and release require the exact Task and lease IDs. Wrong-owner operations fail. Repeated release by the same owner is idempotent and cannot affect another Task.
+Heartbeat, release, and reclaim require the exact Task and runtime-generated lease IDs. Wrong-owner operations fail. Malformed lease IDs also fail. Repeated release by the same owner is idempotent and cannot affect another Task.
 
 ## Acquisition Ordering
 
@@ -43,11 +43,13 @@ If any step after host acquisition fails, release the host lease before returnin
 
 ## Release
 
-Persist the Tester result or blocker before release. Release the optional host lease and project lease in an owner-safe retryable operation, then transition the Task. A missing already-released lease may return `Released` only when no current lease exists for another owner.
+Persist the Tester result or blocker by transitioning `TESTING` to `TEST_FAILED`, `TEST_PASSED`, or `BLOCKED` before release. Then release the optional host lease and project lease in an owner-safe retryable operation. Only after capacity is released may the Worker enter `EXECUTING`, `WAITING_FOR_MERGE`, or another non-testing state. A missing already-released lease may return `Released` only when no current lease exists for another owner.
 
 ## Stale Leases
 
-Expiry is a diagnostic threshold, not automatic proof that a Tester is dead. List stale candidates with their owner and last heartbeat. The Planner or owning Worker must inspect live task status before an explicit reclaim. Record who reclaimed it, why, and which lease was affected.
+Expiry is a diagnostic threshold, not automatic proof that a Tester is dead. List stale project and host candidates with their owner and last heartbeat. The Planner or owning Worker must inspect live task status before explicit reclaim through `pool reclaim`, supplying the exact lease ID, actor, and reason. Project reclaim rejects a fresh lease, transitions its Task to `BLOCKED`, releases host and project capacity, and writes a project-local audit event. It never resumes or expands the Task automatically.
+
+If a process stopped after host admission but before the project lease was durable, `pool reclaim-host` may release that stale orphan only when the Task is still in the pool's waiting state and owns no project lease. The command requires the exact host lease ID, actor, and reason, writes an audit event, and leaves the Task queued for a normal retry.
 
 Pool implementation locks may use a short internal stale threshold for crash recovery because they protect metadata operations only; they must not be confused with Tester leases.
 

@@ -32,6 +32,7 @@ EXPECTED_COMMANDS = {
 }
 ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9._-]{0,63}$")
 TASK_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+LEASE_ID_PATTERN = re.compile(r"^[a-f0-9]{32}$")
 CONTEXT_PATTERN = re.compile(r"^local:([^/\\#]+)(?:#([^/\\#]+))?$")
 TERMINAL_STATES = {"COMPLETED"}
 STATES = {
@@ -99,6 +100,17 @@ def parse_time(value: str) -> datetime:
     if parsed.tzinfo is None:
         raise OrchestratorError(f"Runtime timestamp has no timezone: {value}")
     return parsed.astimezone(timezone.utc)
+
+
+def lease_age_seconds(
+    lease: dict[str, Any], now: datetime | None = None
+) -> tuple[float, int]:
+    heartbeat = parse_time(require_string(lease.get("heartbeat_at"), "lease heartbeat_at"))
+    timeout = require_int(
+        lease.get("lease_timeout_seconds"), "lease_timeout_seconds", 60, 86400
+    )
+    observed_at = now or datetime.now(timezone.utc)
+    return (observed_at - heartbeat).total_seconds(), timeout
 
 
 def require_mapping(value: Any, label: str) -> dict[str, Any]:
@@ -437,6 +449,7 @@ def ensure_runtime(config: ProjectConfig) -> None:
     config.runtime_root.mkdir(parents=True, exist_ok=True)
     (config.runtime_root / "tasks").mkdir(exist_ok=True)
     (config.runtime_root / "pools").mkdir(exist_ok=True)
+    (config.runtime_root / "events").mkdir(exist_ok=True)
     metadata_path = config.runtime_root / "project.json"
     lock_path = config.runtime_root / ".state.lock"
     with directory_lock(lock_path):
@@ -588,9 +601,10 @@ def transition_task(
             raise OrchestratorError(
                 f"Task {task_id} state mismatch: expected {expected}, found {task.get('state')}"
             )
+        if expected == "BLOCKED" and not reason:
+            raise OrchestratorError("Leaving BLOCKED requires a recorded resolution reason")
         if not allowed_transition(expected, target):
-            if not (expected == "BLOCKED" and reason):
-                raise OrchestratorError(f"Invalid Task transition: {expected} -> {target}")
+            raise OrchestratorError(f"Invalid Task transition: {expected} -> {target}")
         if target in {"TESTING", "ARCHIVING"} and internal_lease is None:
             raise OrchestratorError(f"{target} may be entered only through pool acquisition")
 
@@ -756,7 +770,6 @@ def ensure_host_pool(config: ProjectConfig) -> Path | None:
         return None
     root.mkdir(parents=True, exist_ok=True)
     (root / "leases").mkdir(exist_ok=True)
-    metadata_path = root / "pool.json"
     budget = config.host_budget
     assert budget is not None
     expected = {
@@ -765,15 +778,17 @@ def ensure_host_pool(config: ProjectConfig) -> Path | None:
         "capacity": budget["capacity"],
         "lease_timeout_seconds": budget["lease_timeout_seconds"],
     }
-    if metadata_path.exists():
-        actual = read_json(metadata_path)
-        for key, value in expected.items():
-            if actual.get(key) != value:
-                raise OrchestratorError(
-                    f"Host budget mismatch for {key}: expected {value!r}, found {actual.get(key)!r}"
-                )
-    else:
-        atomic_write_json(metadata_path, {**expected, "created_at": utc_now()})
+    metadata_path = root / "pool.json"
+    with directory_lock(root / ".lock"):
+        if metadata_path.exists():
+            actual = read_json(metadata_path)
+            for key, value in expected.items():
+                if actual.get(key) != value:
+                    raise OrchestratorError(
+                        f"Host budget mismatch for {key}: expected {value!r}, found {actual.get(key)!r}"
+                    )
+        else:
+            atomic_write_json(metadata_path, {**expected, "created_at": utc_now()})
     return root
 
 
@@ -790,7 +805,13 @@ def acquire_host_lease(config: ProjectConfig, task_id: str) -> dict[str, Any] | 
         if len(existing) > 1:
             raise OrchestratorError(f"Multiple host leases exist for owner {owner}")
         if existing:
-            return existing[0][1]
+            lease = existing[0][1]
+            age, timeout = lease_age_seconds(lease)
+            if age > timeout:
+                raise OrchestratorError(
+                    f"Host lease {lease.get('lease_id')} for owner {owner} is stale; inspect live Task status before recovery"
+                )
+            return lease
         if len(records) >= budget["capacity"]:
             return {"status": "Waiting"}
         lease_id = uuid.uuid4().hex
@@ -847,7 +868,22 @@ def try_acquire(config: ProjectConfig, pool_name: str, task_id: str) -> dict[str
         leases = list_records(root / "leases")
         existing_lease = find_owned_record(leases, task_id)
         if existing_lease:
-            return {"status": "Acquired", "lease": existing_lease[1], "idempotent": True}
+            lease = existing_lease[1]
+            task = load_task(config, task_id)
+            active_lease = task.get("active_lease")
+            if task.get("state") != acquired_state or active_lease != {
+                "pool": pool_name,
+                "lease_id": lease.get("lease_id"),
+            }:
+                raise OrchestratorError(
+                    f"Task {task_id} has lease {lease.get('lease_id')} but is not consistently {acquired_state}; inspect and release explicitly"
+                )
+            age, timeout = lease_age_seconds(lease)
+            if age > timeout:
+                raise OrchestratorError(
+                    f"Lease {lease.get('lease_id')} for Task {task_id} is stale; inspect live Task status before recovery"
+                )
+            return {"status": "Acquired", "lease": lease, "idempotent": True}
         task = load_task(config, task_id)
         if task.get("state") != expected_state:
             raise OrchestratorError(
@@ -903,6 +939,7 @@ def heartbeat_lease(
     config: ProjectConfig, pool_name: str, task_id: str, lease_id: str
 ) -> dict[str, Any]:
     ensure_runtime(config)
+    lease_id = validate_identifier(lease_id, "lease_id", LEASE_ID_PATTERN)
     root = pool_root(config, pool_name)
     path = root / "leases" / f"{lease_id}.json"
     with directory_lock(root / ".lock"):
@@ -922,8 +959,10 @@ def release_lease(
     config: ProjectConfig, pool_name: str, task_id: str, lease_id: str
 ) -> dict[str, Any]:
     ensure_runtime(config)
+    lease_id = validate_identifier(lease_id, "lease_id", LEASE_ID_PATTERN)
     root = pool_root(config, pool_name)
     path = root / "leases" / f"{lease_id}.json"
+    _, acquired_state = pool_expected_state(config, pool_name)
     with directory_lock(root / ".lock"):
         if not path.exists():
             other = find_owned_record(list_records(root / "leases"), task_id)
@@ -931,14 +970,239 @@ def release_lease(
                 raise OrchestratorError(
                     f"Task {task_id} owns a different active lease: {other[1].get('lease_id')}"
                 )
+            task = load_task(config, task_id)
+            if task.get("state") == acquired_state:
+                raise OrchestratorError(
+                    f"Task {task_id} is still {acquired_state} but its lease is missing; inspect runtime state"
+                )
             return {"status": "Released", "lease_id": lease_id, "idempotent": True}
         lease = read_json(path)
         if lease.get("task_id") != task_id or lease.get("lease_id") != lease_id:
             raise OrchestratorError("Project lease ownership mismatch")
+        task = load_task(config, task_id)
+        if task.get("state") == acquired_state:
+            raise OrchestratorError(
+                f"Persist the Tester or archive result, or use explicit stale reclaim, before releasing {acquired_state}"
+            )
         if lease.get("host_lease_id"):
             release_host_lease(config, lease["host_lease_id"], task_id)
         path.unlink()
         return {"status": "Released", "lease_id": lease_id, "idempotent": False}
+
+
+def reclaim_lease(
+    config: ProjectConfig,
+    pool_name: str,
+    task_id: str,
+    lease_id: str,
+    actor: str,
+    reason: str,
+) -> dict[str, Any]:
+    ensure_runtime(config)
+    lease_id = validate_identifier(lease_id, "lease_id", LEASE_ID_PATTERN)
+    actor = require_string(actor, "actor")
+    reason = require_string(reason, "reason")
+    root = pool_root(config, pool_name)
+    path = root / "leases" / f"{lease_id}.json"
+    event_path = config.runtime_root / "events" / f"lease-reclaim-{lease_id}.json"
+    _, acquired_state = pool_expected_state(config, pool_name)
+    resolution = f"Stale lease {lease_id} reclaimed by {actor}: {reason}"
+    with directory_lock(root / ".lock"):
+        if not path.exists():
+            other = find_owned_record(list_records(root / "leases"), task_id)
+            if other:
+                raise OrchestratorError(
+                    f"Task {task_id} owns a different active lease: {other[1].get('lease_id')}"
+                )
+            if event_path.exists():
+                event = read_json(event_path)
+                if all(
+                    event.get(key) == value
+                    for key, value in {
+                        "project_id": config.project_id,
+                        "pool": pool_name,
+                        "task_id": task_id,
+                        "lease_id": lease_id,
+                        "actor": actor,
+                        "reason": reason,
+                    }.items()
+                ):
+                    task = load_task(config, task_id)
+                    if task.get("state") != "BLOCKED" or task.get("latest_reason") != resolution:
+                        raise OrchestratorError(
+                            f"Reclaim audit for {lease_id} does not match Task {task_id} state"
+                        )
+                    if event.get("status") != "Completed":
+                        event["status"] = "Completed"
+                        event["completed_at"] = utc_now()
+                        atomic_write_json(event_path, event)
+                    return {
+                        "status": "Reclaimed",
+                        "lease_id": lease_id,
+                        "event": event,
+                        "idempotent": True,
+                    }
+            raise OrchestratorError(f"Lease does not exist and has no reclaim audit: {lease_id}")
+
+        lease = read_json(path)
+        if lease.get("task_id") != task_id or lease.get("lease_id") != lease_id:
+            raise OrchestratorError("Project lease ownership mismatch")
+        age, timeout = lease_age_seconds(lease)
+        if age <= timeout:
+            raise OrchestratorError(
+                f"Lease {lease_id} is not stale; heartbeat or persist the normal result instead"
+            )
+        task = load_task(config, task_id)
+        expected_active = {"pool": pool_name, "lease_id": lease_id}
+        recovery_started = (
+            task.get("state") == "BLOCKED"
+            and task.get("latest_reason") == resolution
+            and not task.get("active_lease")
+        )
+        if not recovery_started and (
+            task.get("state") != acquired_state
+            or task.get("active_lease") != expected_active
+        ):
+            raise OrchestratorError(
+                f"Task {task_id} and lease {lease_id} are inconsistent; inspect before recovery"
+            )
+
+        if event_path.exists():
+            event = read_json(event_path)
+            if any(
+                event.get(key) != value
+                for key, value in {
+                    "project_id": config.project_id,
+                    "pool": pool_name,
+                    "task_id": task_id,
+                    "lease_id": lease_id,
+                    "actor": actor,
+                    "reason": reason,
+                }.items()
+            ):
+                raise OrchestratorError(f"Reclaim audit ownership mismatch: {event_path}")
+        else:
+            event = {
+                "event": "lease-reclaimed",
+                "status": "Started",
+                "project_id": config.project_id,
+                "pool": pool_name,
+                "task_id": task_id,
+                "lease_id": lease_id,
+                "actor": actor,
+                "reason": reason,
+                "started_at": utc_now(),
+            }
+            atomic_write_json(event_path, event)
+        if lease.get("host_lease_id"):
+            release_host_lease(config, lease["host_lease_id"], task_id)
+        if not recovery_started:
+            transition_task(
+                config,
+                task_id,
+                acquired_state,
+                "BLOCKED",
+                reason=resolution,
+            )
+        event["status"] = "Completed"
+        event["completed_at"] = utc_now()
+        atomic_write_json(event_path, event)
+        path.unlink()
+        return {
+            "status": "Reclaimed",
+            "lease_id": lease_id,
+            "event": event,
+            "idempotent": False,
+        }
+
+
+def reclaim_host_lease(
+    config: ProjectConfig,
+    pool_name: str,
+    task_id: str,
+    lease_id: str,
+    actor: str,
+    reason: str,
+) -> dict[str, Any]:
+    ensure_runtime(config)
+    lease_id = validate_identifier(lease_id, "lease_id", LEASE_ID_PATTERN)
+    actor = require_string(actor, "actor")
+    reason = require_string(reason, "reason")
+    project_pool = pool_root(config, pool_name)
+    expected_state, _ = pool_expected_state(config, pool_name)
+    host_root = ensure_host_pool(config)
+    if host_root is None:
+        raise OrchestratorError("Host budget is not enabled for this project")
+    path = host_root / "leases" / f"{lease_id}.json"
+    event_path = config.runtime_root / "events" / f"host-lease-reclaim-{lease_id}.json"
+    owner = f"{config.project_id}:{task_id}"
+
+    with directory_lock(project_pool / ".lock"):
+        project_lease = find_owned_record(
+            list_records(project_pool / "leases"), task_id
+        )
+        if project_lease:
+            raise OrchestratorError(
+                f"Task {task_id} has project lease {project_lease[1].get('lease_id')}; use project lease recovery"
+            )
+        task = load_task(config, task_id)
+        if task.get("state") != expected_state or task.get("active_lease"):
+            raise OrchestratorError(
+                f"Task {task_id} is not an orphan-host candidate in {expected_state}"
+            )
+
+        with directory_lock(host_root / ".lock"):
+            if not path.exists():
+                if event_path.exists():
+                    event = read_json(event_path)
+                    if all(
+                        event.get(key) == value
+                        for key, value in {
+                            "project_id": config.project_id,
+                            "pool": pool_name,
+                            "task_id": task_id,
+                            "owner": owner,
+                            "lease_id": lease_id,
+                            "actor": actor,
+                            "reason": reason,
+                        }.items()
+                    ):
+                        return {
+                            "status": "HostReclaimed",
+                            "lease_id": lease_id,
+                            "event": event,
+                            "idempotent": True,
+                        }
+                raise OrchestratorError(
+                    f"Host lease does not exist and has no reclaim audit: {lease_id}"
+                )
+            lease = read_json(path)
+            if lease.get("owner") != owner or lease.get("lease_id") != lease_id:
+                raise OrchestratorError("Host lease ownership mismatch")
+            age, timeout = lease_age_seconds(lease)
+            if age <= timeout:
+                raise OrchestratorError(
+                    f"Host lease {lease_id} is not stale; retry normal acquisition instead"
+                )
+            event = {
+                "event": "orphan-host-lease-reclaimed",
+                "project_id": config.project_id,
+                "pool": pool_name,
+                "task_id": task_id,
+                "owner": owner,
+                "lease_id": lease_id,
+                "actor": actor,
+                "reason": reason,
+                "at": utc_now(),
+            }
+            atomic_write_json(event_path, event)
+            path.unlink()
+            return {
+                "status": "HostReclaimed",
+                "lease_id": lease_id,
+                "event": event,
+                "idempotent": False,
+            }
 
 
 def stale_leases(config: ProjectConfig, pool_name: str) -> dict[str, Any]:
@@ -947,14 +1211,26 @@ def stale_leases(config: ProjectConfig, pool_name: str) -> dict[str, Any]:
     now = datetime.now(timezone.utc)
     stale: list[dict[str, Any]] = []
     for _, lease in list_records(root / "leases"):
-        heartbeat = parse_time(require_string(lease.get("heartbeat_at"), "lease heartbeat_at"))
-        timeout = require_int(
-            lease.get("lease_timeout_seconds"), "lease_timeout_seconds", 60, 86400
-        )
-        age = (now - heartbeat).total_seconds()
+        age, timeout = lease_age_seconds(lease, now)
         if age > timeout:
             stale.append({**lease, "age_seconds": int(age)})
-    return {"status": "Inspected", "pool": pool_name, "stale": stale}
+    stale_host: list[dict[str, Any]] = []
+    host_root = ensure_host_pool(config)
+    if host_root is not None:
+        owner_prefix = f"{config.project_id}:"
+        with directory_lock(host_root / ".lock"):
+            for _, lease in list_records(host_root / "leases"):
+                if not str(lease.get("owner", "")).startswith(owner_prefix):
+                    continue
+                age, timeout = lease_age_seconds(lease, now)
+                if age > timeout:
+                    stale_host.append({**lease, "age_seconds": int(age)})
+    return {
+        "status": "Inspected",
+        "pool": pool_name,
+        "stale": stale,
+        "stale_host": stale_host,
+    }
 
 
 def project_status(config: ProjectConfig) -> dict[str, Any]:
@@ -1043,13 +1319,23 @@ def build_parser() -> argparse.ArgumentParser:
 
     pool_parser = domains.add_parser("pool")
     pool_actions = pool_parser.add_subparsers(dest="action", required=True)
-    for action in ("enqueue", "try-acquire", "heartbeat", "release"):
+    for action in (
+        "enqueue",
+        "try-acquire",
+        "heartbeat",
+        "release",
+        "reclaim",
+        "reclaim-host",
+    ):
         action_parser = pool_actions.add_parser(action)
         add_project_root(action_parser)
         action_parser.add_argument("--pool", required=True)
         action_parser.add_argument("--task-id", required=True)
-        if action in {"heartbeat", "release"}:
+        if action in {"heartbeat", "release", "reclaim", "reclaim-host"}:
             action_parser.add_argument("--lease-id", required=True)
+        if action in {"reclaim", "reclaim-host"}:
+            action_parser.add_argument("--actor", required=True)
+            action_parser.add_argument("--reason", required=True)
     pool_stale_parser = pool_actions.add_parser("stale")
     add_project_root(pool_stale_parser)
     pool_stale_parser.add_argument("--pool", required=True)
@@ -1088,6 +1374,24 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
         return heartbeat_lease(config, args.pool, args.task_id, args.lease_id)
     if args.domain == "pool" and args.action == "release":
         return release_lease(config, args.pool, args.task_id, args.lease_id)
+    if args.domain == "pool" and args.action == "reclaim":
+        return reclaim_lease(
+            config,
+            args.pool,
+            args.task_id,
+            args.lease_id,
+            args.actor,
+            args.reason,
+        )
+    if args.domain == "pool" and args.action == "reclaim-host":
+        return reclaim_host_lease(
+            config,
+            args.pool,
+            args.task_id,
+            args.lease_id,
+            args.actor,
+            args.reason,
+        )
     if args.domain == "pool" and args.action == "stale":
         return stale_leases(config, args.pool)
     raise OrchestratorError(f"Unsupported command: {args.domain} {args.action}")

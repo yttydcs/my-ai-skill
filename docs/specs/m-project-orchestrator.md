@@ -44,7 +44,7 @@ Project metadata must not treat a worktree-specific checkout path as repository 
 
 ## Runtime CLI Contract
 
-The standard-library helper provides `config validate`, `planner register`, `project status`, `task create`, `task bind-worker`, `task transition`, `pool enqueue`, `pool try-acquire`, `pool heartbeat`, `pool release`, and `pool stale`.
+The standard-library helper provides `config validate`, `planner register`, `project status`, `task create`, `task bind-worker`, `task transition`, `pool enqueue`, `pool try-acquire`, `pool heartbeat`, `pool release`, `pool reclaim`, `pool reclaim-host`, and `pool stale`.
 
 All successful commands emit structured JSON. Validation and ownership errors emit actionable stderr and a non-zero exit status. Mutation commands are retryable without releasing another Task's state or capacity.
 
@@ -71,7 +71,9 @@ Transitions use expected-state compare-and-set. Evidence bodies are not copied i
 - A lease has an opaque ID and exact Task owner.
 - Heartbeat and release reject ownership mismatch.
 - Same-owner repeated release is idempotent.
-- Expiry lists stale candidates but never silently reclaims them.
+- Normal release rejects a Task that has not persisted its test, archive, or blocker result.
+- Expiry lists stale project and host candidates but never silently reclaims them; explicit project reclaim requires an actor and reason, blocks the Task, and persists an audit event.
+- An audited host-orphan reclaim is allowed only when no project lease exists and the Task remains in its pool waiting state.
 - Optional host capacity is acquired while project admission is serialized; any partial failure rolls host capacity back.
 
 ## Host Tool Contract

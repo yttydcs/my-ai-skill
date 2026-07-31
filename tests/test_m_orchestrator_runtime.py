@@ -242,6 +242,9 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
         self.assertEqual(acquired["status"], "Acquired")
         lease_id = acquired["lease"]["lease_id"]
         self.assertEqual(runtime.load_task(project.config, "T-1")["state"], "TESTING")
+        retried = runtime.try_acquire(project.config, "tester", "T-1")
+        self.assertTrue(retried["idempotent"])
+        self.assertEqual(retried["lease"]["lease_id"], lease_id)
 
         failure = project.evidence("test-failure", {"status": "Failed"})
         runtime.transition_task(
@@ -251,6 +254,8 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
             "TEST_FAILED",
             str(failure),
         )
+        with self.assertRaisesRegex(runtime.OrchestratorError, "not consistently TESTING"):
+            runtime.try_acquire(project.config, "tester", "T-1")
         released = runtime.release_lease(project.config, "tester", "T-1", lease_id)
         self.assertFalse(released["idempotent"])
         self.assertTrue(
@@ -272,6 +277,30 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
                 project.config, "tester", "T-2", lease["lease_id"]
             )
 
+    def test_release_requires_persisted_result(self):
+        project = ProjectFixture(self.root / "project", "project")
+        project.prepare_waiting_task("T-1")
+        lease = runtime.try_acquire(project.config, "tester", "T-1")["lease"]
+        with self.assertRaisesRegex(runtime.OrchestratorError, "is not stale"):
+            runtime.reclaim_lease(
+                project.config,
+                "tester",
+                "T-1",
+                lease["lease_id"],
+                "planner-thread",
+                "premature recovery",
+            )
+        with self.assertRaisesRegex(runtime.OrchestratorError, "Persist the Tester"):
+            runtime.release_lease(
+                project.config, "tester", "T-1", lease["lease_id"]
+            )
+
+    def test_lease_id_path_input_is_rejected(self):
+        project = ProjectFixture(self.root / "project", "project")
+        project.prepare_waiting_task("T-1")
+        with self.assertRaisesRegex(runtime.OrchestratorError, "lease_id contains unsafe"):
+            runtime.release_lease(project.config, "tester", "T-1", "../../outside")
+
     def test_concurrent_acquisition_preserves_fifo_and_capacity(self):
         project = ProjectFixture(self.root / "project", "project", tester_capacity=1)
         project.prepare_waiting_task("T-1")
@@ -290,6 +319,10 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
         self.assertEqual(len(leases), 1)
         acquired = next(item for item in results if item["status"] == "Acquired")
         self.assertEqual(acquired["lease"]["task_id"], "T-1")
+        result = project.evidence("capacity-result", {"status": "Passed"})
+        runtime.transition_task(
+            project.config, "T-1", "TESTING", "TEST_PASSED", str(result)
+        )
         runtime.release_lease(
             project.config, "tester", "T-1", acquired["lease"]["lease_id"]
         )
@@ -316,6 +349,219 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
         result = runtime.stale_leases(project.config, "tester")
         self.assertEqual([item["lease_id"] for item in result["stale"]], [lease_id])
         self.assertTrue(lease_path.exists())
+        with self.assertRaisesRegex(runtime.OrchestratorError, "is stale"):
+            runtime.try_acquire(project.config, "tester", "T-1")
+
+    def test_stale_host_lease_is_not_silently_reused(self):
+        project = ProjectFixture(
+            self.root / "project", "project", host_enabled=True, host_capacity=1
+        )
+        lease = runtime.acquire_host_lease(project.config, "T-1")
+        self.assertIsNotNone(lease)
+        lease_id = lease["lease_id"]
+        host_root = runtime.host_pool_root(project.config)
+        self.assertIsNotNone(host_root)
+        lease_path = host_root / "leases" / f"{lease_id}.json"
+        stale = runtime.read_json(lease_path)
+        stale["heartbeat_at"] = (
+            datetime.now(timezone.utc) - timedelta(minutes=5)
+        ).isoformat()
+        runtime.atomic_write_json(lease_path, stale)
+
+        with self.assertRaisesRegex(runtime.OrchestratorError, "is stale"):
+            runtime.acquire_host_lease(project.config, "T-1")
+        self.assertTrue(lease_path.exists())
+
+    def test_stale_reclaim_blocks_task_and_writes_audit(self):
+        project = ProjectFixture(
+            self.root / "project", "project", host_enabled=True, host_capacity=1
+        )
+        project.prepare_waiting_task("T-1")
+        lease = runtime.try_acquire(project.config, "tester", "T-1")["lease"]
+        lease_id = lease["lease_id"]
+        lease_path = (
+            project.config.runtime_root
+            / "pools"
+            / "tester"
+            / "leases"
+            / f"{lease_id}.json"
+        )
+        stale = runtime.read_json(lease_path)
+        stale["heartbeat_at"] = (
+            datetime.now(timezone.utc) - timedelta(minutes=5)
+        ).isoformat()
+        runtime.atomic_write_json(lease_path, stale)
+
+        reclaimed = runtime.reclaim_lease(
+            project.config,
+            "tester",
+            "T-1",
+            lease_id,
+            "planner-thread",
+            "Worker task was confirmed closed",
+        )
+        self.assertFalse(reclaimed["idempotent"])
+        self.assertEqual(runtime.load_task(project.config, "T-1")["state"], "BLOCKED")
+        self.assertFalse(lease_path.exists())
+        self.assertTrue(
+            (
+                project.config.runtime_root
+                / "events"
+                / f"lease-reclaim-{lease_id}.json"
+            ).is_file()
+        )
+        self.assertTrue(
+            runtime.reclaim_lease(
+                project.config,
+                "tester",
+                "T-1",
+                lease_id,
+                "planner-thread",
+                "Worker task was confirmed closed",
+            )["idempotent"]
+        )
+
+    def test_stale_reclaim_resumes_started_audit(self):
+        project = ProjectFixture(
+            self.root / "project", "project", host_enabled=True, host_capacity=1
+        )
+        project.prepare_waiting_task("T-1")
+        lease = runtime.try_acquire(project.config, "tester", "T-1")["lease"]
+        lease_id = lease["lease_id"]
+        lease_path = (
+            project.config.runtime_root
+            / "pools"
+            / "tester"
+            / "leases"
+            / f"{lease_id}.json"
+        )
+        stale = runtime.read_json(lease_path)
+        stale["heartbeat_at"] = (
+            datetime.now(timezone.utc) - timedelta(minutes=5)
+        ).isoformat()
+        runtime.atomic_write_json(lease_path, stale)
+        reason = "Worker task was confirmed closed"
+        resolution = f"Stale lease {lease_id} reclaimed by planner-thread: {reason}"
+        event_path = (
+            project.config.runtime_root
+            / "events"
+            / f"lease-reclaim-{lease_id}.json"
+        )
+        runtime.atomic_write_json(
+            event_path,
+            {
+                "event": "lease-reclaimed",
+                "status": "Started",
+                "project_id": project.config.project_id,
+                "pool": "tester",
+                "task_id": "T-1",
+                "lease_id": lease_id,
+                "actor": "planner-thread",
+                "reason": reason,
+                "started_at": runtime.utc_now(),
+            },
+        )
+        runtime.transition_task(
+            project.config,
+            "T-1",
+            "TESTING",
+            "BLOCKED",
+            reason=resolution,
+        )
+
+        recovered = runtime.reclaim_lease(
+            project.config,
+            "tester",
+            "T-1",
+            lease_id,
+            "planner-thread",
+            reason,
+        )
+        self.assertFalse(recovered["idempotent"])
+        self.assertFalse(lease_path.exists())
+        self.assertEqual(runtime.read_json(event_path)["status"], "Completed")
+
+    def test_stale_host_orphan_is_reported_and_audited(self):
+        project = ProjectFixture(
+            self.root / "project", "project", host_enabled=True, host_capacity=1
+        )
+        project.prepare_waiting_task("T-1")
+        host_lease = runtime.acquire_host_lease(project.config, "T-1")
+        self.assertIsNotNone(host_lease)
+        lease_id = host_lease["lease_id"]
+        with self.assertRaisesRegex(runtime.OrchestratorError, "is not stale"):
+            runtime.reclaim_host_lease(
+                project.config,
+                "tester",
+                "T-1",
+                lease_id,
+                "planner-thread",
+                "premature recovery",
+            )
+        host_root = runtime.host_pool_root(project.config)
+        self.assertIsNotNone(host_root)
+        lease_path = host_root / "leases" / f"{lease_id}.json"
+        stale = runtime.read_json(lease_path)
+        stale["heartbeat_at"] = (
+            datetime.now(timezone.utc) - timedelta(minutes=5)
+        ).isoformat()
+        runtime.atomic_write_json(lease_path, stale)
+
+        inspected = runtime.stale_leases(project.config, "tester")
+        self.assertEqual(
+            [item["lease_id"] for item in inspected["stale_host"]], [lease_id]
+        )
+        reclaimed = runtime.reclaim_host_lease(
+            project.config,
+            "tester",
+            "T-1",
+            lease_id,
+            "planner-thread",
+            "Worker stopped before project admission",
+        )
+        self.assertFalse(reclaimed["idempotent"])
+        self.assertFalse(lease_path.exists())
+        self.assertEqual(
+            runtime.load_task(project.config, "T-1")["state"],
+            "WAITING_FOR_TESTER",
+        )
+        self.assertTrue(
+            runtime.reclaim_host_lease(
+                project.config,
+                "tester",
+                "T-1",
+                lease_id,
+                "planner-thread",
+                "Worker stopped before project admission",
+            )["idempotent"]
+        )
+
+    def test_conflicting_host_pool_initialization_is_serialized(self):
+        first = ProjectFixture(
+            self.root / "first", "project-a", host_enabled=True, host_capacity=1
+        )
+        second = ProjectFixture(
+            self.root / "second", "project-b", host_enabled=True, host_capacity=2
+        )
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            futures = [
+                executor.submit(runtime.ensure_host_pool, config)
+                for config in (first.config, second.config)
+            ]
+            results = []
+            errors = []
+            for future in futures:
+                try:
+                    results.append(future.result())
+                except runtime.OrchestratorError as exc:
+                    errors.append(str(exc))
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("Host budget mismatch for capacity", errors[0])
+        host_root = runtime.host_pool_root(first.config)
+        self.assertIsNotNone(host_root)
+        self.assertIn(runtime.read_json(host_root / "pool.json")["capacity"], {1, 2})
 
     def test_host_budget_limits_separate_projects_and_releases(self):
         first = ProjectFixture(
@@ -329,6 +575,10 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
         first_lease = runtime.try_acquire(first.config, "tester", "T-A")["lease"]
         waiting = runtime.try_acquire(second.config, "tester", "T-B")
         self.assertEqual(waiting["reason"], "host-capacity")
+        result = first.evidence("host-result", {"status": "Passed"})
+        runtime.transition_task(
+            first.config, "T-A", "TESTING", "TEST_PASSED", str(result)
+        )
         runtime.release_lease(
             first.config, "tester", "T-A", first_lease["lease_id"]
         )
@@ -384,6 +634,23 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
             project.config, "thread-b", "local", True, "thread-a was archived"
         )
         self.assertEqual(replaced["thread_id"], "thread-b")
+
+    def test_blocked_resume_requires_recorded_resolution(self):
+        project = ProjectFixture(self.root / "project", "project")
+        runtime.create_task(project.config, "T-1", str(project.plan_path))
+        runtime.transition_task(
+            project.config, "T-1", "PLANNED", "BLOCKED", reason="approval missing"
+        )
+        with self.assertRaisesRegex(runtime.OrchestratorError, "recorded resolution"):
+            runtime.transition_task(project.config, "T-1", "BLOCKED", "PLANNED")
+        resumed = runtime.transition_task(
+            project.config,
+            "T-1",
+            "BLOCKED",
+            "PLANNED",
+            reason="approval recorded in the plan",
+        )
+        self.assertEqual(resumed["state"], "PLANNED")
 
     def test_worker_binding_is_owner_safe_and_idempotent(self):
         project = ProjectFixture(self.root / "project", "project")
