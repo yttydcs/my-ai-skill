@@ -1,13 +1,13 @@
 ---
 name: m-execute
-description: Execution phase for the m-autoflow workflow. Use only after $m-plan has produced a confirmed root plan.md/todo.md and the user approved implementation. Implements mapped Task IDs inside the active worktree, performs a parallelism assessment, applies the smallest safe code changes, runs lightweight validation, and stops before archive or closeout.
+description: Execution phase for the m-autoflow workflow. Use only after $m-plan has produced confirmed root plan.md/todo.md artifacts and the user approved implementation. Implements mapped Task IDs inside the active repository worktree or approved multi-repository worktree set, performs a parallelism assessment, applies the smallest safe code changes, runs lightweight validation, and stops before archive or closeout.
 ---
 
 # m:execute
 
 ## Overview
 
-Use this skill to implement confirmed plan tasks inside the active worktree. It is the `m-autoflow` phase for code changes and lightweight validation.
+Use this skill to implement confirmed plan tasks inside the active repository worktree or exact approved multi-repository worktree set. It is the `m-autoflow` phase for code changes and lightweight validation.
 
 ## Quick Start
 
@@ -21,7 +21,7 @@ Use this skill to implement confirmed plan tasks inside the active worktree. It 
 Implementation may start only when all are true:
 
 - requirements and architecture are unblocked
-- the active worktree root has a confirmed `plan.md` or `todo.md`
+- every active participating repository worktree root has its confirmed `plan.md` or `todo.md`
 - every intended change maps to a Task ID
 - the user has approved moving from planning into execution
 

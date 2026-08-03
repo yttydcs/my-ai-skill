@@ -21,7 +21,9 @@ from typing import Any, Iterator
 import uuid
 
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
+SUPPORTED_SCHEMA_VERSIONS = {1, 2}
+TASK_MANIFEST_VERSION = 1
 CONFIG_RELATIVE_PATH = Path(".codex") / "m-orchestrator.toml"
 EXPECTED_COMMANDS = {
     "discuss": "m-discuss",
@@ -72,18 +74,28 @@ class OrchestratorError(RuntimeError):
 
 
 @dataclass(frozen=True)
+class RepositoryConfig:
+    repository_id: str
+    root: Path
+    base_branch: str
+    git_common_dir: Path
+
+
+@dataclass(frozen=True)
 class ProjectConfig:
     project_root: Path
     config_path: Path
     raw: dict[str, Any]
+    schema_version: int
     project_id: str
     docs_root: Path
-    base_branch: str
+    base_branch: str | None
     environment_namespace: str
     commands: dict[str, dict[str, Any]]
     pools: dict[str, dict[str, Any]]
     host_budget: dict[str, Any] | None
-    git_common_dir: Path
+    repositories: dict[str, RepositoryConfig]
+    git_common_dir: Path | None
     runtime_root: Path
     config_fingerprint: str
 
@@ -141,6 +153,13 @@ def reject_unknown_keys(table: dict[str, Any], allowed: set[str], label: str) ->
         raise OrchestratorError(f"{label} contains unsupported keys: {', '.join(unknown)}")
 
 
+def paths_identical(first: Path, second: Path) -> bool:
+    try:
+        return first.samefile(second)
+    except OSError:
+        return os.path.normcase(str(first.resolve())) == os.path.normcase(str(second.resolve()))
+
+
 def validate_identifier(value: Any, label: str, pattern: re.Pattern[str]) -> str:
     identifier = require_string(value, label)
     if not pattern.fullmatch(identifier):
@@ -169,21 +188,63 @@ def resolve_docs_root(project_root: Path, value: Any) -> Path:
     return resolved
 
 
-def resolve_git_common_dir(project_root: Path) -> Path:
+def run_git(repository_root: Path, arguments: list[str], label: str) -> str:
     process = subprocess.run(
-        ["git", "-C", str(project_root), "rev-parse", "--git-common-dir"],
+        ["git", "-C", str(repository_root), *arguments],
         capture_output=True,
         text=True,
         check=False,
     )
     if process.returncode != 0:
         detail = process.stderr.strip() or process.stdout.strip() or "unknown Git error"
-        raise OrchestratorError(f"Cannot resolve Git common directory: {detail}")
-    raw_path = Path(process.stdout.strip())
-    resolved = raw_path.resolve() if raw_path.is_absolute() else (project_root / raw_path).resolve()
+        raise OrchestratorError(f"{label}: {detail}")
+    return process.stdout.strip()
+
+
+def resolve_git_repository(repository_root: Path, label: str) -> Path:
+    top_level = Path(
+        run_git(repository_root, ["rev-parse", "--show-toplevel"], f"{label} is not a valid Git repository")
+    ).resolve()
+    if not paths_identical(top_level, repository_root.resolve()):
+        raise OrchestratorError(
+            f"{label} must point to the Git worktree root; resolved top level is {top_level}"
+        )
+    raw_path = Path(
+        run_git(repository_root, ["rev-parse", "--git-common-dir"], f"Cannot resolve {label} Git common directory")
+    )
+    resolved = raw_path.resolve() if raw_path.is_absolute() else (repository_root / raw_path).resolve()
     if not resolved.is_dir():
-        raise OrchestratorError(f"Git common directory does not exist: {resolved}")
+        raise OrchestratorError(f"{label} Git common directory does not exist: {resolved}")
     return resolved
+
+
+def resolve_git_common_dir(project_root: Path) -> Path:
+    return resolve_git_repository(project_root, "project_root")
+
+
+def resolve_repository_root(project_root: Path, value: Any, label: str) -> Path:
+    text = require_string(value, f"{label}.path")
+    candidate = Path(text)
+    if candidate.is_absolute():
+        raise OrchestratorError(f"{label}.path must be relative to project_root")
+    if ".." in candidate.parts:
+        raise OrchestratorError(f"{label}.path must not contain traversal segments")
+    resolved = (project_root / candidate).resolve()
+    try:
+        resolved.relative_to(project_root)
+    except ValueError as exc:
+        raise OrchestratorError(f"{label}.path resolves outside project_root: {resolved}") from exc
+    if not resolved.is_dir():
+        raise OrchestratorError(f"{label}.path directory does not exist: {resolved}")
+    return resolved
+
+
+def validate_base_ref(repository_root: Path, base_branch: str, label: str) -> None:
+    run_git(
+        repository_root,
+        ["rev-parse", "--verify", f"{base_branch}^{{commit}}"],
+        f"{label}.base_branch does not resolve to a commit",
+    )
 
 
 def normalize_fingerprint(raw: dict[str, Any]) -> str:
@@ -205,27 +266,74 @@ def load_config(project_root: str | os.PathLike[str]) -> ProjectConfig:
     except (OSError, UnicodeError, tomllib.TOMLDecodeError) as exc:
         raise OrchestratorError(f"Cannot read orchestrator config {config_path}: {exc}") from exc
 
-    reject_unknown_keys(
-        raw,
-        {
-            "schema_version",
-            "project_id",
-            "docs_root",
-            "base_branch",
-            "commands",
-            "pools",
-            "environment",
-            "host_budget",
-        },
-        "root config",
-    )
-    if raw.get("schema_version") != SCHEMA_VERSION:
+    schema_version = raw.get("schema_version")
+    if isinstance(schema_version, bool) or not isinstance(schema_version, int):
+        raise OrchestratorError("schema_version must be an integer")
+    if schema_version not in SUPPORTED_SCHEMA_VERSIONS:
         raise OrchestratorError(
-            f"schema_version must be {SCHEMA_VERSION}; got {raw.get('schema_version')!r}"
+            f"schema_version must be one of {sorted(SUPPORTED_SCHEMA_VERSIONS)}; got {schema_version!r}"
         )
+    allowed_root_keys = {
+        "schema_version",
+        "project_id",
+        "docs_root",
+        "commands",
+        "pools",
+        "environment",
+        "host_budget",
+    }
+    allowed_root_keys.add("base_branch" if schema_version == 1 else "repositories")
+    reject_unknown_keys(raw, allowed_root_keys, "root config")
     project_id = validate_identifier(raw.get("project_id"), "project_id", ID_PATTERN)
     docs_root = resolve_docs_root(root, raw.get("docs_root"))
-    base_branch = require_string(raw.get("base_branch"), "base_branch")
+    base_branch: str | None = None
+    repositories: dict[str, RepositoryConfig] = {}
+    git_common_dir: Path | None = None
+    if schema_version == 1:
+        base_branch = require_string(raw.get("base_branch"), "base_branch")
+        try:
+            git_common_dir = resolve_git_common_dir(root)
+        except OrchestratorError as exc:
+            raise OrchestratorError(
+                "schema_version 1 supports only a single Git repository at project_root; "
+                "for a non-Git umbrella project, use schema_version 2 with explicit [[repositories]] entries. "
+                f"Details: {exc}"
+            ) from exc
+        repositories["default"] = RepositoryConfig(
+            repository_id="default",
+            root=root,
+            base_branch=base_branch,
+            git_common_dir=git_common_dir,
+        )
+    else:
+        repository_entries = raw.get("repositories")
+        if not isinstance(repository_entries, list) or not repository_entries:
+            raise OrchestratorError("repositories must be a non-empty array of tables in schema_version 2")
+        for index, repository_value in enumerate(repository_entries):
+            label = f"repositories[{index}]"
+            repository = require_mapping(repository_value, label)
+            reject_unknown_keys(repository, {"id", "path", "base_branch"}, label)
+            repository_id = validate_identifier(repository.get("id"), f"{label}.id", ID_PATTERN)
+            if repository_id in repositories:
+                raise OrchestratorError(f"Duplicate repository id: {repository_id}")
+            repository_root = resolve_repository_root(root, repository.get("path"), label)
+            for existing in repositories.values():
+                if paths_identical(repository_root, existing.root):
+                    raise OrchestratorError(
+                        f"Repository {repository_id} resolves to the same path as "
+                        f"{existing.repository_id}: {repository_root}"
+                    )
+            repository_base = require_string(repository.get("base_branch"), f"{label}.base_branch")
+            repository_git_common_dir = resolve_git_repository(
+                repository_root, f"repository {repository_id}"
+            )
+            validate_base_ref(repository_root, repository_base, f"repository {repository_id}")
+            repositories[repository_id] = RepositoryConfig(
+                repository_id=repository_id,
+                root=repository_root,
+                base_branch=repository_base,
+                git_common_dir=repository_git_common_dir,
+            )
 
     environment = require_mapping(raw.get("environment"), "environment")
     reject_unknown_keys(environment, {"namespace"}, "environment")
@@ -346,12 +454,16 @@ def load_config(project_root: str | os.PathLike[str]) -> ProjectConfig:
                 }
             )
 
-    git_common_dir = resolve_git_common_dir(root)
-    runtime_root = git_common_dir / "codex" / "m-orchestrator" / "projects" / project_id
+    runtime_root = (
+        git_common_dir / "codex" / "m-orchestrator" / "projects" / project_id
+        if schema_version == 1 and git_common_dir is not None
+        else root / ".codex-runtime" / "m-orchestrator" / "projects" / project_id
+    )
     return ProjectConfig(
         project_root=root,
         config_path=config_path,
         raw=raw,
+        schema_version=schema_version,
         project_id=project_id,
         docs_root=docs_root,
         base_branch=base_branch,
@@ -359,6 +471,7 @@ def load_config(project_root: str | os.PathLike[str]) -> ProjectConfig:
         commands=validated_commands,
         pools=validated_pools,
         host_budget=host_budget,
+        repositories=repositories,
         git_common_dir=git_common_dir,
         runtime_root=runtime_root,
         config_fingerprint=normalize_fingerprint(raw),
@@ -446,6 +559,29 @@ def has_active_runtime_work(runtime_root: Path) -> bool:
 
 
 def ensure_runtime(config: ProjectConfig) -> None:
+    if config.schema_version == 2:
+        legacy_marker = config.project_root / ".git"
+        has_legacy_marker = legacy_marker.is_file() or (
+            legacy_marker.is_dir() and next(legacy_marker.iterdir(), None) is not None
+        )
+        if has_legacy_marker:
+            try:
+                legacy_git_common_dir = resolve_git_common_dir(config.project_root)
+            except OrchestratorError:
+                legacy_git_common_dir = None
+        else:
+            legacy_git_common_dir = None
+        if legacy_git_common_dir is not None:
+            legacy_runtime_root = (
+                legacy_git_common_dir / "codex" / "m-orchestrator" / "projects" / config.project_id
+            )
+            if legacy_runtime_root != config.runtime_root and legacy_runtime_root.is_dir() and has_active_runtime_work(
+                legacy_runtime_root
+            ):
+                raise OrchestratorError(
+                    "A schema_version 1 runtime for this project_id still has non-terminal Tasks or leases; "
+                    "converge that runtime before enabling schema_version 2"
+                )
     config.runtime_root.mkdir(parents=True, exist_ok=True)
     (config.runtime_root / "tasks").mkdir(exist_ok=True)
     (config.runtime_root / "pools").mkdir(exist_ok=True)
@@ -457,8 +593,20 @@ def ensure_runtime(config: ProjectConfig) -> None:
             metadata = read_json(metadata_path)
             if metadata.get("project_id") != config.project_id:
                 raise OrchestratorError("Runtime project ID does not match validated config")
-            if Path(metadata.get("git_common_dir", "")).resolve() != config.git_common_dir:
-                raise OrchestratorError("Runtime Git common directory does not match this repository")
+            metadata_schema = metadata.get("schema_version", 1)
+            if metadata_schema != config.schema_version:
+                raise OrchestratorError(
+                    "Runtime schema version does not match the validated config; automatic runtime migration is not supported"
+                )
+            if config.schema_version == 1:
+                if not paths_identical(
+                    Path(metadata.get("git_common_dir", "")).resolve(), config.git_common_dir
+                ):
+                    raise OrchestratorError("Runtime Git common directory does not match this repository")
+            elif not paths_identical(
+                Path(metadata.get("project_root", "")).resolve(), config.project_root
+            ):
+                raise OrchestratorError("Runtime project root does not match the validated umbrella project")
             previous = metadata.get("config_fingerprint")
             if previous != config.config_fingerprint and has_active_runtime_work(config.runtime_root):
                 raise OrchestratorError(
@@ -472,9 +620,13 @@ def ensure_runtime(config: ProjectConfig) -> None:
             atomic_write_json(
                 metadata_path,
                 {
-                    "schema_version": SCHEMA_VERSION,
+                    "schema_version": config.schema_version,
                     "project_id": config.project_id,
-                    "git_common_dir": str(config.git_common_dir),
+                    **(
+                        {"git_common_dir": str(config.git_common_dir)}
+                        if config.schema_version == 1
+                        else {"project_root": str(config.project_root)}
+                    ),
                     "config_fingerprint": config.config_fingerprint,
                     "created_at": utc_now(),
                     "updated_at": utc_now(),
@@ -499,6 +651,328 @@ def load_evidence_json(path_value: str) -> tuple[dict[str, Any], dict[str, Any]]
     return evidence, body
 
 
+def require_string_list(value: Any, label: str, allow_empty: bool = False) -> list[str]:
+    if not isinstance(value, list) or (not value and not allow_empty):
+        qualifier = "an array" if allow_empty else "a non-empty array"
+        raise OrchestratorError(f"{label} must be {qualifier} of non-empty strings")
+    return [require_string(item, f"{label}[{index}]") for index, item in enumerate(value)]
+
+
+def resolve_absolute_file(value: Any, label: str) -> Path:
+    text = require_string(value, label)
+    candidate = Path(text)
+    if not candidate.is_absolute():
+        raise OrchestratorError(f"{label} must be an absolute path")
+    resolved = candidate.resolve()
+    if not resolved.is_file():
+        raise OrchestratorError(f"{label} does not exist: {resolved}")
+    return resolved
+
+
+def resolve_absolute_worktree(config: ProjectConfig, value: Any, label: str) -> Path:
+    text = require_string(value, label)
+    candidate = Path(text)
+    if not candidate.is_absolute():
+        raise OrchestratorError(f"{label} must be an absolute path")
+    resolved = candidate.resolve()
+    if not resolved.is_dir():
+        raise OrchestratorError(f"{label} directory does not exist: {resolved}")
+    allowed_root = (config.project_root / "worktrees").resolve()
+    try:
+        resolved.relative_to(allowed_root)
+    except ValueError as exc:
+        raise OrchestratorError(
+            f"{label} must be inside the project worktree root {allowed_root}; got {resolved}"
+        ) from exc
+    return resolved
+
+
+def validate_write_set(value: Any, label: str) -> list[str]:
+    entries = require_string_list(value, label)
+    normalized: list[str] = []
+    for index, entry in enumerate(entries):
+        candidate = Path(entry)
+        if candidate.is_absolute() or ".." in candidate.parts:
+            raise OrchestratorError(
+                f"{label}[{index}] must be a traversal-free path or glob relative to its worktree"
+            )
+        normalized.append(entry.replace("\\", "/"))
+    return normalized
+
+
+def git_commit(repository_root: Path, ref: str, label: str) -> str:
+    return run_git(
+        repository_root,
+        ["rev-parse", "--verify", f"{ref}^{{commit}}"],
+        f"{label} does not resolve to a commit",
+    )
+
+
+def validate_task_manifest(
+    config: ProjectConfig, manifest_path_value: str
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    manifest_evidence, manifest = load_evidence_json(manifest_path_value)
+    reject_unknown_keys(
+        manifest,
+        {
+            "schema_version",
+            "task_id",
+            "title",
+            "plan",
+            "repositories",
+            "acceptance",
+            "tests",
+            "rollback",
+            "planner",
+        },
+        "Task manifest",
+    )
+    manifest_schema_version = manifest.get("schema_version")
+    if isinstance(manifest_schema_version, bool) or manifest_schema_version != TASK_MANIFEST_VERSION:
+        raise OrchestratorError(
+            f"Task manifest schema_version must be {TASK_MANIFEST_VERSION}; "
+            f"got {manifest_schema_version!r}"
+        )
+    task_id = validate_identifier(manifest.get("task_id"), "Task manifest task_id", TASK_ID_PATTERN)
+    title = require_string(manifest.get("title"), "Task manifest title")
+    canonical_plan_path = resolve_absolute_file(manifest.get("plan"), "Task manifest plan")
+    canonical_plan = file_evidence(str(canonical_plan_path))
+    assert canonical_plan is not None
+    acceptance = require_string_list(manifest.get("acceptance"), "Task manifest acceptance")
+    tests = require_string_list(manifest.get("tests"), "Task manifest tests")
+    rollback = require_string(manifest.get("rollback"), "Task manifest rollback")
+
+    planner_value = require_mapping(manifest.get("planner"), "Task manifest planner")
+    reject_unknown_keys(planner_value, {"thread_id", "host_id"}, "Task manifest planner")
+    planner = {
+        "thread_id": require_string(planner_value.get("thread_id"), "Task manifest planner.thread_id"),
+        "host_id": None,
+    }
+    if planner_value.get("host_id") is not None:
+        planner["host_id"] = require_string(
+            planner_value.get("host_id"), "Task manifest planner.host_id"
+        )
+
+    repository_values = manifest.get("repositories")
+    if not isinstance(repository_values, list) or not repository_values:
+        raise OrchestratorError("Task manifest repositories must be a non-empty array")
+    selected: list[dict[str, Any]] = []
+    selected_ids: set[str] = set()
+    selected_worktrees: set[str] = set()
+    for index, repository_value in enumerate(repository_values):
+        label = f"Task manifest repositories[{index}]"
+        repository = require_mapping(repository_value, label)
+        reject_unknown_keys(
+            repository,
+            {"id", "worktree", "branch", "base_ref", "planning_ref", "plan", "write_set"},
+            label,
+        )
+        repository_id = validate_identifier(repository.get("id"), f"{label}.id", ID_PATTERN)
+        configured = config.repositories.get(repository_id)
+        if configured is None:
+            raise OrchestratorError(f"{label}.id is not configured for this project: {repository_id}")
+        if repository_id in selected_ids:
+            raise OrchestratorError(f"Task manifest selects repository more than once: {repository_id}")
+        worktree = resolve_absolute_worktree(config, repository.get("worktree"), f"{label}.worktree")
+        worktree_key = os.path.normcase(str(worktree))
+        if worktree_key in selected_worktrees:
+            raise OrchestratorError(f"Task manifest reuses a worktree path: {worktree}")
+        worktree_git_common_dir = resolve_git_repository(worktree, f"Task repository {repository_id} worktree")
+        if not paths_identical(worktree_git_common_dir, configured.git_common_dir):
+            raise OrchestratorError(
+                f"Task repository {repository_id} worktree belongs to a different Git repository"
+            )
+        branch = require_string(repository.get("branch"), f"{label}.branch")
+        current_branch = run_git(
+            worktree,
+            ["branch", "--show-current"],
+            f"Cannot resolve Task repository {repository_id} branch",
+        )
+        if not current_branch or current_branch != branch:
+            raise OrchestratorError(
+                f"Task repository {repository_id} branch mismatch: expected {branch}, found {current_branch or 'detached HEAD'}"
+            )
+        base_ref = require_string(repository.get("base_ref"), f"{label}.base_ref")
+        if base_ref != configured.base_branch:
+            raise OrchestratorError(
+                f"Task repository {repository_id} base_ref must match configured base_branch "
+                f"{configured.base_branch}; got {base_ref}"
+            )
+        planning_ref = require_string(repository.get("planning_ref"), f"{label}.planning_ref")
+        planning_commit = git_commit(worktree, planning_ref, f"{label}.planning_ref")
+        head_commit = git_commit(worktree, "HEAD", f"Task repository {repository_id} HEAD")
+        if planning_commit != head_commit:
+            raise OrchestratorError(
+                f"Task repository {repository_id} planning_ref must identify the current committed planning state"
+            )
+        repository_plan_path = resolve_absolute_file(repository.get("plan"), f"{label}.plan")
+        if repository_plan_path.parent != worktree or repository_plan_path.name not in {"plan.md", "todo.md"}:
+            raise OrchestratorError(
+                f"{label}.plan must be plan.md or todo.md at the selected worktree root"
+            )
+        repository_plan = file_evidence(str(repository_plan_path))
+        assert repository_plan is not None
+        selected.append(
+            {
+                "id": repository_id,
+                "repository_root": str(configured.root),
+                "git_common_dir": str(configured.git_common_dir),
+                "base_ref": base_ref,
+                "branch": branch,
+                "planning_ref": planning_commit,
+                "worktree": str(worktree),
+                "plan": repository_plan,
+                "write_set": validate_write_set(repository.get("write_set"), f"{label}.write_set"),
+            }
+        )
+        selected_ids.add(repository_id)
+        selected_worktrees.add(worktree_key)
+
+    normalized = {
+        "task_id": task_id,
+        "title": title,
+        "plan": canonical_plan,
+        "manifest": manifest_evidence,
+        "repositories": selected,
+        "acceptance": acceptance,
+        "tests": tests,
+        "rollback": rollback,
+        "planner": planner,
+    }
+    return manifest_evidence, normalized
+
+
+def run_git_bytes(repository_root: Path, arguments: list[str], label: str) -> bytes:
+    process = subprocess.run(
+        ["git", "-C", str(repository_root), *arguments],
+        capture_output=True,
+        check=False,
+    )
+    if process.returncode != 0:
+        detail = process.stderr.decode(errors="replace").strip() or "unknown Git error"
+        raise OrchestratorError(f"{label}: {detail}")
+    return process.stdout
+
+
+def worktree_snapshot(repository: dict[str, Any]) -> dict[str, Any]:
+    worktree = Path(require_string(repository.get("worktree"), "Task repository worktree")).resolve()
+    current_git_common_dir = resolve_git_repository(
+        worktree, f"Task repository {repository.get('id')} worktree"
+    )
+    expected_git_common_dir = Path(
+        require_string(repository.get("git_common_dir"), "Task repository git_common_dir")
+    ).resolve()
+    if not paths_identical(current_git_common_dir, expected_git_common_dir):
+        raise OrchestratorError(
+            f"Task repository {repository.get('id')} worktree no longer belongs to its configured Git repository"
+        )
+    head = git_commit(worktree, "HEAD", f"Task repository {repository.get('id')} HEAD")
+    diff = run_git_bytes(
+        worktree,
+        ["diff", "--binary", "--no-ext-diff", "HEAD"],
+        f"Cannot read Task repository {repository.get('id')} diff",
+    )
+    untracked_raw = run_git_bytes(
+        worktree,
+        ["ls-files", "--others", "--exclude-standard", "-z"],
+        f"Cannot list Task repository {repository.get('id')} untracked files",
+    )
+    untracked: list[dict[str, str]] = []
+    for raw_name in [item for item in untracked_raw.split(b"\0") if item]:
+        relative_name = raw_name.decode("utf-8", errors="surrogateescape")
+        relative_path = Path(relative_name)
+        if relative_path.is_absolute() or ".." in relative_path.parts:
+            raise OrchestratorError(
+                f"Git returned an unsafe untracked path for repository {repository.get('id')}: {relative_name}"
+            )
+        candidate = worktree / relative_path
+        if candidate.is_symlink():
+            body = os.readlink(candidate).encode("utf-8", errors="surrogateescape")
+        else:
+            resolved = candidate.resolve()
+            try:
+                resolved.relative_to(worktree)
+            except ValueError as exc:
+                raise OrchestratorError(
+                    f"Untracked file resolves outside worktree for repository {repository.get('id')}: {candidate}"
+                ) from exc
+            body = resolved.read_bytes()
+        untracked.append(
+            {"path": relative_name.replace("\\", "/"), "sha256": hashlib.sha256(body).hexdigest()}
+        )
+    plan_value = require_mapping(repository.get("plan"), "Task repository plan")
+    current_plan = file_evidence(require_string(plan_value.get("path"), "Task repository plan path"))
+    assert current_plan is not None
+    return {
+        "id": repository.get("id"),
+        "head": head,
+        "diff_sha256": hashlib.sha256(diff).hexdigest(),
+        "untracked": sorted(untracked, key=lambda item: item["path"]),
+        "plan_sha256": current_plan["sha256"],
+    }
+
+
+def compute_task_change_id(config: ProjectConfig, task_id: str) -> str:
+    task = load_task(config, task_id)
+    repositories = task.get("repositories")
+    if not isinstance(repositories, list) or not repositories:
+        raise OrchestratorError(f"Task {task_id} has no repository manifest for composite change identity")
+    snapshots = sorted(
+        [worktree_snapshot(require_mapping(item, "Task repository")) for item in repositories],
+        key=lambda item: str(item["id"]),
+    )
+    encoded = json.dumps(snapshots, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+        "utf-8"
+    )
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def validate_repository_gate_evidence(task: dict[str, Any], evidence_body: dict[str, Any]) -> None:
+    task_repositories = task.get("repositories")
+    if not isinstance(task_repositories, list) or not task_repositories:
+        return
+    evidence_repositories = evidence_body.get("repositories")
+    if not isinstance(evidence_repositories, list) or not evidence_repositories:
+        raise OrchestratorError("Multi-repository gate evidence requires a repositories array")
+    expected_ids = {str(item.get("id")) for item in task_repositories}
+    actual_ids: set[str] = set()
+    for index, item_value in enumerate(evidence_repositories):
+        item = require_mapping(item_value, f"Gate evidence repositories[{index}]")
+        repository_id = validate_identifier(
+            item.get("id"), f"Gate evidence repositories[{index}].id", ID_PATTERN
+        )
+        if repository_id in actual_ids:
+            raise OrchestratorError(f"Gate evidence contains duplicate repository: {repository_id}")
+        if item.get("status") != "Passed":
+            raise OrchestratorError(
+                f"Gate evidence repository {repository_id} status must be Passed"
+            )
+        actual_ids.add(repository_id)
+    if actual_ids != expected_ids:
+        raise OrchestratorError(
+            f"Gate evidence repository set does not match Task manifest; "
+            f"expected={sorted(expected_ids)}, actual={sorted(actual_ids)}"
+        )
+
+
+def ensure_current_passing_gate(config: ProjectConfig, task: dict[str, Any]) -> None:
+    if not (task.get("gate") and task.get("change_id")):
+        raise OrchestratorError("Tester admission requires a current passing gate")
+    gate = require_mapping(task.get("gate"), "Task gate")
+    current_gate = file_evidence(require_string(gate.get("path"), "Task gate path"))
+    assert current_gate is not None
+    if current_gate.get("sha256") != gate.get("sha256"):
+        raise OrchestratorError(
+            "Lightweight gate evidence changed after Task transition; regenerate it before Tester admission"
+        )
+    if task.get("repositories"):
+        current_change_id = compute_task_change_id(config, require_string(task.get("task_id"), "task_id"))
+        if current_change_id != task.get("change_id"):
+            raise OrchestratorError(
+                "Task repository state changed after the lightweight gate; rerun the complete gate before Tester admission"
+            )
+
+
 def task_path(config: ProjectConfig, task_id: str) -> Path:
     validated = validate_identifier(task_id, "task_id", TASK_ID_PATTERN)
     return config.runtime_root / "tasks" / f"{validated}.json"
@@ -511,20 +985,47 @@ def load_task(config: ProjectConfig, task_id: str) -> dict[str, Any]:
     return read_json(path)
 
 
-def create_task(config: ProjectConfig, task_id: str, plan_path_value: str) -> dict[str, Any]:
-    ensure_runtime(config)
-    path = task_path(config, task_id)
-    plan = file_evidence(plan_path_value)
+def create_task(
+    config: ProjectConfig,
+    task_id: str | None = None,
+    plan_path_value: str | None = None,
+    manifest_path_value: str | None = None,
+) -> dict[str, Any]:
+    normalized_manifest: dict[str, Any] | None = None
+    if manifest_path_value is not None:
+        _, normalized_manifest = validate_task_manifest(config, manifest_path_value)
+        manifest_task_id = normalized_manifest["task_id"]
+        if task_id is not None and task_id != manifest_task_id:
+            raise OrchestratorError(
+                f"Task ID argument {task_id} does not match manifest task_id {manifest_task_id}"
+            )
+        task_id = manifest_task_id
+        if plan_path_value is not None:
+            supplied_plan = file_evidence(plan_path_value)
+            if supplied_plan != normalized_manifest["plan"]:
+                raise OrchestratorError("--plan does not match the canonical plan in the Task manifest")
+    elif config.schema_version == 2:
+        raise OrchestratorError("schema_version 2 Task creation requires --manifest")
+    if task_id is None:
+        raise OrchestratorError("Task creation requires task_id")
+    if normalized_manifest is None and plan_path_value is None:
+        raise OrchestratorError("schema_version 1 Task creation requires --plan or --manifest")
+    plan = normalized_manifest["plan"] if normalized_manifest else file_evidence(plan_path_value)
     assert plan is not None
+    path = task_path(config, task_id)
+    ensure_runtime(config)
     with directory_lock(config.runtime_root / ".state.lock"):
         if path.exists():
             existing = read_json(path)
-            if existing.get("plan", {}).get("sha256") != plan["sha256"]:
+            if normalized_manifest:
+                if existing.get("manifest", {}).get("sha256") != normalized_manifest["manifest"]["sha256"]:
+                    raise OrchestratorError(f"Task {task_id} already exists with a different manifest")
+            elif existing.get("plan", {}).get("sha256") != plan["sha256"]:
                 raise OrchestratorError(f"Task {task_id} already exists with a different plan")
             return existing
         now = utc_now()
         task = {
-            "schema_version": SCHEMA_VERSION,
+            "schema_version": config.schema_version,
             "project_id": config.project_id,
             "task_id": task_id,
             "state": "PLANNED",
@@ -535,6 +1036,17 @@ def create_task(config: ProjectConfig, task_id: str, plan_path_value: str) -> di
             "updated_at": now,
             "history": [{"from": None, "to": "PLANNED", "at": now}],
         }
+        if normalized_manifest:
+            for key in (
+                "title",
+                "manifest",
+                "repositories",
+                "acceptance",
+                "tests",
+                "rollback",
+                "planner",
+            ):
+                task[key] = normalized_manifest[key]
         atomic_write_json(path, task)
         return task
 
@@ -622,6 +1134,13 @@ def transition_task(
                 raise OrchestratorError("Lightweight gate evidence status must be Passed")
             if evidence_body.get("change_id") != change_id:
                 raise OrchestratorError("Gate evidence change_id does not match transition change_id")
+            validate_repository_gate_evidence(task, evidence_body)
+            if task.get("repositories"):
+                current_change_id = compute_task_change_id(config, task_id)
+                if current_change_id != change_id:
+                    raise OrchestratorError(
+                        "Gate evidence change_id does not match the current multi-repository Task state"
+                    )
         if target in {"TEST_FAILED", "TEST_PASSED", "COMPLETED"} and evidence is None:
             raise OrchestratorError(f"{target} requires evidence")
         if expected == "EXECUTING" and target == "WAITING_FOR_MERGE":
@@ -738,8 +1257,8 @@ def enqueue_task(config: ProjectConfig, pool_name: str, task_id: str) -> dict[st
         raise OrchestratorError(
             f"Task {task_id} must be {expected_state} before enqueue; found {task.get('state')}"
         )
-    if expected_state == "WAITING_FOR_TESTER" and not (task.get("gate") and task.get("change_id")):
-        raise OrchestratorError("Tester enqueue requires a current passing gate")
+    if expected_state == "WAITING_FOR_TESTER":
+        ensure_current_passing_gate(config, task)
     with directory_lock(root / ".lock"):
         existing = find_owned_record(list_records(root / "queue"), task_id)
         if existing:
@@ -889,6 +1408,8 @@ def try_acquire(config: ProjectConfig, pool_name: str, task_id: str) -> dict[str
             raise OrchestratorError(
                 f"Task {task_id} must be {expected_state} before acquire; found {task.get('state')}"
             )
+        if expected_state == "WAITING_FOR_TESTER":
+            ensure_current_passing_gate(config, task)
         tickets = list_records(root / "queue")
         owned_ticket = find_owned_record(tickets, task_id)
         if not owned_ticket:
@@ -1248,7 +1769,17 @@ def project_status(config: ProjectConfig) -> dict[str, Any]:
     return {
         "status": "Ready",
         "project_id": config.project_id,
+        "schema_version": config.schema_version,
         "runtime_root": str(config.runtime_root),
+        "repositories": [
+            {
+                "id": repository.repository_id,
+                "root": str(repository.root),
+                "base_branch": repository.base_branch,
+                "git_common_dir": str(repository.git_common_dir),
+            }
+            for repository in config.repositories.values()
+        ],
         "planner": read_json(planner_path) if planner_path.exists() else None,
         "tasks": tasks,
         "pools": pools,
@@ -1259,11 +1790,21 @@ def config_result(config: ProjectConfig) -> dict[str, Any]:
     ensure_runtime(config)
     return {
         "status": "Valid",
+        "schema_version": config.schema_version,
         "project_id": config.project_id,
         "project_root": str(config.project_root),
         "docs_root": str(config.docs_root),
-        "git_common_dir": str(config.git_common_dir),
+        "git_common_dir": str(config.git_common_dir) if config.git_common_dir else None,
         "runtime_root": str(config.runtime_root),
+        "repositories": [
+            {
+                "id": repository.repository_id,
+                "root": str(repository.root),
+                "base_branch": repository.base_branch,
+                "git_common_dir": str(repository.git_common_dir),
+            }
+            for repository in config.repositories.values()
+        ],
         "commands": config.commands,
         "pools": config.pools,
         "host_budget": config.host_budget,
@@ -1301,8 +1842,12 @@ def build_parser() -> argparse.ArgumentParser:
     task_actions = task_parser.add_subparsers(dest="action", required=True)
     task_create_parser = task_actions.add_parser("create")
     add_project_root(task_create_parser)
-    task_create_parser.add_argument("--task-id", required=True)
-    task_create_parser.add_argument("--plan", required=True)
+    task_create_parser.add_argument("--task-id")
+    task_create_parser.add_argument("--plan")
+    task_create_parser.add_argument("--manifest")
+    task_change_id_parser = task_actions.add_parser("change-id")
+    add_project_root(task_change_id_parser)
+    task_change_id_parser.add_argument("--task-id", required=True)
     task_bind_parser = task_actions.add_parser("bind-worker")
     add_project_root(task_bind_parser)
     task_bind_parser.add_argument("--task-id", required=True)
@@ -1353,7 +1898,13 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
     if args.domain == "project" and args.action == "status":
         return project_status(config)
     if args.domain == "task" and args.action == "create":
-        return create_task(config, args.task_id, args.plan)
+        return create_task(config, args.task_id, args.plan, args.manifest)
+    if args.domain == "task" and args.action == "change-id":
+        return {
+            "status": "Computed",
+            "task_id": args.task_id,
+            "change_id": compute_task_change_id(config, args.task_id),
+        }
     if args.domain == "task" and args.action == "bind-worker":
         return bind_worker(config, args.task_id, args.thread_id, args.host_id)
     if args.domain == "task" and args.action == "transition":

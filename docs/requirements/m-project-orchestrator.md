@@ -21,7 +21,9 @@ Provide a project-scoped automation companion that coordinates persistent planni
 - return failed Tester evidence to the owning Worker for execute repair and complete gate rerun;
 - serialize project archive/integration admission at capacity one;
 - use `$m-archive` as the archive, merge, and cleanup authority;
-- isolate projects by Git common directory plus stable `project_id`;
+- support a non-Git umbrella project root with one or more explicitly declared Git implementation repositories;
+- keep per-repository IDs, paths, base branches, Task branches, worktrees, planning refs, plans, and write sets explicit;
+- isolate schema version 2 projects by canonical umbrella root plus stable `project_id`, while preserving schema version 1 Git-common-directory compatibility;
 - map every command to its existing skill and explicit local contexts;
 - fail explicitly for missing required context, invalid config, unavailable host task tools, wrong lease ownership, or invalid state transitions;
 - preserve existing `m-*` behavior and backward compatibility;
@@ -50,6 +52,8 @@ Provide a project-scoped automation companion that coordinates persistent planni
 - Configuration validation must occur before runtime mutation.
 - Planner registration must prevent silent replacement of a live Planner.
 - Worker dispatch must persist exact project, plan, Task, Worktree/ref, context, acceptance, test, rollback, and callback data.
+- A multi-repository Task must persist a non-empty exact subset of configured repositories and reject undeclared, duplicate, aliased, traversal, or out-of-project repository/worktree paths.
+- A composite change identifier must cover every selected repository's commit, tracked diff, untracked content, and root plan; drift in any selected repository must invalidate Tester admission.
 - Task transitions must use expected-state compare-and-set semantics.
 - `WAITING_FOR_TESTER` must require passing gate evidence and a non-empty change identifier.
 - Tester acquisition must require an eligible queue-head Task and must never exceed project or enabled host capacity.
@@ -58,10 +62,12 @@ Provide a project-scoped automation companion that coordinates persistent planni
 - Stale lease listing must not reclaim automatically.
 - Integration admission must use a configured capacity-one pool.
 - Base reconciliation that changes executable content must invalidate earlier validation as appropriate.
+- Multi-repository integration must preflight every selected repository, use recorded dependency order, and report partial completion as blocked rather than atomic success.
 
 ## Non-functional Requirements
 
 - Project status and pool inspection must scale with the selected project's entries rather than scanning unrelated repositories.
+- Configuration validation and status must inspect only declared repositories and must not recursively discover project repositories.
 - Runtime mutations must use atomic filesystem operations and explicit error messages.
 - The system must avoid busy waits and long silent blocking calls.
 - Config, state, and evidence boundaries must be deterministic and testable on Windows.
@@ -73,6 +79,9 @@ Provide a project-scoped automation companion that coordinates persistent planni
 - Concurrent tests prove project capacity is never exceeded and FIFO order is preserved.
 - Two project IDs in one repository resolve to different runtime roots.
 - Separate repositories with the same project ID remain isolated.
+- A non-Git umbrella with multiple declared child repositories validates and registers a Planner even when the umbrella contains an empty `.git` directory.
+- Existing schema version 1 single-repository projects keep their current runtime roots and Task creation interface.
+- A schema version 1 non-Git umbrella receives a schema version 2 migration error and is never instructed to initialize Git at the umbrella root.
 - Invalid config, path traversal, context scope, ownership, and state transitions fail explicitly.
 - A Worker without a current passing gate cannot enqueue or acquire the Tester pool.
 - Failure releases project and host capacity before repair.
@@ -90,6 +99,7 @@ Provide a project-scoped automation companion that coordinates persistent planni
 
 ## Related Decisions
 
+- [2026-08-04_orchestrator-multi-repo-runtime.md](../decisions/2026-08-04_orchestrator-multi-repo-runtime.md)
 - [2026-07-31_project-orchestrator.md](../decisions/2026-07-31_project-orchestrator.md)
 
 ## Related Changes

@@ -33,10 +33,12 @@ If the user explicitly chooses to skip `$m-test`, proceed to `$m-archive` rather
 ## Heavy Validation Scope
 
 - Run integration or end-to-end checks for the changed workflow when practical.
+- For an approved multi-repository workflow, validate the complete persisted worktree set and the affected cross-repository path; do not substitute unrelated default checkouts for Task worktrees.
 - Validate user-facing usability for critical flows: discoverability, error messages, loading/empty states, recovery, and regressions in common paths.
 - Review security boundaries: input trust, authorization, data exposure, secret handling, injection surfaces, and unsafe defaults.
 - Review performance indicators: latency-sensitive paths, repeated I/O, N+1 behavior, avoidable O(n^2), memory growth, contention, and configured thresholds where available.
 - If a heavy test cannot run, record why and describe residual risk.
+- Report repository-specific evidence plus the aggregate verdict when failures or skips differ between participating repositories.
 
 ## UI Validation Evidence
 

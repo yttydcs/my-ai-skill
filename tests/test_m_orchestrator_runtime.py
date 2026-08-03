@@ -82,6 +82,75 @@ lease_timeout_seconds = 60
 '''
 
 
+def config_v2_text(
+    project_id: str,
+    repositories: list[tuple[str, str, str]],
+    tester_capacity: int = 1,
+) -> str:
+    repository_blocks = "\n".join(
+        f'''[[repositories]]
+id = "{repository_id}"
+path = "{path}"
+base_branch = "{base_branch}"
+'''
+        for repository_id, path, base_branch in repositories
+    )
+    return f'''schema_version = 2
+project_id = "{project_id}"
+docs_root = "docs"
+
+{repository_blocks}
+[commands.discuss]
+skill = "m-discuss"
+contexts = ["local:planner"]
+
+[commands.plan]
+skill = "m-plan"
+contexts = ["local:planner"]
+
+[commands.execute]
+skill = "m-execute"
+contexts = ["local:worker"]
+require_lightweight_gate = true
+
+[commands.test]
+skill = "m-test"
+contexts = ["local:tester"]
+pool = "tester"
+
+[commands.archive]
+skill = "m-archive"
+contexts = ["local:archive"]
+pool = "merge"
+
+[pools.tester]
+capacity = {tester_capacity}
+queue = "fifo"
+lease_timeout_seconds = 60
+
+[pools.merge]
+capacity = 1
+queue = "fifo"
+lease_timeout_seconds = 60
+
+[environment]
+namespace = "{project_id}"
+
+[host_budget]
+enabled = false
+'''
+
+
+def run_fixture_git(repository: Path, *arguments: str) -> str:
+    process = subprocess.run(
+        ["git", "-C", str(repository), *arguments],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return process.stdout.strip()
+
+
 class ProjectFixture:
     def __init__(
         self,
@@ -94,7 +163,27 @@ class ProjectFixture:
         self.root = root
         root.mkdir(parents=True)
         subprocess.run(
-            ["git", "init", "-q", str(root)],
+            ["git", "init", "-q", "-b", "main", str(root)],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        (root / "seed.txt").write_text("initial\n", encoding="utf-8")
+        run_fixture_git(root, "add", "seed.txt")
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(root),
+                "-c",
+                "user.name=Codex Tests",
+                "-c",
+                "user.email=codex-tests@example.invalid",
+                "commit",
+                "-q",
+                "-m",
+                "initial",
+            ],
             check=True,
             capture_output=True,
             text=True,
@@ -145,6 +234,127 @@ class ProjectFixture:
             change,
         )
         return runtime.enqueue_task(self.config, "tester", task_id)
+
+
+class MultiRepoProjectFixture:
+    def __init__(
+        self,
+        root: Path,
+        project_id: str = "umbrella",
+        repository_ids: tuple[str, ...] = ("service-a", "service-b"),
+        empty_umbrella_git: bool = False,
+    ):
+        self.root = root
+        root.mkdir(parents=True)
+        if empty_umbrella_git:
+            (root / ".git").mkdir()
+        context_root = root / "docs" / "context"
+        context_root.mkdir(parents=True)
+        for name in ("planner", "worker", "tester", "archive"):
+            (context_root / f"{name}.md").write_text(
+                f"# {name}\n\n## Constraints\n\n- umbrella project only\n", encoding="utf-8"
+            )
+        self.repository_roots: dict[str, Path] = {}
+        repository_config: list[tuple[str, str, str]] = []
+        for repository_id in repository_ids:
+            repository_root = root / "repo" / repository_id
+            repository_root.parent.mkdir(parents=True, exist_ok=True)
+            subprocess.run(
+                ["git", "init", "-q", "-b", "main", str(repository_root)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            (repository_root / "seed.txt").write_text(f"{repository_id}\n", encoding="utf-8")
+            run_fixture_git(repository_root, "add", "seed.txt")
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(repository_root),
+                    "-c",
+                    "user.name=Codex Tests",
+                    "-c",
+                    "user.email=codex-tests@example.invalid",
+                    "commit",
+                    "-q",
+                    "-m",
+                    "initial",
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            self.repository_roots[repository_id] = repository_root
+            repository_config.append((repository_id, f"repo/{repository_id}", "main"))
+        config_root = root / ".codex"
+        config_root.mkdir()
+        self.config_path = config_root / "m-orchestrator.toml"
+        self.config_path.write_text(
+            config_v2_text(project_id, repository_config), encoding="utf-8"
+        )
+        self.config = runtime.load_config(root)
+
+    def create_manifest(self, task_id: str, selected: tuple[str, ...] | None = None) -> Path:
+        selected_ids = selected or tuple(self.repository_roots)
+        repository_entries: list[dict[str, object]] = []
+        for repository_id in selected_ids:
+            repository_root = self.repository_roots[repository_id]
+            worktree = self.root / "worktrees" / task_id / repository_id
+            worktree.parent.mkdir(parents=True, exist_ok=True)
+            branch = f"feat/{task_id.lower()}-{repository_id}"
+            run_fixture_git(repository_root, "worktree", "add", "-q", "-b", branch, str(worktree), "main")
+            plan_path = worktree / "plan.md"
+            plan_path.write_text(f"# Confirmed plan for {task_id}\n", encoding="utf-8")
+            run_fixture_git(worktree, "add", "plan.md")
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(worktree),
+                    "-c",
+                    "user.name=Codex Tests",
+                    "-c",
+                    "user.email=codex-tests@example.invalid",
+                    "commit",
+                    "-q",
+                    "-m",
+                    "plan",
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            repository_entries.append(
+                {
+                    "id": repository_id,
+                    "worktree": str(worktree),
+                    "branch": branch,
+                    "base_ref": "main",
+                    "planning_ref": run_fixture_git(worktree, "rev-parse", "HEAD"),
+                    "plan": str(plan_path),
+                    "write_set": ["seed.txt"],
+                }
+            )
+        manifest = {
+            "schema_version": 1,
+            "task_id": task_id,
+            "title": f"Task {task_id}",
+            "plan": repository_entries[0]["plan"],
+            "repositories": repository_entries,
+            "acceptance": ["All selected repositories pass their checks"],
+            "tests": ["Run focused repository tests"],
+            "rollback": "Revert the task commits in reverse integration order.",
+            "planner": {"thread_id": "planner-thread", "host_id": "local"},
+        }
+        manifest_path = self.root / f"{task_id}-manifest.json"
+        manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+        return manifest_path
+
+    def evidence(self, name: str, body: dict) -> Path:
+        path = self.root / f"{name}.json"
+        path.write_text(json.dumps(body), encoding="utf-8")
+        return path
 
 
 class MOrchestratorRuntimeTests(unittest.TestCase):
@@ -198,6 +408,264 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
         logical_second = runtime.load_config(first.root)
         self.assertNotEqual(first.config.runtime_root, logical_second.runtime_root)
         self.assertEqual(first.config.git_common_dir, logical_second.git_common_dir)
+
+    def test_v2_non_git_umbrella_ignores_empty_git_and_registers_planner(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", empty_umbrella_git=True
+        )
+        result = runtime.config_result(project.config)
+        self.assertEqual(result["schema_version"], 2)
+        self.assertIsNone(result["git_common_dir"])
+        self.assertEqual(
+            {item["id"] for item in result["repositories"]},
+            {"service-a", "service-b"},
+        )
+        self.assertEqual(
+            project.config.runtime_root.relative_to(project.config.project_root),
+            Path(".codex-runtime") / "m-orchestrator" / "projects" / "umbrella",
+        )
+        planner = runtime.register_planner(
+            project.config, "planner-thread", "local", False, None
+        )
+        self.assertEqual(planner["thread_id"], "planner-thread")
+
+    def test_v2_same_project_id_in_different_umbrellas_is_isolated(self):
+        first = MultiRepoProjectFixture(self.root / "first", project_id="shared")
+        second = MultiRepoProjectFixture(self.root / "second", project_id="shared")
+        self.assertNotEqual(first.config.runtime_root, second.config.runtime_root)
+        self.assertEqual(
+            first.config.runtime_root.relative_to(first.config.project_root).parts[0],
+            ".codex-runtime",
+        )
+        self.assertEqual(
+            second.config.runtime_root.relative_to(second.config.project_root).parts[0],
+            ".codex-runtime",
+        )
+
+    def test_v1_non_git_umbrella_reports_schema_v2_migration(self):
+        root = self.root / "legacy-umbrella"
+        root.mkdir()
+        context_root = root / "docs" / "context"
+        context_root.mkdir(parents=True)
+        for name in ("planner", "worker", "tester", "archive"):
+            (context_root / f"{name}.md").write_text(f"# {name}\n", encoding="utf-8")
+        config_root = root / ".codex"
+        config_root.mkdir()
+        (config_root / "m-orchestrator.toml").write_text(
+            config_text("legacy-umbrella"), encoding="utf-8"
+        )
+        with self.assertRaisesRegex(
+            runtime.OrchestratorError, "schema_version 2 with explicit"
+        ) as raised:
+            runtime.load_config(root)
+        self.assertNotIn("git init", str(raised.exception))
+
+    def test_v2_does_not_start_while_legacy_v1_runtime_is_active(self):
+        project = ProjectFixture(self.root / "project", "project")
+        runtime.create_task(project.config, "T-1", str(project.plan_path))
+        project.config_path.write_text(
+            config_v2_text("project", [("root", ".", "main")]), encoding="utf-8"
+        )
+        v2_config = runtime.load_config(project.root)
+        with self.assertRaisesRegex(runtime.OrchestratorError, "schema_version 1 runtime"):
+            runtime.config_result(v2_config)
+
+    def test_v2_invalid_repository_names_the_declared_path(self):
+        project = MultiRepoProjectFixture(self.root / "umbrella")
+        original = project.config_path.read_text(encoding="utf-8")
+        project.config_path.write_text(
+            original.replace('path = "repo/service-a"', 'path = "repo/missing"'),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(
+            runtime.OrchestratorError, r"repositories\[0\]\.path directory does not exist"
+        ):
+            runtime.load_config(project.root)
+
+    def test_v2_rejects_duplicate_and_traversing_repository_paths(self):
+        project = MultiRepoProjectFixture(self.root / "umbrella")
+        project.config_path.write_text(
+            config_v2_text(
+                "umbrella",
+                [
+                    ("first", "repo/service-a", "main"),
+                    ("alias", "repo/service-a", "main"),
+                ],
+            ),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(runtime.OrchestratorError, "resolves to the same path"):
+            runtime.load_config(project.root)
+
+        project.config_path.write_text(
+            config_v2_text("umbrella", [("outside", "../outside", "main")]),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(runtime.OrchestratorError, "traversal segments"):
+            runtime.load_config(project.root)
+
+    def test_v2_task_manifest_persists_repository_set_and_composite_gate(self):
+        project = MultiRepoProjectFixture(self.root / "umbrella")
+        manifest = project.create_manifest("T-1")
+        task = runtime.create_task(project.config, manifest_path_value=str(manifest))
+        self.assertEqual(
+            [item["id"] for item in task["repositories"]],
+            ["service-a", "service-b"],
+        )
+        self.assertEqual(task["planner"]["thread_id"], "planner-thread")
+        change_id = runtime.compute_task_change_id(project.config, "T-1")
+        runtime.transition_task(project.config, "T-1", "PLANNED", "DISPATCHING")
+        runtime.bind_worker(project.config, "T-1", "worker-T-1", "local")
+        gate = project.evidence(
+            "gate-T-1",
+            {
+                "status": "Passed",
+                "change_id": change_id,
+                "repositories": [
+                    {"id": "service-a", "status": "Passed"},
+                    {"id": "service-b", "status": "Passed"},
+                ],
+            },
+        )
+        runtime.transition_task(
+            project.config,
+            "T-1",
+            "EXECUTING",
+            "WAITING_FOR_TESTER",
+            str(gate),
+            change_id,
+        )
+        queued = runtime.enqueue_task(project.config, "tester", "T-1")
+        self.assertEqual(queued["status"], "Queued")
+        first_worktree = Path(task["repositories"][0]["worktree"])
+        (first_worktree / "seed.txt").write_text("changed after gate\n", encoding="utf-8")
+        with self.assertRaisesRegex(runtime.OrchestratorError, "changed after the lightweight gate"):
+            runtime.try_acquire(project.config, "tester", "T-1")
+
+    def test_v2_cli_creates_manifest_task_and_computes_change_id(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        manifest = project.create_manifest("T-1")
+        environment = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
+        created = subprocess.run(
+            [
+                sys.executable,
+                str(RUNTIME_PATH),
+                "task",
+                "create",
+                "--project-root",
+                str(project.root),
+                "--manifest",
+                str(manifest),
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            env=environment,
+        )
+        self.assertEqual(created.returncode, 0, created.stderr)
+        self.assertEqual(json.loads(created.stdout)["task_id"], "T-1")
+        computed = subprocess.run(
+            [
+                sys.executable,
+                str(RUNTIME_PATH),
+                "task",
+                "change-id",
+                "--project-root",
+                str(project.root),
+                "--task-id",
+                "T-1",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            env=environment,
+        )
+        self.assertEqual(computed.returncode, 0, computed.stderr)
+        self.assertRegex(json.loads(computed.stdout)["change_id"], r"^[a-f0-9]{64}$")
+
+    def test_v2_task_manifest_rejects_unknown_repository_and_legacy_create(self):
+        project = MultiRepoProjectFixture(self.root / "umbrella")
+        with self.assertRaisesRegex(runtime.OrchestratorError, "requires --manifest"):
+            runtime.create_task(project.config, "T-legacy", str(project.root / "missing-plan.md"))
+        self.assertFalse(project.config.runtime_root.exists())
+
+        manifest_path = project.create_manifest("T-1", selected=("service-a",))
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["repositories"][0]["id"] = "unknown"
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaisesRegex(runtime.OrchestratorError, "not configured"):
+            runtime.create_task(project.config, manifest_path_value=str(manifest_path))
+
+    def test_v2_task_manifest_rejects_worktree_outside_project_worktrees(self):
+        project = MultiRepoProjectFixture(self.root / "umbrella")
+        manifest_path = project.create_manifest("T-1", selected=("service-a",))
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["repositories"][0]["worktree"] = str(
+            project.repository_roots["service-a"]
+        )
+        manifest["repositories"][0]["plan"] = str(
+            project.repository_roots["service-a"] / "plan.md"
+        )
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaisesRegex(runtime.OrchestratorError, "project worktree root"):
+            runtime.create_task(project.config, manifest_path_value=str(manifest_path))
+
+    def test_v2_gate_requires_every_selected_repository(self):
+        project = MultiRepoProjectFixture(self.root / "umbrella")
+        manifest = project.create_manifest("T-1")
+        runtime.create_task(project.config, manifest_path_value=str(manifest))
+        change_id = runtime.compute_task_change_id(project.config, "T-1")
+        runtime.transition_task(project.config, "T-1", "PLANNED", "DISPATCHING")
+        runtime.bind_worker(project.config, "T-1", "worker-T-1", "local")
+        gate = project.evidence(
+            "incomplete-gate",
+            {
+                "status": "Passed",
+                "change_id": change_id,
+                "repositories": [{"id": "service-a", "status": "Passed"}],
+            },
+        )
+        with self.assertRaisesRegex(runtime.OrchestratorError, "repository set does not match"):
+            runtime.transition_task(
+                project.config,
+                "T-1",
+                "EXECUTING",
+                "WAITING_FOR_TESTER",
+                str(gate),
+                change_id,
+            )
+
+    def test_v2_tester_acquisition_rejects_mutated_gate_evidence(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        manifest = project.create_manifest("T-1")
+        runtime.create_task(project.config, manifest_path_value=str(manifest))
+        change_id = runtime.compute_task_change_id(project.config, "T-1")
+        runtime.transition_task(project.config, "T-1", "PLANNED", "DISPATCHING")
+        runtime.bind_worker(project.config, "T-1", "worker-T-1", "local")
+        gate = project.evidence(
+            "gate",
+            {
+                "status": "Passed",
+                "change_id": change_id,
+                "repositories": [{"id": "service-a", "status": "Passed"}],
+            },
+        )
+        runtime.transition_task(
+            project.config,
+            "T-1",
+            "EXECUTING",
+            "WAITING_FOR_TESTER",
+            str(gate),
+            change_id,
+        )
+        runtime.enqueue_task(project.config, "tester", "T-1")
+        gate.write_text('{"status":"Failed"}', encoding="utf-8")
+        with self.assertRaisesRegex(runtime.OrchestratorError, "evidence changed"):
+            runtime.try_acquire(project.config, "tester", "T-1")
 
     def test_config_rejects_global_context_and_missing_local_context(self):
         project = ProjectFixture(self.root / "project", "project")

@@ -33,11 +33,13 @@ Any non-terminal state may enter `BLOCKED` with evidence. Leaving `BLOCKED` requ
 ## Evidence Invariants
 
 - `WAITING_FOR_TESTER` requires a passing gate file and a non-empty change identifier.
+- A manifest-backed Task gate must cover exactly every selected repository and its change identifier must match the current composite worktree-set snapshot. Any repository or plan drift makes Tester enqueue/acquisition ineligible.
 - `TESTING` requires an active project Tester lease for the same Task.
 - `TEST_FAILED` and `TEST_PASSED` require a persisted `$m-test` result.
 - `WAITING_FOR_MERGE` requires `TEST_PASSED` or a separately recorded justified heavy-test skip allowed by the existing workflow.
 - `ARCHIVING` requires an active capacity-one integration lease.
 - `COMPLETED` requires `$m-archive` completion evidence.
+- Multi-repository archive evidence must record an ordered result for every selected repository. A partial integration enters `BLOCKED`; it is not `COMPLETED`.
 
 The runtime stores evidence paths, hashes, statuses, timestamps, and opaque identifiers. It never copies evidence bodies or loaded contexts into Task state.
 

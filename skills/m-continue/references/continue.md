@@ -14,11 +14,11 @@ Use this reference for the unattended `$m-execute` / `$m-test` convergence loop 
 Inspect all available reliable evidence:
 
 - approved Task IDs, write sets, acceptance criteria, test points, and statuses in the active plan
-- current worktree status and diff
+- current status and diff for every active repository worktree
 - the latest `$m-execute` changed-file and lightweight-validation result
 - the latest `$m-test` check table, evidence, failures, blockers, or justified skip
 
-Never infer a pass from missing evidence. If implementation appears complete but validation evidence is absent or ambiguous, enter `$m-test`. If implementation is incomplete or a failed check maps to an approved Task ID, enter `$m-execute`.
+Never infer a pass from missing evidence. For a multi-repository Task, evidence is incomplete until every persisted repository/worktree is accounted for. If implementation appears complete but validation evidence is absent or ambiguous, enter `$m-test`. If implementation is incomplete or a failed check maps to an approved Task ID, enter `$m-execute`.
 
 Classify the state as exactly one of:
 

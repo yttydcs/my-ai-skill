@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed.
+Accepted and implemented.
 
 ## Context
 
@@ -66,7 +66,7 @@ High. The model matches existing `m-autoflow` contracts and the observed project
 
 ## Supersedes / Superseded By
 
-- Supersedes: the Git-common-directory project identity and single project-level base-branch portions of [2026-07-31_project-orchestrator.md](2026-07-31_project-orchestrator.md), after this decision is accepted and implemented.
+- Supersedes: the Git-common-directory project identity and single project-level base-branch portions of [2026-07-31_project-orchestrator.md](2026-07-31_project-orchestrator.md).
 - Superseded by: none.
 
 ## Related Intake

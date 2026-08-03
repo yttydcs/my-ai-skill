@@ -48,7 +48,7 @@ High for the skill and local runtime contracts. Live background-task creation st
 ## Supersedes / Superseded By
 
 - Supersedes: none.
-- Superseded by: none.
+- Superseded by: [2026-08-04_orchestrator-multi-repo-runtime.md](2026-08-04_orchestrator-multi-repo-runtime.md) for project runtime identity and base-branch/repository topology; all other orchestration decisions remain active.
 
 ## Related Intake
 

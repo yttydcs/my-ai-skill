@@ -67,7 +67,7 @@ class MOrchestratorContractTests(unittest.TestCase):
     def test_worker_gate_precedes_tester_admission(self):
         required = (
             "Do not enqueue, reserve, or create a Tester until every applicable check passes",
-            "Any implementation edit after gate creation invalidates that gate",
+            "Any implementation or plan edit in any participating repository",
             "Release project and host permits before repair",
             "rerun the complete gate",
         )
@@ -80,7 +80,8 @@ class MOrchestratorContractTests(unittest.TestCase):
         required = (
             "explicit `local:<name>`",
             "cannot silently select unrelated global data",
-            "repository common Git directory and `project_id`",
+            "canonical project root plus `project_id`",
+            "Git-common-directory isolation for schema version 1 compatibility",
             "contains only numeric capacity",
         )
         for text in required:
@@ -116,10 +117,45 @@ class MOrchestratorContractTests(unittest.TestCase):
             REPO_ROOT / "docs" / "requirements" / "m-project-orchestrator.md",
             REPO_ROOT / "docs" / "specs" / "m-project-orchestrator.md",
             REPO_ROOT / "docs" / "decisions" / "2026-07-31_project-orchestrator.md",
+            REPO_ROOT / "docs" / "decisions" / "2026-08-04_orchestrator-multi-repo-runtime.md",
         )
         for path in required:
             with self.subTest(path=path):
                 self.assertTrue(path.is_file())
+
+    def test_schema_v2_and_multi_repository_dispatch_are_explicit(self):
+        configuration = self.references["configuration.md"]
+        planner = self.references["planner.md"]
+        worker = self.references["worker.md"]
+        required = (
+            (configuration, "Schema version 2 treats `project_root` as an umbrella directory"),
+            (configuration, "explicit repository catalog"),
+            (configuration, "never recommend initializing an umbrella root"),
+            (planner, "pass the complete absolute worktree map"),
+            (worker, "composite change identifier"),
+            (worker, "never claim cross-repository atomicity"),
+        )
+        for source, text in required:
+            with self.subTest(text=text):
+                self.assertIn(text, source)
+
+        example = (SKILL_ROOT / "assets" / "m-orchestrator.example.toml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("schema_version = 2", example)
+        self.assertGreaterEqual(example.count("[[repositories]]"), 2)
+
+    def test_phase_references_preserve_multi_repository_worktree_set(self):
+        required = {
+            "m-execute/references/execution.md": "exact per-repository worktree set",
+            "m-test/references/testing.md": "complete persisted worktree set",
+            "m-continue/references/continue.md": "every active repository worktree",
+            "m-archive/references/archive.md": "do not describe independent Git merges as atomic",
+        }
+        for relative, text in required.items():
+            source = (REPO_ROOT / "skills" / relative).read_text(encoding="utf-8")
+            with self.subTest(relative=relative):
+                self.assertIn(text, source)
 
 
 if __name__ == "__main__":

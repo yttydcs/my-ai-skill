@@ -10,8 +10,8 @@
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\orchestrator-multi-repo`
 - Read-only acceptance example: `D:\project\monkeys`
-- Current Stage: `3.1 - Planning`
-- Planning Status: awaiting user confirmation
+- Current Stage: `3.2 - Implementation`
+- Planning Status: confirmed by the user on 2026-08-04 for MRO-1 through MRO-7
 
 ## Stage Records
 
@@ -78,7 +78,7 @@ The `monkeys` example has at least fifteen valid child Git repositories under `D
 #### Issue List
 
 - No requirements blocker.
-- Implementation remains blocked until the user approves MRO-1 through MRO-7.
+- MRO-1 through MRO-7 were approved by the user on 2026-08-04.
 
 ### Plan - Requirements And Architecture
 
@@ -305,7 +305,7 @@ flowchart LR
 #### Issue List
 
 - No design blocker.
-- Approval is required before implementation.
+- No requirements or architecture blocker remains for the approved scope.
 
 ### Stage 3.1 - Planning
 
@@ -484,10 +484,35 @@ The existing orchestrator is functional for a single Git-root project but contra
 
 #### Issue List
 
-- Blocking: user confirmation of MRO-1 through MRO-7 is required before implementation.
+- No blocking issue for MRO-1 through MRO-7.
+
+## Execution Progress
+
+| Task ID | Status | Evidence |
+| --- | --- | --- |
+| MRO-1 | Completed | feature, requirements, specs, and superseding decision now describe non-Git umbrella roots and explicit repository catalogs |
+| MRO-2 | Completed | schema version 2 repository parser/validator plus schema version 1 compatibility adapter and migration diagnostics |
+| MRO-3 | Completed | project-local v2 runtime identity, legacy active-runtime guard, canonical path checks, and project/repository status output |
+| MRO-4 | Completed | validated Task manifest, exact repository/worktree/ref/plan/write-set persistence, CLI `task change-id`, and composite gate revalidation |
+| MRO-5 | Completed | Planner/Worker/Tester/state/archive contracts propagate the complete worktree set while preserving existing phase authorities |
+| MRO-6 | Completed | real temporary multi-repository Git fixtures cover umbrella validation, manifest safety, gate drift, CLI flow, v1 compatibility, and lease regressions |
+| MRO-7 | Completed | validators, focused/full tests, sync, installed validation, parity, docs links, and diff checks passed; English execution commit prepared |
+
+### Execution Validation
+
+- Python syntax compilation passed for `orchestrator_runtime.py`.
+- 43 orchestrator-focused runtime/contract tests passed.
+- Full discovery passed 83 tests with one existing Windows symbolic-link privilege skip.
+- Source validators passed for `m-orchestrator`, `m-execute`, `m-test`, `m-continue`, and `m-archive`.
+- Installed validators passed for the same five skills.
+- Source, distribution, and installed SHA-256 parity passed for all files in the five affected skills, excluding generated `.build-info.json` metadata.
+- Affected documentation links and `git diff --check` passed.
+- No files under `D:\project\monkeys` were modified and no umbrella Git repository was initialized.
+
+Execution-stage lightweight validation passed. Heavy independent review remains owned by `$m-test`; this phase does not create `docs/change`, archive, merge, push, or clean the worktree.
 
 ## Approval Gate
 
-Blocked: yes
+Blocked: no
 
-Confirm MRO-1 through MRO-7 to enter `$m-execute`. Do not implement, migrate the real project, archive, merge, or clean up before confirmation.
+Execute MRO-1 through MRO-7. Do not implement MRO-X1 or MRO-X2, migrate the real project, archive, merge, or clean up in this phase.

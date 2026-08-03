@@ -65,6 +65,15 @@ Default closeout sequence:
 7. remove/prune the worktree and delete the local feature branch when safe
 8. report whether the result is local-only or pushed
 
+For a multi-repository workflow:
+
+- preflight every participating repository before the first merge;
+- use the dependency/integration order recorded by the approved plan or Task manifest;
+- keep docs-repository commits separate from code-repository commits;
+- record archive, commit, merge, validation, and cleanup status per repository;
+- do not describe independent Git merges as atomic;
+- if a later repository fails after earlier integration succeeded, stop, preserve all worktrees needed for recovery, report completed and pending repositories, and require an explicit recovery decision rather than claiming closeout.
+
 ## User-facing Closeout
 
 - Lead with whether archive and closeout completed or where they stopped.

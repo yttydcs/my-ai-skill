@@ -10,7 +10,7 @@ Use this reference for `$m-execute`, the implementation phase of `m-autoflow`.
 
 ## Hard Rules
 
-- Stay inside the active worktree.
+- Stay inside the active worktree, or the exact per-repository worktree set recorded by an approved multi-repository plan/manifest.
 - Map every changed file to a Task ID.
 - Do not introduce plan-external behavior; return to planning if scope expands.
 - Do not silently swallow errors.
@@ -43,7 +43,7 @@ If sub-agents are skipped, state the concrete reason.
 
 ## Lightweight Validation
 
-Run cheap, local checks in this phase when practical:
+Run cheap, local checks in this phase when practical. For multi-repository work, apply them to every affected repository and do not report an aggregate pass while one participating repository fails:
 
 - syntax checks
 - type checks

@@ -15,8 +15,9 @@ One registered Planner task owns project-level discussion, architecture, approva
 
 - Use configured Planner contexts before `$m-discuss` or `$m-plan`.
 - Follow the normal dedicated branch/worktree and confirmed root-plan gates.
-- Persist the approved Task IDs, plan location, planning commit/ref, base branch, write sets, acceptance, tests, rollback, and project identity before dispatch.
-- A planning ref handed to a Worker must contain the exact approved `plan.md` or `todo.md` state.
+- Persist the approved Task IDs, canonical plan, participating repository IDs, per-repository planning refs, base refs, branches, worktrees, root plans, write sets, acceptance, tests, rollback, and project identity before dispatch.
+- Every participating repository has its own dedicated branch, worktree, and root `plan.md` or `todo.md`. A planning ref handed to a Worker must identify that repository's exact committed planning state.
+- Create the validated Task manifest before host dispatch. An undeclared repository or later worktree-set expansion requires a return to planning.
 
 ## Worker Dispatch
 
@@ -24,12 +25,14 @@ Before creation, confirm that the user approved the exact Task IDs and that host
 
 On Codex hosts, search for the current `list_projects`, `create_thread`, `wait_threads`, `read_thread`, and `send_message_to_thread` tools instead of assuming a fixed wrapper. Use `create_thread` non-blockingly; for a Git project, select its Worktree environment. Prefer compact `wait_threads` snapshots over repeated full thread reads.
 
-Create one background project Worker for one approved task workflow. For a Git project, request a dedicated Worktree starting from the committed planning ref. The initial prompt must contain:
+Create one background project Worker for one approved task workflow. For a schema version 1 Git-root project, the host may create the dedicated Worktree from the committed planning ref. For a schema version 2 project, prepare every participating repository worktree first, then create the Worker in the umbrella local project or an explicitly designated primary worktree and pass the complete absolute worktree map. Do not assume one host-created worktree represents a multi-repository Task.
+
+The initial prompt must contain:
 
 - role: Worker
 - project ID and project root
 - docs root and configuration path
-- repository, base ref, and expected planning ref
+- ordered repository IDs and, for each repository, its root, base ref, branch, expected planning ref, worktree, root plan, and write set
 - exact Task IDs and titles
 - active plan path and confirmation requirement
 - write sets, forbidden paths, acceptance, tests, and rollback
@@ -38,6 +41,8 @@ Create one background project Worker for one approved task workflow. For a Git p
 - Planner task/thread ID for status handoff
 - instruction to use `$m-execute`, not `$m-go`
 - instruction to stop on new scope, missing authority, invalid config, or unavailable environment
+
+The Worker must be able to access every listed worktree before binding succeeds. Missing host multi-path access blocks dispatch instead of silently dropping a participating repository.
 
 Task creation is non-blocking. Bind the returned Worker task/thread and host IDs to the `DISPATCHING` Task record before reporting successful dispatch. Worker binding atomically enters `EXECUTING` and is idempotent only for the same IDs. If creation succeeds but binding fails, preserve the returned IDs and report a reconciliation blocker rather than creating a duplicate Worker.
 
@@ -56,4 +61,6 @@ Do not repeatedly poll unchanged tasks or narrate unchanged snapshots.
 
 ## Integration Coordination
 
-Passing Workers queue for the configured capacity-one archive/integration pool. Before integration, compare the Task branch with the latest base. If reconciliation changes executable content, require the appropriate lightweight gate and heavyweight validation again before `$m-archive` proceeds.
+Passing Workers queue for the configured capacity-one archive/integration pool. Before integration, compare every Task branch with its repository's latest base. If reconciliation changes executable content in any repository, invalidate the composite change identifier and require the appropriate lightweight gate and heavyweight validation again before `$m-archive` proceeds.
+
+Cross-repository integration uses complete preflight plus the manifest repository order. It is not atomic: if a later repository cannot integrate, persist the completed and pending repository results, block the Task, and require an explicit recovery decision. `$m-archive` remains the authority for commits, control-plane merges, docs handling, and cleanup.

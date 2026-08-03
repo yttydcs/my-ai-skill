@@ -6,12 +6,15 @@ A pool limits concurrent temporary role executions. It does not represent reusab
 
 Every project owns independent queues and leases. An optional host budget limits aggregate numeric resource consumption across projects without sharing their context or commands.
 
+A Tester lease belongs to one Task, not one repository. For a multi-repository Task, the temporary Tester receives the exact persisted repository/worktree set and validates the affected cross-repository flow while holding one project permit (and one optional host permit).
+
 ## FIFO Admission
 
 - Enqueue one ticket per project, pool, and Task.
 - Repeated enqueue for the same waiting Task is idempotent.
 - Sort tickets by durable creation time and opaque ticket ID.
 - Only the head eligible Task may acquire a project slot.
+- Revalidate a manifest-backed Task's composite change identifier before enqueue and again before acquisition. Repository drift keeps the Task in Worker execution and must not consume Tester capacity.
 - Do not remove a ticket until all required project and host capacity is acquired and the lease record is durable.
 
 ## Lease Ownership
