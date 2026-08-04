@@ -651,6 +651,30 @@ def load_evidence_json(path_value: str) -> tuple[dict[str, Any], dict[str, Any]]
     return evidence, body
 
 
+TASK_MANIFEST_KEYS = {
+    "schema_version",
+    "task_id",
+    "title",
+    "plan",
+    "repositories",
+    "acceptance",
+    "tests",
+    "rollback",
+    "planner",
+}
+
+
+def validate_task_manifest_header(manifest: dict[str, Any]) -> str:
+    reject_unknown_keys(manifest, TASK_MANIFEST_KEYS, "Task manifest")
+    manifest_schema_version = manifest.get("schema_version")
+    if isinstance(manifest_schema_version, bool) or manifest_schema_version != TASK_MANIFEST_VERSION:
+        raise OrchestratorError(
+            f"Task manifest schema_version must be {TASK_MANIFEST_VERSION}; "
+            f"got {manifest_schema_version!r}"
+        )
+    return validate_identifier(manifest.get("task_id"), "Task manifest task_id", TASK_ID_PATTERN)
+
+
 def require_string_list(value: Any, label: str, allow_empty: bool = False) -> list[str]:
     if not isinstance(value, list) or (not value and not allow_empty):
         qualifier = "an array" if allow_empty else "a non-empty array"
@@ -709,31 +733,14 @@ def git_commit(repository_root: Path, ref: str, label: str) -> str:
 
 
 def validate_task_manifest(
-    config: ProjectConfig, manifest_path_value: str
+    config: ProjectConfig,
+    manifest_path_value: str,
+    manifest_evidence: dict[str, Any] | None = None,
+    manifest: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    manifest_evidence, manifest = load_evidence_json(manifest_path_value)
-    reject_unknown_keys(
-        manifest,
-        {
-            "schema_version",
-            "task_id",
-            "title",
-            "plan",
-            "repositories",
-            "acceptance",
-            "tests",
-            "rollback",
-            "planner",
-        },
-        "Task manifest",
-    )
-    manifest_schema_version = manifest.get("schema_version")
-    if isinstance(manifest_schema_version, bool) or manifest_schema_version != TASK_MANIFEST_VERSION:
-        raise OrchestratorError(
-            f"Task manifest schema_version must be {TASK_MANIFEST_VERSION}; "
-            f"got {manifest_schema_version!r}"
-        )
-    task_id = validate_identifier(manifest.get("task_id"), "Task manifest task_id", TASK_ID_PATTERN)
+    if manifest_evidence is None or manifest is None:
+        manifest_evidence, manifest = load_evidence_json(manifest_path_value)
+    task_id = validate_task_manifest_header(manifest)
     title = require_string(manifest.get("title"), "Task manifest title")
     canonical_plan_path = resolve_absolute_file(manifest.get("plan"), "Task manifest plan")
     canonical_plan = file_evidence(str(canonical_plan_path))
@@ -992,27 +999,45 @@ def create_task(
     manifest_path_value: str | None = None,
 ) -> dict[str, Any]:
     normalized_manifest: dict[str, Any] | None = None
+    manifest_evidence: dict[str, Any] | None = None
+    manifest_body: dict[str, Any] | None = None
     if manifest_path_value is not None:
-        _, normalized_manifest = validate_task_manifest(config, manifest_path_value)
-        manifest_task_id = normalized_manifest["task_id"]
+        manifest_evidence, manifest_body = load_evidence_json(manifest_path_value)
+        manifest_task_id = validate_task_manifest_header(manifest_body)
         if task_id is not None and task_id != manifest_task_id:
             raise OrchestratorError(
                 f"Task ID argument {task_id} does not match manifest task_id {manifest_task_id}"
             )
         task_id = manifest_task_id
-        if plan_path_value is not None:
-            supplied_plan = file_evidence(plan_path_value)
-            if supplied_plan != normalized_manifest["plan"]:
-                raise OrchestratorError("--plan does not match the canonical plan in the Task manifest")
     elif config.schema_version == 2:
         raise OrchestratorError("schema_version 2 Task creation requires --manifest")
     if task_id is None:
         raise OrchestratorError("Task creation requires task_id")
-    if normalized_manifest is None and plan_path_value is None:
+    if manifest_path_value is None and plan_path_value is None:
         raise OrchestratorError("schema_version 1 Task creation requires --plan or --manifest")
+    path = task_path(config, task_id)
+    if manifest_evidence is not None and path.is_file():
+        ensure_runtime(config)
+        with directory_lock(config.runtime_root / ".state.lock"):
+            if path.exists():
+                existing = read_json(path)
+                if existing.get("manifest", {}).get("sha256") != manifest_evidence["sha256"]:
+                    raise OrchestratorError(f"Task {task_id} already exists with a different manifest")
+                if plan_path_value is not None and file_evidence(plan_path_value) != existing.get("plan"):
+                    raise OrchestratorError("--plan does not match the canonical plan in the Task manifest")
+                return existing
+
+    if manifest_path_value is not None:
+        assert manifest_evidence is not None and manifest_body is not None
+        _, normalized_manifest = validate_task_manifest(
+            config, manifest_path_value, manifest_evidence, manifest_body
+        )
+        if plan_path_value is not None:
+            supplied_plan = file_evidence(plan_path_value)
+            if supplied_plan != normalized_manifest["plan"]:
+                raise OrchestratorError("--plan does not match the canonical plan in the Task manifest")
     plan = normalized_manifest["plan"] if normalized_manifest else file_evidence(plan_path_value)
     assert plan is not None
-    path = task_path(config, task_id)
     ensure_runtime(config)
     with directory_lock(config.runtime_root / ".state.lock"):
         if path.exists():
@@ -1311,6 +1336,30 @@ def ensure_host_pool(config: ProjectConfig) -> Path | None:
     return root
 
 
+def project_instance_id(config: ProjectConfig) -> str:
+    runtime_identity = os.path.normcase(str(config.runtime_root.resolve()))
+    payload = f"{config.schema_version}\0{runtime_identity}".encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def host_lease_owner(config: ProjectConfig, task_id: str) -> str:
+    validated_task_id = validate_identifier(task_id, "task_id", TASK_ID_PATTERN)
+    payload = f"{project_instance_id(config)}\0{validated_task_id}".encode("utf-8")
+    return f"v2:{hashlib.sha256(payload).hexdigest()}"
+
+
+def legacy_host_lease_owner(config: ProjectConfig, task_id: str) -> str:
+    return f"{config.project_id}:{task_id}"
+
+
+def host_lease_owner_matches(
+    config: ProjectConfig, task_id: str, owner: Any, *, allow_legacy: bool
+) -> bool:
+    if owner == host_lease_owner(config, task_id):
+        return True
+    return allow_legacy and owner == legacy_host_lease_owner(config, task_id)
+
+
 def acquire_host_lease(config: ProjectConfig, task_id: str) -> dict[str, Any] | None:
     root = ensure_host_pool(config)
     if root is None:
@@ -1319,7 +1368,7 @@ def acquire_host_lease(config: ProjectConfig, task_id: str) -> dict[str, Any] | 
     assert budget is not None
     with directory_lock(root / ".lock"):
         records = list_records(root / "leases")
-        owner = f"{config.project_id}:{task_id}"
+        owner = host_lease_owner(config, task_id)
         existing = [(path, item) for path, item in records if item.get("owner") == owner]
         if len(existing) > 1:
             raise OrchestratorError(f"Multiple host leases exist for owner {owner}")
@@ -1331,6 +1380,13 @@ def acquire_host_lease(config: ProjectConfig, task_id: str) -> dict[str, Any] | 
                     f"Host lease {lease.get('lease_id')} for owner {owner} is stale; inspect live Task status before recovery"
                 )
             return lease
+        legacy_owner = legacy_host_lease_owner(config, task_id)
+        legacy = [item for _, item in records if item.get("owner") == legacy_owner]
+        if legacy:
+            raise OrchestratorError(
+                f"Legacy host lease {legacy[0].get('lease_id')} cannot be safely attributed to this project instance; "
+                "inspect the linked project lease and recover or release it before retrying"
+            )
         if len(records) >= budget["capacity"]:
             return {"status": "Waiting"}
         lease_id = uuid.uuid4().hex
@@ -1339,6 +1395,7 @@ def acquire_host_lease(config: ProjectConfig, task_id: str) -> dict[str, Any] | 
             "host_id": budget["host_id"],
             "resource": budget["resource"],
             "owner": owner,
+            "project_instance_id": project_instance_id(config),
             "lease_id": lease_id,
             "acquired_at": now,
             "heartbeat_at": now,
@@ -1353,12 +1410,13 @@ def release_host_lease(config: ProjectConfig, lease_id: str, task_id: str) -> No
     if root is None:
         return
     path = root / "leases" / f"{lease_id}.json"
-    owner = f"{config.project_id}:{task_id}"
     with directory_lock(root / ".lock"):
         if not path.exists():
             return
         lease = read_json(path)
-        if lease.get("owner") != owner or lease.get("lease_id") != lease_id:
+        if not host_lease_owner_matches(
+            config, task_id, lease.get("owner"), allow_legacy=True
+        ) or lease.get("lease_id") != lease_id:
             raise OrchestratorError("Host lease ownership mismatch")
         path.unlink()
 
@@ -1368,12 +1426,13 @@ def heartbeat_host_lease(config: ProjectConfig, lease_id: str, task_id: str) -> 
     if root is None:
         return
     path = root / "leases" / f"{lease_id}.json"
-    owner = f"{config.project_id}:{task_id}"
     with directory_lock(root / ".lock"):
         if not path.exists():
             raise OrchestratorError(f"Host lease does not exist: {lease_id}")
         lease = read_json(path)
-        if lease.get("owner") != owner:
+        if not host_lease_owner_matches(
+            config, task_id, lease.get("owner"), allow_legacy=True
+        ):
             raise OrchestratorError("Host lease ownership mismatch")
         lease["heartbeat_at"] = utc_now()
         atomic_write_json(path, lease)
@@ -1656,8 +1715,6 @@ def reclaim_host_lease(
         raise OrchestratorError("Host budget is not enabled for this project")
     path = host_root / "leases" / f"{lease_id}.json"
     event_path = config.runtime_root / "events" / f"host-lease-reclaim-{lease_id}.json"
-    owner = f"{config.project_id}:{task_id}"
-
     with directory_lock(project_pool / ".lock"):
         project_lease = find_owned_record(
             list_records(project_pool / "leases"), task_id
@@ -1682,11 +1739,12 @@ def reclaim_host_lease(
                             "project_id": config.project_id,
                             "pool": pool_name,
                             "task_id": task_id,
-                            "owner": owner,
                             "lease_id": lease_id,
                             "actor": actor,
                             "reason": reason,
                         }.items()
+                    ) and host_lease_owner_matches(
+                        config, task_id, event.get("owner"), allow_legacy=True
                     ):
                         return {
                             "status": "HostReclaimed",
@@ -1698,7 +1756,9 @@ def reclaim_host_lease(
                     f"Host lease does not exist and has no reclaim audit: {lease_id}"
                 )
             lease = read_json(path)
-            if lease.get("owner") != owner or lease.get("lease_id") != lease_id:
+            if not host_lease_owner_matches(
+                config, task_id, lease.get("owner"), allow_legacy=True
+            ) or lease.get("lease_id") != lease_id:
                 raise OrchestratorError("Host lease ownership mismatch")
             age, timeout = lease_age_seconds(lease)
             if age <= timeout:
@@ -1710,7 +1770,7 @@ def reclaim_host_lease(
                 "project_id": config.project_id,
                 "pool": pool_name,
                 "task_id": task_id,
-                "owner": owner,
+                "owner": lease.get("owner"),
                 "lease_id": lease_id,
                 "actor": actor,
                 "reason": reason,
@@ -1738,10 +1798,13 @@ def stale_leases(config: ProjectConfig, pool_name: str) -> dict[str, Any]:
     stale_host: list[dict[str, Any]] = []
     host_root = ensure_host_pool(config)
     if host_root is not None:
-        owner_prefix = f"{config.project_id}:"
+        instance_id = project_instance_id(config)
+        legacy_owner_prefix = f"{config.project_id}:"
         with directory_lock(host_root / ".lock"):
             for _, lease in list_records(host_root / "leases"):
-                if not str(lease.get("owner", "")).startswith(owner_prefix):
+                if lease.get("project_instance_id") != instance_id and not str(
+                    lease.get("owner", "")
+                ).startswith(legacy_owner_prefix):
                     continue
                 age, timeout = lease_age_seconds(lease, now)
                 if age > timeout:

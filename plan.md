@@ -10,7 +10,7 @@
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\orchestrator-multi-repo`
 - Read-only acceptance example: `D:\project\monkeys`
-- Current Stage: `3.2 - Implementation`
+- Current Stage: `3.3 - Heavy Validation`
 - Planning Status: confirmed by the user on 2026-08-04 for MRO-1 through MRO-7
 
 ## Stage Records
@@ -510,6 +510,16 @@ The existing orchestrator is functional for a single Git-root project but contra
 - No files under `D:\project\monkeys` were modified and no umbrella Git repository was initialized.
 
 Execution-stage lightweight validation passed. Heavy independent review remains owned by `$m-test`; this phase does not create `docs/change`, archive, merge, push, or clean the worktree.
+
+### m-continue Repair Iteration 1
+
+- Failure mapping: the host lease collision maps to MRO-3/MRO-6; manifest retry idempotency maps to MRO-4/MRO-6. No Task ID, acceptance criterion, or write-set expansion was required.
+- Host ownership: new host leases use an opaque digest derived from the canonical project runtime identity and Task ID, plus an opaque project-instance digest for project-scoped inspection. Separate umbrella roots with the same `project_id` and `task_id` no longer share a lease. Exact-ID heartbeat, release, and reclaim remain compatible with legacy owner records, while new acquisition never adopts an ambiguous legacy record.
+- Task retry: manifest identity is checked before creation-time worktree validation. An exact existing manifest returns its persisted Task after Worker commits, while a different manifest still fails explicitly. First-create races are rechecked under the state lock before writing.
+- Regression coverage: added same-ID cross-umbrella host-capacity coverage, legacy lease continuation coverage, and exact manifest retry coverage after a Worker commit.
+- Execution validation: Python compilation, `git diff --check`, 46 focused runtime/contract tests, 86 full tests with one existing Windows symbolic-link privilege skip, and the `m-orchestrator` source validator passed.
+- Parallelism: no sub-agents were used because both repairs share the runtime/test write set and `$m-continue` does not grant `$m-go` worker-only delegation.
+- Next automatic phase: repeat `$m-test` heavy integration, security, performance, installed-copy, and parity checks before declaring convergence.
 
 ## Approval Gate
 

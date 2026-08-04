@@ -86,7 +86,10 @@ def config_v2_text(
     project_id: str,
     repositories: list[tuple[str, str, str]],
     tester_capacity: int = 1,
+    host_enabled: bool = False,
+    host_capacity: int = 1,
 ) -> str:
+    enabled = "true" if host_enabled else "false"
     repository_blocks = "\n".join(
         f'''[[repositories]]
 id = "{repository_id}"
@@ -137,7 +140,11 @@ lease_timeout_seconds = 60
 namespace = "{project_id}"
 
 [host_budget]
-enabled = false
+enabled = {enabled}
+host_id = "local"
+resource = "testers"
+capacity = {host_capacity}
+lease_timeout_seconds = 60
 '''
 
 
@@ -243,6 +250,8 @@ class MultiRepoProjectFixture:
         project_id: str = "umbrella",
         repository_ids: tuple[str, ...] = ("service-a", "service-b"),
         empty_umbrella_git: bool = False,
+        host_enabled: bool = False,
+        host_capacity: int = 1,
     ):
         self.root = root
         root.mkdir(parents=True)
@@ -291,7 +300,13 @@ class MultiRepoProjectFixture:
         config_root.mkdir()
         self.config_path = config_root / "m-orchestrator.toml"
         self.config_path.write_text(
-            config_v2_text(project_id, repository_config), encoding="utf-8"
+            config_v2_text(
+                project_id,
+                repository_config,
+                host_enabled=host_enabled,
+                host_capacity=host_capacity,
+            ),
+            encoding="utf-8",
         )
         self.config = runtime.load_config(root)
 
@@ -442,6 +457,62 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
             ".codex-runtime",
         )
 
+    def test_v2_host_budget_isolates_same_project_and_task_ids_across_umbrellas(self):
+        first = MultiRepoProjectFixture(
+            self.root / "first",
+            project_id="shared",
+            repository_ids=("service-a",),
+            host_enabled=True,
+        )
+        second = MultiRepoProjectFixture(
+            self.root / "second",
+            project_id="shared",
+            repository_ids=("service-a",),
+            host_enabled=True,
+        )
+
+        first_lease = runtime.acquire_host_lease(first.config, "T-1")
+        self.assertIsNotNone(first_lease)
+        self.assertNotIn("shared", first_lease["owner"])
+        self.assertNotIn("T-1", first_lease["owner"])
+        self.assertEqual(
+            first_lease["project_instance_id"], runtime.project_instance_id(first.config)
+        )
+        self.assertNotEqual(
+            runtime.project_instance_id(first.config),
+            runtime.project_instance_id(second.config),
+        )
+
+        waiting = runtime.acquire_host_lease(second.config, "T-1")
+        self.assertEqual(waiting, {"status": "Waiting"})
+        runtime.release_host_lease(first.config, first_lease["lease_id"], "T-1")
+        second_lease = runtime.acquire_host_lease(second.config, "T-1")
+        self.assertNotEqual(first_lease["lease_id"], second_lease["lease_id"])
+
+    def test_legacy_host_lease_can_be_heartbeated_and_released_by_exact_id(self):
+        project = ProjectFixture(
+            self.root / "project", "project", host_enabled=True, host_capacity=1
+        )
+        host_root = runtime.ensure_host_pool(project.config)
+        lease_id = "a" * 32
+        now = runtime.utc_now()
+        runtime.atomic_write_json(
+            host_root / "leases" / f"{lease_id}.json",
+            {
+                "host_id": "local",
+                "resource": "testers",
+                "owner": "project:T-1",
+                "lease_id": lease_id,
+                "acquired_at": now,
+                "heartbeat_at": now,
+                "lease_timeout_seconds": 60,
+            },
+        )
+
+        runtime.heartbeat_host_lease(project.config, lease_id, "T-1")
+        runtime.release_host_lease(project.config, lease_id, "T-1")
+        self.assertFalse((host_root / "leases" / f"{lease_id}.json").exists())
+
     def test_v1_non_git_umbrella_reports_schema_v2_migration(self):
         root = self.root / "legacy-umbrella"
         root.mkdir()
@@ -541,6 +612,45 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
         (first_worktree / "seed.txt").write_text("changed after gate\n", encoding="utf-8")
         with self.assertRaisesRegex(runtime.OrchestratorError, "changed after the lightweight gate"):
             runtime.try_acquire(project.config, "tester", "T-1")
+
+    def test_v2_task_create_retry_is_idempotent_after_worker_commit(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        manifest_path = project.create_manifest("T-1")
+        created = runtime.create_task(project.config, manifest_path_value=str(manifest_path))
+        worktree = Path(created["repositories"][0]["worktree"])
+        (worktree / "seed.txt").write_text("worker implementation\n", encoding="utf-8")
+        run_fixture_git(worktree, "add", "seed.txt")
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(worktree),
+                "-c",
+                "user.name=Codex Tests",
+                "-c",
+                "user.email=codex-tests@example.invalid",
+                "commit",
+                "-q",
+                "-m",
+                "implementation",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        retried = runtime.create_task(
+            project.config, manifest_path_value=str(manifest_path)
+        )
+        self.assertEqual(retried, created)
+
+        changed_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        changed_manifest["title"] = "Changed title"
+        manifest_path.write_text(json.dumps(changed_manifest), encoding="utf-8")
+        with self.assertRaisesRegex(runtime.OrchestratorError, "different manifest"):
+            runtime.create_task(project.config, manifest_path_value=str(manifest_path))
 
     def test_v2_cli_creates_manifest_task_and_computes_change_id(self):
         project = MultiRepoProjectFixture(
