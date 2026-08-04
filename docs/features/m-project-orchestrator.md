@@ -112,8 +112,10 @@ Given `$m-test` fails, when the result is persisted, then all Tester permits are
 
 ## Related Changes
 
+- [2026-08-04_orchestrator-multi-repo.md](../change/2026-08-04_orchestrator-multi-repo.md)
 - [2026-07-31_project-orchestrator.md](../change/2026-07-31_project-orchestrator.md)
 
 ## Related Lessons
 
+- [orchestrator-multi-repository-runtime-boundaries.md](../lessons/orchestrator-multi-repository-runtime-boundaries.md)
 - [orchestrator-lease-recovery.md](../lessons/orchestrator-lease-recovery.md)

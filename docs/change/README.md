@@ -25,6 +25,7 @@ Store completed workflow result documents for this repository.
 
 ## Current Docs
 
+- [2026-08-04_orchestrator-multi-repo.md](2026-08-04_orchestrator-multi-repo.md)
 - [2026-07-31_project-orchestrator.md](2026-07-31_project-orchestrator.md)
 - [2026-07-20_m-discuss-grill-mode.md](2026-07-20_m-discuss-grill-mode.md)
 - [2026-07-17_m-continue-loop.md](2026-07-17_m-continue-loop.md)

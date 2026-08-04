@@ -89,4 +89,12 @@ High. The model matches existing `m-autoflow` contracts and the observed project
 
 ## Related Plan
 
-- [Active multi-repository plan](../../plan.md)
+- [Archived multi-repository plan](../plan/2026-08-04_orchestrator-multi-repo.md)
+
+## Related Change
+
+- [2026-08-04_orchestrator-multi-repo.md](../change/2026-08-04_orchestrator-multi-repo.md)
+
+## Related Lesson
+
+- [orchestrator-multi-repository-runtime-boundaries.md](../lessons/orchestrator-multi-repository-runtime-boundaries.md)

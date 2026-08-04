@@ -64,8 +64,10 @@ The wider `m-*` workflow already defines:
 
 ## Routed Docs
 
-- [Active plan](../../plan.md)
-- [Proposed decision](../decisions/2026-08-04_orchestrator-multi-repo-runtime.md)
+- [Archived plan](../plan/2026-08-04_orchestrator-multi-repo.md)
+- [Completed change](../change/2026-08-04_orchestrator-multi-repo.md)
+- [Accepted decision](../decisions/2026-08-04_orchestrator-multi-repo-runtime.md)
+- [Reusable runtime-boundary lesson](../lessons/orchestrator-multi-repository-runtime-boundaries.md)
 - [Project orchestrator feature](../features/m-project-orchestrator.md)
 - [Project orchestrator requirements](../requirements/m-project-orchestrator.md)
 - [Project orchestrator specification](../specs/m-project-orchestrator.md)

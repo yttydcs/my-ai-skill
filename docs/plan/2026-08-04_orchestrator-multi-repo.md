@@ -10,7 +10,7 @@
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\orchestrator-multi-repo`
 - Read-only acceptance example: `D:\project\monkeys`
-- Current Stage: `3.3 - Heavy Validation`
+- Current Stage: `4 - Archive and Closeout`
 - Planning Status: confirmed by the user on 2026-08-04 for MRO-1 through MRO-7
 
 ## Stage Records
@@ -526,3 +526,34 @@ Execution-stage lightweight validation passed. Heavy independent review remains 
 Blocked: no
 
 Execute MRO-1 through MRO-7. Do not implement MRO-X1 or MRO-X2, migrate the real project, archive, merge, or clean up in this phase.
+
+## Stage 4 - Archive and Closeout
+
+### Archive Records
+
+- Change archive: `docs/change/2026-08-04_orchestrator-multi-repo.md`.
+- Retained plan: `docs/plan/2026-08-04_orchestrator-multi-repo.md`.
+- Reusable lesson: `docs/lessons/orchestrator-multi-repository-runtime-boundaries.md`.
+
+### Docs Impact
+
+- Intake impact: updated with completed plan/change/lesson links.
+- Feature impact: updated during execution and linked to the completed change and lesson.
+- Requirements impact: updated during execution and linked to the completed change and lesson.
+- Specs impact: updated during execution and linked to the completed change and lesson.
+- Decision impact: the schema v2 decision is accepted/implemented and links the archived plan/change/lesson.
+- Lessons impact: added a searchable runtime-boundary lesson and cross-linked the existing lease-recovery lesson.
+- Root docs index impact: none; category topology and reading order are unchanged.
+- Category indexes: change, plan, and lessons updated.
+
+### Validation Decision
+
+- `$m-test`: passed after one `$m-continue` repair/test iteration.
+- Evidence: 46 focused tests passed; 86 full tests passed with one established Windows symlink privilege skip; source/installed validators, source/dist/install parity, installed single- and multi-repository smoke flows, read-only migration diagnostics, and `git diff --check` passed.
+- Residual risks: repository validation remains linear; legacy host owners require exact-ID continuation or explicit recovery; cross-repository integration remains non-atomic.
+
+### Publication and Closeout
+
+- Docs and code changes are local/versioned only; no remote, push, publication, or backup action was authorized.
+- Default `$m-archive` closeout will commit these records, merge `fix/orchestrator-multi-repo` from the clean control-plane checkout, verify the merge, remove/prune the dedicated worktree, and delete the merged local feature branch when safe.
+- `D:\project\monkeys` remains outside the write set and was not modified.

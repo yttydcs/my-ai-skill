@@ -74,3 +74,5 @@ A lease file alone is not the full ownership state. Correct ownership is the con
 - [Project orchestrator decision](../decisions/2026-07-31_project-orchestrator.md)
 - [Project orchestrator change](../change/2026-07-31_project-orchestrator.md)
 - [Project orchestrator plan](../plan/2026-07-31_project-orchestrator.md)
+- [Multi-repository runtime change](../change/2026-08-04_orchestrator-multi-repo.md)
+- [Multi-repository runtime boundary lesson](orchestrator-multi-repository-runtime-boundaries.md)
