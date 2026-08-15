@@ -5,31 +5,68 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function Test-ExcludedSyncItem {
+    param(
+        [Parameter(Mandatory = $true)][System.IO.FileSystemInfo]$Item
+    )
+
+    if ($Item.PSIsContainer) {
+        return $Item.Name -eq "__pycache__"
+    }
+
+    return $Item.Extension.ToLowerInvariant() -in @(".pyc", ".pyo")
+}
+
+function Copy-TreeContent {
+    param(
+        [Parameter(Mandatory = $true)][string]$Source,
+        [Parameter(Mandatory = $true)][string]$Destination
+    )
+
+    if (-not (Test-Path -LiteralPath $Destination)) {
+        New-Item -ItemType Directory -Path $Destination | Out-Null
+    }
+
+    foreach ($item in Get-ChildItem -LiteralPath $Source -Force) {
+        if (Test-ExcludedSyncItem -Item $item) {
+            continue
+        }
+
+        $target = Join-Path $Destination $item.Name
+        if ($item.PSIsContainer) {
+            Copy-TreeContent -Source $item.FullName -Destination $target
+        }
+        else {
+            Copy-Item -LiteralPath $item.FullName -Destination $target -Force
+        }
+    }
+}
+
 function Copy-CleanTree {
     param(
         [Parameter(Mandatory = $true)][string]$Source,
         [Parameter(Mandatory = $true)][string]$Destination
     )
 
-    if (Test-Path $Destination) {
-        Remove-Item -Recurse -Force $Destination
+    if (Test-Path -LiteralPath $Destination) {
+        Remove-Item -LiteralPath $Destination -Recurse -Force
     }
 
     $parent = Split-Path -Parent $Destination
-    if (-not (Test-Path $parent)) {
+    if (-not (Test-Path -LiteralPath $parent)) {
         New-Item -ItemType Directory -Path $parent | Out-Null
     }
 
-    Copy-Item -Recurse -Force $Source $Destination
+    Copy-TreeContent -Source $Source -Destination $Destination
 }
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 $sourceDir = Join-Path $repoRoot "skills/$Skill"
 $distDir = Join-Path $repoRoot "dist/codex/$Skill"
 $installDir = Join-Path $InstallRoot $Skill
 $manifestPath = Join-Path $repoRoot "manifests/$Skill.json"
 
-if (-not (Test-Path $sourceDir)) {
+if (-not (Test-Path -LiteralPath $sourceDir)) {
     throw "Skill source not found: $sourceDir"
 }
 
@@ -42,17 +79,17 @@ $buildInfo = [ordered]@{
     install_mode = "copy"
 }
 
-if (Test-Path $manifestPath) {
-    $manifest = Get-Content $manifestPath -Raw | ConvertFrom-Json
+if (Test-Path -LiteralPath $manifestPath) {
+    $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
     if ($manifest.version) {
         $buildInfo.version = $manifest.version
     }
 }
 
 $buildInfoPath = Join-Path $distDir ".build-info.json"
-$buildInfo | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 $buildInfoPath
+$buildInfo | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $buildInfoPath -Encoding UTF8
 
-if (-not (Test-Path $InstallRoot)) {
+if (-not (Test-Path -LiteralPath $InstallRoot)) {
     New-Item -ItemType Directory -Path $InstallRoot | Out-Null
 }
 

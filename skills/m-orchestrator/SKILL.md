@@ -50,7 +50,7 @@ Use each project's configured capacity-one merge pool to serialize its archive a
 8. On success, release Tester permits, persist the archive candidate, and queue for project-local capacity-one archive/integration admission.
 9. Revalidate worktree identity and base heads at archive admission; return drift to execution without a lease.
 10. Invoke `$m-archive` only after admission. After normal release, deliver any `next_ready` callback to that same project's existing Worker; use project status to recover a missed wakeup.
-9. Keep the Planner non-blocking. Inspect background tasks with compact host status/wait tools when status is requested or a transition needs verification.
+11. Keep the Planner non-blocking. Inspect background tasks with compact host status/wait tools when status is requested or a transition needs verification.
 
 ## Host Tool Gate
 

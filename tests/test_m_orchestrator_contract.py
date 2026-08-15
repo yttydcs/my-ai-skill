@@ -1,5 +1,9 @@
 import json
 from pathlib import Path
+import re
+import shutil
+import subprocess
+import tempfile
 import unittest
 
 
@@ -63,6 +67,78 @@ class MOrchestratorContractTests(unittest.TestCase):
         for text in required:
             with self.subTest(text=text):
                 self.assertIn(text, self.all_text)
+
+    def test_workflow_step_numbers_are_contiguous(self):
+        workflow = self.skill_text.split("## Workflow", 1)[1].split(
+            "## Host Tool Gate", 1
+        )[0]
+        numbers = [
+            int(match.group(1))
+            for match in re.finditer(r"(?m)^(\d+)\. ", workflow)
+        ]
+        self.assertEqual(numbers, list(range(1, len(numbers) + 1)))
+
+    def test_sync_excludes_python_bytecode_without_dropping_skill_files(self):
+        powershell = shutil.which("pwsh") or shutil.which("powershell")
+        if powershell is None:
+            self.skipTest("PowerShell is unavailable")
+
+        sync_script = REPO_ROOT / "tools" / "sync-skills.ps1"
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            temporary_root = Path(temporary_directory)
+            fake_repo = temporary_root / "repo"
+            fake_tools = fake_repo / "tools"
+            fake_skill = fake_repo / "skills" / "example"
+            fake_scripts = fake_skill / "scripts"
+            fake_cache = fake_scripts / "__pycache__"
+            install_root = temporary_root / "install"
+
+            fake_tools.mkdir(parents=True)
+            fake_cache.mkdir(parents=True)
+            shutil.copy2(sync_script, fake_tools / sync_script.name)
+            (fake_skill / "SKILL.md").write_text("# example\n", encoding="utf-8")
+            (fake_scripts / "runtime.py").write_text("pass\n", encoding="utf-8")
+            (fake_cache / "runtime.cpython-312.pyc").write_bytes(b"bytecode")
+            (fake_scripts / "runtime.pyc").write_bytes(b"bytecode")
+            (fake_scripts / "runtime.pyo").write_bytes(b"bytecode")
+
+            subprocess.run(
+                [
+                    powershell,
+                    "-NoProfile",
+                    "-File",
+                    str(fake_tools / sync_script.name),
+                    "-Skill",
+                    "example",
+                    "-InstallRoot",
+                    str(install_root),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+
+            for copied_root in (
+                fake_repo / "dist" / "codex" / "example",
+                install_root / "example",
+            ):
+                with self.subTest(copied_root=copied_root):
+                    self.assertEqual(
+                        (copied_root / "SKILL.md").read_text(encoding="utf-8"),
+                        "# example\n",
+                    )
+                    self.assertTrue((copied_root / "scripts" / "runtime.py").is_file())
+                    self.assertFalse((copied_root / "scripts" / "__pycache__").exists())
+                    self.assertFalse((copied_root / "scripts" / "runtime.pyc").exists())
+                    self.assertFalse((copied_root / "scripts" / "runtime.pyo").exists())
+
+    def test_sync_script_declares_python_bytecode_exclusions(self):
+        sync_script = (REPO_ROOT / "tools" / "sync-skills.ps1").read_text(
+            encoding="utf-8"
+        )
+        for generated_artifact in ("__pycache__", '".pyc"', '".pyo"'):
+            with self.subTest(generated_artifact=generated_artifact):
+                self.assertIn(generated_artifact, sync_script)
 
     def test_worker_gate_precedes_tester_admission(self):
         required = (
