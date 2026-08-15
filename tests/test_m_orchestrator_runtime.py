@@ -158,6 +158,27 @@ def run_fixture_git(repository: Path, *arguments: str) -> str:
     return process.stdout.strip()
 
 
+def start_archive_acquire(project_root: Path, task_id: str) -> subprocess.Popen[str]:
+    return subprocess.Popen(
+        [
+            sys.executable,
+            str(RUNTIME_PATH),
+            "pool",
+            "try-acquire",
+            "--project-root",
+            str(project_root),
+            "--pool",
+            "merge",
+            "--task-id",
+            task_id,
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+    )
+
+
 class ProjectFixture:
     def __init__(
         self,
@@ -370,6 +391,48 @@ class MultiRepoProjectFixture:
         path = self.root / f"{name}.json"
         path.write_text(json.dumps(body), encoding="utf-8")
         return path
+
+    def prepare_archive_task(self, task_id: str) -> dict:
+        manifest = self.create_manifest(task_id)
+        task = runtime.create_task(self.config, manifest_path_value=str(manifest))
+        runtime.transition_task(self.config, task_id, "PLANNED", "DISPATCHING")
+        runtime.bind_worker(self.config, task_id, f"worker-{task_id}", "local")
+        change_id = runtime.compute_task_change_id(self.config, task_id)
+        gate = self.evidence(
+            f"gate-{task_id}",
+            {
+                "status": "Passed",
+                "change_id": change_id,
+                "repositories": [
+                    {"id": item["id"], "status": "Passed"}
+                    for item in task["repositories"]
+                ],
+            },
+        )
+        runtime.transition_task(
+            self.config,
+            task_id,
+            "EXECUTING",
+            "WAITING_FOR_TESTER",
+            str(gate),
+            change_id,
+        )
+        runtime.enqueue_task(self.config, "tester", task_id)
+        tester_lease = runtime.try_acquire(self.config, "tester", task_id)["lease"]
+        passed = self.evidence(f"test-passed-{task_id}", {"status": "Passed"})
+        runtime.transition_task(
+            self.config, task_id, "TESTING", "TEST_PASSED", str(passed)
+        )
+        runtime.release_lease(
+            self.config, "tester", task_id, tester_lease["lease_id"]
+        )
+        runtime.transition_task(
+            self.config, task_id, "TEST_PASSED", "WAITING_FOR_MERGE"
+        )
+        queued = runtime.enqueue_task(self.config, "merge", task_id)
+        if queued["status"] != "Queued":
+            raise AssertionError(f"Task {task_id} did not reach archive queue: {queued}")
+        return runtime.load_task(self.config, task_id)
 
 
 class MOrchestratorRuntimeTests(unittest.TestCase):
@@ -1164,6 +1227,242 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
             runtime.try_acquire(second.config, "tester", "T-B")["status"],
             "Acquired",
         )
+
+    def test_process_archive_admission_serializes_and_resumes_same_project(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",), host_enabled=True
+        )
+        project.prepare_archive_task("T-1")
+        project.prepare_archive_task("T-2")
+
+        processes = [
+            start_archive_acquire(project.root, task_id) for task_id in ("T-1", "T-2")
+        ]
+        results = []
+        for process in processes:
+            stdout, stderr = process.communicate(timeout=20)
+            self.assertEqual(process.returncode, 0, stderr)
+            results.append(json.loads(stdout))
+
+        self.assertEqual(sum(item["status"] == "Acquired" for item in results), 1)
+        acquired = next(item for item in results if item["status"] == "Acquired")
+        waiting = next(item for item in results if item["status"] == "Waiting")
+        self.assertEqual(acquired["lease"]["task_id"], "T-1")
+        self.assertIsNone(acquired["lease"]["host_lease_id"])
+        self.assertIn(waiting["reason"], {"fifo", "project-capacity"})
+
+        archive = project.evidence("archive-T-1", {"status": "Passed"})
+        runtime.transition_task(
+            project.config, "T-1", "ARCHIVING", "COMPLETED", str(archive)
+        )
+        released = runtime.release_lease(
+            project.config, "merge", "T-1", acquired["lease"]["lease_id"]
+        )
+        self.assertEqual(released["next_ready"]["task_id"], "T-2")
+        self.assertEqual(released["next_ready"]["thread_id"], "worker-T-2")
+        status = runtime.project_status(project.config)
+        self.assertEqual(status["pools"]["merge"]["next_ready"], released["next_ready"])
+        self.assertEqual(
+            runtime.try_acquire(project.config, "merge", "T-2")["status"],
+            "Acquired",
+        )
+
+    def test_process_archives_run_in_parallel_between_projects_without_host_capacity(self):
+        first = MultiRepoProjectFixture(
+            self.root / "first",
+            project_id="first",
+            repository_ids=("service-a",),
+            host_enabled=True,
+            host_capacity=1,
+        )
+        second = MultiRepoProjectFixture(
+            self.root / "second",
+            project_id="second",
+            repository_ids=("service-a",),
+            host_enabled=True,
+            host_capacity=1,
+        )
+        first.prepare_archive_task("T-A")
+        second.prepare_archive_task("T-B")
+        host_holder = runtime.acquire_host_lease(first.config, "TESTER-HOLDER")
+        self.assertIsNotNone(host_holder)
+
+        processes = [
+            start_archive_acquire(first.root, "T-A"),
+            start_archive_acquire(second.root, "T-B"),
+        ]
+        results = []
+        for process in processes:
+            stdout, stderr = process.communicate(timeout=20)
+            self.assertEqual(process.returncode, 0, stderr)
+            results.append(json.loads(stdout))
+
+        self.assertEqual([item["status"] for item in results], ["Acquired", "Acquired"])
+        self.assertTrue(all(item["lease"]["host_lease_id"] is None for item in results))
+        host_root = runtime.host_pool_root(first.config)
+        self.assertEqual(len(list((host_root / "leases").glob("*.json"))), 1)
+        runtime.release_host_lease(
+            first.config, host_holder["lease_id"], "TESTER-HOLDER"
+        )
+
+    def test_archive_acquire_rejects_worktree_drift_without_a_lease(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        task = project.prepare_archive_task("T-1")
+        worktree = Path(task["repositories"][0]["worktree"])
+        (worktree / "seed.txt").write_text("changed after test\n", encoding="utf-8")
+
+        result = runtime.try_acquire(project.config, "merge", "T-1")
+
+        self.assertEqual(result["status"], "NeedsRevalidation")
+        self.assertEqual(result["reason"], "worktree-drift")
+        task = runtime.load_task(project.config, "T-1")
+        self.assertEqual(task["state"], "EXECUTING")
+        self.assertNotIn("archive_candidate", task)
+        merge_root = runtime.pool_root(project.config, "merge")
+        self.assertEqual(list((merge_root / "queue").glob("*.json")), [])
+        self.assertEqual(list((merge_root / "leases").glob("*.json")), [])
+
+    def test_archive_acquire_rejects_base_drift_without_a_lease(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        project.prepare_archive_task("T-1")
+        repository = project.repository_roots["service-a"]
+        (repository / "base.txt").write_text("advanced base\n", encoding="utf-8")
+        run_fixture_git(repository, "add", "base.txt")
+        run_fixture_git(
+            repository,
+            "-c",
+            "user.name=Codex Tests",
+            "-c",
+            "user.email=codex-tests@example.invalid",
+            "commit",
+            "-q",
+            "-m",
+            "advance base",
+        )
+
+        result = runtime.try_acquire(project.config, "merge", "T-1")
+
+        self.assertEqual(result["status"], "NeedsRevalidation")
+        self.assertEqual(result["reason"], "base-drift")
+        self.assertEqual(runtime.load_task(project.config, "T-1")["state"], "EXECUTING")
+        self.assertEqual(
+            list((runtime.pool_root(project.config, "merge") / "leases").glob("*.json")),
+            [],
+        )
+
+    def test_missing_archive_candidate_returns_upgraded_task_to_execution(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        project.prepare_archive_task("T-1")
+        path = runtime.task_path(project.config, "T-1")
+        task = runtime.read_json(path)
+        task.pop("archive_candidate")
+        runtime.atomic_write_json(path, task)
+
+        result = runtime.try_acquire(project.config, "merge", "T-1")
+
+        self.assertEqual(result["status"], "NeedsRevalidation")
+        self.assertEqual(result["reason"], "missing-archive-candidate")
+        self.assertEqual(runtime.load_task(project.config, "T-1")["state"], "EXECUTING")
+
+    def test_stale_archive_recovery_holds_unrelated_queue_until_owner_completes(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        project.prepare_archive_task("T-1")
+        project.prepare_archive_task("T-2")
+        lease = runtime.try_acquire(project.config, "merge", "T-1")["lease"]
+        lease_path = (
+            runtime.pool_root(project.config, "merge")
+            / "leases"
+            / f"{lease['lease_id']}.json"
+        )
+        stale = runtime.read_json(lease_path)
+        stale["heartbeat_at"] = (
+            datetime.now(timezone.utc) - timedelta(minutes=5)
+        ).isoformat()
+        runtime.atomic_write_json(lease_path, stale)
+
+        reclaimed = runtime.reclaim_lease(
+            project.config,
+            "merge",
+            "T-1",
+            lease["lease_id"],
+            "planner-thread",
+            "archive owner stopped",
+        )
+        self.assertEqual(reclaimed["recovery_hold"]["task_id"], "T-1")
+        blocked = runtime.try_acquire(project.config, "merge", "T-2")
+        self.assertEqual(blocked["status"], "Blocked")
+        self.assertEqual(blocked["reason"], "archive-recovery")
+        self.assertIsNone(runtime.project_status(project.config)["pools"]["merge"]["next_ready"])
+
+        runtime.transition_task(
+            project.config,
+            "T-1",
+            "BLOCKED",
+            "WAITING_FOR_MERGE",
+            reason="resume the interrupted archive owner",
+        )
+        runtime.enqueue_task(project.config, "merge", "T-1")
+        recovery_lease = runtime.try_acquire(project.config, "merge", "T-1")["lease"]
+        archive = project.evidence("archive-recovered-T-1", {"status": "Passed"})
+        runtime.transition_task(
+            project.config, "T-1", "ARCHIVING", "COMPLETED", str(archive)
+        )
+        released = runtime.release_lease(
+            project.config, "merge", "T-1", recovery_lease["lease_id"]
+        )
+        self.assertIsNone(released["recovery_hold"])
+        self.assertEqual(released["next_ready"]["task_id"], "T-2")
+
+    def test_legacy_archive_host_lease_is_cleaned_on_release(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella",
+            repository_ids=("service-a",),
+            host_enabled=True,
+        )
+        project.prepare_archive_task("T-1")
+        merge_lease = runtime.try_acquire(project.config, "merge", "T-1")["lease"]
+        self.assertIsNone(merge_lease["host_lease_id"])
+        legacy_host_id = "a" * 32
+        host_root = runtime.ensure_host_pool(project.config)
+        now = runtime.utc_now()
+        runtime.atomic_write_json(
+            host_root / "leases" / f"{legacy_host_id}.json",
+            {
+                "host_id": "local",
+                "resource": "testers",
+                "owner": "umbrella:T-1",
+                "lease_id": legacy_host_id,
+                "acquired_at": now,
+                "heartbeat_at": now,
+                "lease_timeout_seconds": 60,
+            },
+        )
+        merge_path = (
+            runtime.pool_root(project.config, "merge")
+            / "leases"
+            / f"{merge_lease['lease_id']}.json"
+        )
+        stored_merge = runtime.read_json(merge_path)
+        stored_merge["host_lease_id"] = legacy_host_id
+        runtime.atomic_write_json(merge_path, stored_merge)
+        archive = project.evidence("archive-legacy-host", {"status": "Passed"})
+        runtime.transition_task(
+            project.config, "T-1", "ARCHIVING", "COMPLETED", str(archive)
+        )
+
+        runtime.release_lease(
+            project.config, "merge", "T-1", merge_lease["lease_id"]
+        )
+
+        self.assertFalse((host_root / "leases" / f"{legacy_host_id}.json").exists())
 
     def test_success_path_reaches_serialized_archive(self):
         project = ProjectFixture(self.root / "project", "project")

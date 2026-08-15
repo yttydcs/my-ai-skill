@@ -100,6 +100,24 @@ class MOrchestratorContractTests(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertIn(text, pool)
 
+    def test_archive_contract_is_project_scoped_retryable_and_revalidated(self):
+        archive_skill = (
+            REPO_ROOT / "skills" / "m-archive" / "SKILL.md"
+        ).read_text(encoding="utf-8")
+        required = (
+            (self.skill_text, "Independent projects may archive concurrently"),
+            (self.skill_text, "never introduce a machine-wide archive lock"),
+            (self.skill_text, "Ordinary contention remains `WAITING_FOR_MERGE`"),
+            (self.references["worker.md"], "`NeedsRevalidation` returns the Task to `EXECUTING`"),
+            (self.references["testing-pool.md"], "return `next_ready`"),
+            (self.references["configuration.md"], "never acquired for the archive/integration pool"),
+            (archive_skill, "active project integration lease"),
+            (archive_skill, "Standalone `$m-archive` behavior is unchanged"),
+        )
+        for source, text in required:
+            with self.subTest(text=text):
+                self.assertIn(text, source)
+
     def test_autoflow_routes_orchestrator_as_non_phase_companion(self):
         umbrella = (REPO_ROOT / "skills" / "m-autoflow" / "SKILL.md").read_text(
             encoding="utf-8"
@@ -118,6 +136,7 @@ class MOrchestratorContractTests(unittest.TestCase):
             REPO_ROOT / "docs" / "specs" / "m-project-orchestrator.md",
             REPO_ROOT / "docs" / "decisions" / "2026-07-31_project-orchestrator.md",
             REPO_ROOT / "docs" / "decisions" / "2026-08-04_orchestrator-multi-repo-runtime.md",
+            REPO_ROOT / "docs" / "decisions" / "2026-08-15_project-scoped-archive-resume.md",
         )
         for path in required:
             with self.subTest(path=path):
