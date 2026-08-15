@@ -61,6 +61,10 @@ Do not repeatedly poll unchanged tasks or narrate unchanged snapshots.
 
 ## Integration Coordination
 
-Passing Workers queue for the configured capacity-one archive/integration pool. Before integration, compare every Task branch with its repository's latest base. If reconciliation changes executable content in any repository, invalidate the composite change identifier and require the appropriate lightweight gate and heavyweight validation again before `$m-archive` proceeds.
+Passing Workers queue for their project's configured capacity-one archive/integration pool. Ordinary contention stays `WAITING_FOR_MERGE`; it is not a blocker. Project release/status may return `next_ready` with the persisted Worker callback. Send that Worker a targeted retry message, but do not describe the wakeup as ownership: only successful acquisition authorizes archive. A missed wakeup is recoverable from project status.
+
+Before integration, revalidate the recorded composite change identifier and every selected repository's recorded base head. Drift removes the stale archive ticket, returns the Task to execution, and requires the appropriate lightweight gate and heavyweight validation again before `$m-archive` proceeds. Archive pools remain project-local and never consume the optional Tester host budget, so independent projects may archive concurrently.
 
 Cross-repository integration uses complete preflight plus the manifest repository order. It is not atomic: if a later repository cannot integrate, persist the completed and pending repository results, block the Task, and require an explicit recovery decision. `$m-archive` remains the authority for commits, control-plane merges, docs handling, and cleanup.
+
+After stale ownership, reclaim, or partial integration, do not wake or admit an unrelated queued Task while the project reports an archive recovery hold. Resume the affected owner only after the explicit recovery decision is recorded.

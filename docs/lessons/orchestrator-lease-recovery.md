@@ -6,8 +6,8 @@ Filesystem-backed admission needs durable agreement between Task state, project 
 
 ## Lookup Hints
 
-- Keywords: `stale lease`, `orphan host lease`, `pool reclaim`, `reclaim-host`, `active_lease`, `not consistently TESTING`, `premature release`, `Started`, `Completed`.
-- Quick checks: compare Task state with the exact project lease; inspect `pool stale`; check for a host-only lease; verify the result transition preceded normal release; inspect the project-local reclaim event.
+- Keywords: `stale lease`, `orphan host lease`, `pool reclaim`, `reclaim-host`, `active_lease`, `archive recovery hold`, `next_ready`, `premature release`, `Started`, `Completed`.
+- Quick checks: compare Task state with the exact project lease; inspect `pool stale`; check for a Tester host-only lease; verify the result transition preceded normal release; inspect `recovery_hold` and the project-local reclaim event.
 
 ## Symptoms
 
@@ -23,6 +23,7 @@ Filesystem-backed admission needs durable agreement between Task state, project 
 - A stale owner can appear live, allowing conflicting work or misleading status.
 - Manual repair may release the wrong owner or lose the reason and actor responsible for recovery.
 - A queue head with inconsistent state can prevent otherwise eligible Tasks from progressing.
+- An abnormal archive release can wake unrelated queued work into a partially integrated project unless readiness is held for explicit recovery.
 
 ## Trigger Conditions
 
@@ -55,6 +56,8 @@ A lease file alone is not the full ownership state. Correct ownership is the con
 - Block a reclaimed active Task, leave a host-orphan Task queued, and write project-local audit events.
 - Use `Started` and `Completed` reclaim audit states so recovery can safely resume after interruption.
 - Serialize host-pool metadata creation and validation with the same host lock used for admission.
+- Restrict host leases to Tester pools; archive pools are already isolated by their project-local capacity-one lease.
+- After normal archive completion, expose the next same-project queue head and persisted Worker callback as advisory readiness. After reclaim or partial integration, persist a recovery hold instead.
 
 ## Prevention / Guardrails
 
@@ -63,6 +66,7 @@ A lease file alone is not the full ownership state. Correct ownership is the con
 - Never infer that timeout proves an owner is dead; inspect the live Worker first.
 - Do not silently reclaim capacity during status or acquisition calls.
 - Keep recovery commands explicit and auditable, and make repeated calls owner-safe.
+- Treat a wakeup as a retry hint rather than ownership; only a newly created project lease authorizes archive work.
 - Bind every path-derived external identifier to a strict allowlist pattern before filesystem access.
 
 ## Related Docs
@@ -72,6 +76,7 @@ A lease file alone is not the full ownership state. Correct ownership is the con
 - [Project orchestrator requirements](../requirements/m-project-orchestrator.md)
 - [Project orchestrator specification](../specs/m-project-orchestrator.md)
 - [Project orchestrator decision](../decisions/2026-07-31_project-orchestrator.md)
+- [Project-scoped archive resume decision](../decisions/2026-08-15_project-scoped-archive-resume.md)
 - [Project orchestrator change](../change/2026-07-31_project-orchestrator.md)
 - [Project orchestrator plan](../plan/2026-07-31_project-orchestrator.md)
 - [Multi-repository runtime change](../change/2026-08-04_orchestrator-multi-repo.md)

@@ -9,7 +9,7 @@
 - Docs Root: `D:\project\my-ai-skills\worktrees\archive-project-queue-resume\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\archive-project-queue-resume`
-- Current Stage: `$m-plan`; awaiting explicit approval before implementation
+- Current Stage: `$m-execute`; ARQ-1 through ARQ-4 approved on 2026-08-15
 
 ## Stage Records
 
@@ -490,4 +490,4 @@ The repository already provides project-isolated queues and capacity-one archive
 #### Issue List
 
 - Blocked: no for planning.
-- Implementation authorization: pending explicit user approval of `ARQ-1` through `ARQ-4`.
+- Implementation authorization: user approved `ARQ-1` through `ARQ-4` on 2026-08-15.

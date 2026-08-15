@@ -59,7 +59,7 @@ Each `contexts` entry must use explicit `local:<name>` syntax. An empty list is 
 - `lease_timeout_seconds`: integer from 60 through 86400.
 - The archive/integration pool capacity must be `1`.
 
-An optional `[host_budget]` table may provide a numeric machine-wide ceiling:
+An optional `[host_budget]` table may provide a numeric machine-wide ceiling for temporary Testers:
 
 ```toml
 [host_budget]
@@ -71,6 +71,8 @@ lease_timeout_seconds = 3600
 ```
 
 Every project sharing the same host/resource pair must declare the same capacity and timeout. A mismatch fails explicitly. Host runtime metadata contains only numeric capacity, opaque owner/lease IDs, and timestamps.
+
+The host budget is never acquired for the archive/integration pool. Archive capacity is the capacity-one pool under each project runtime root; independent project roots therefore do not conflict.
 
 ## Context Files
 

@@ -6,7 +6,7 @@ The staged `m-*` workflow automates one task well but requires manual management
 
 ## Goal
 
-Provide a project-scoped automation companion that coordinates persistent planning, temporary background execution, execution quality gates, bounded temporary testing, repair loops, and serialized archive admission while reusing existing phase skills.
+Provide a project-scoped automation companion that coordinates persistent planning, temporary background execution, execution quality gates, bounded temporary testing, repair loops, and project-serialized archive admission while reusing existing phase skills and preserving archive parallelism between independent projects.
 
 ## Must
 
@@ -20,6 +20,9 @@ Provide a project-scoped automation companion that coordinates persistent planni
 - release permits before repair, archive, blocking waits, or unrelated work;
 - return failed Tester evidence to the owning Worker for execute repair and complete gate rerun;
 - serialize project archive/integration admission at capacity one;
+- keep ordinary same-project archive contention queued instead of blocked, and expose the next eligible Worker after normal release;
+- allow independent projects to archive concurrently without a global archive lock;
+- revalidate tested worktree identity and repository base heads immediately before archive lease creation;
 - use `$m-archive` as the archive, merge, and cleanup authority;
 - support a non-Git umbrella project root with one or more explicitly declared Git implementation repositories;
 - keep per-repository IDs, paths, base branches, Task branches, worktrees, planning refs, plans, and write sets explicit;
@@ -27,7 +30,7 @@ Provide a project-scoped automation companion that coordinates persistent planni
 - map every command to its existing skill and explicit local contexts;
 - fail explicitly for missing required context, invalid config, unavailable host task tools, wrong lease ownership, or invalid state transitions;
 - preserve existing `m-*` behavior and backward compatibility;
-- support an optional machine-level numeric resource ceiling without project knowledge.
+- support an optional machine-level Tester resource ceiling without project knowledge, and never consume it for archive admission.
 
 ## Should
 
@@ -61,6 +64,11 @@ Provide a project-scoped automation companion that coordinates persistent planni
 - Repeated enqueue and same-owner release must be idempotent.
 - Stale lease listing must not reclaim automatically.
 - Integration admission must use a configured capacity-one pool.
+- Integration tickets and leases must remain project-local; no machine-wide archive capacity may serialize independent projects.
+- Normal integration release must identify the next eligible same-project queue head and its persisted Worker callback for retryable host wakeup.
+- Project status must expose the same archive readiness so a missed wakeup can be recovered without busy waiting.
+- Integration acquisition must revalidate the persisted archive candidate under the project-pool critical section; worktree or base drift must remove the stale ticket, return the Task to execution, and consume no permit.
+- Stale or partial integration recovery must not advertise unrelated queued work until an explicit recovery decision is recorded.
 - Base reconciliation that changes executable content must invalidate earlier validation as appropriate.
 - Multi-repository integration must preflight every selected repository, use recorded dependency order, and report partial completion as blocked rather than atomic success.
 
@@ -70,7 +78,7 @@ Provide a project-scoped automation companion that coordinates persistent planni
 - Configuration validation and status must inspect only declared repositories and must not recursively discover project repositories.
 - Runtime mutations must use atomic filesystem operations and explicit error messages.
 - The system must avoid busy waits and long silent blocking calls.
-- Config, state, and evidence boundaries must be deterministic and testable on Windows.
+- Config, state, and evidence boundaries must be deterministic and testable on Windows and Linux without platform-specific file-lock APIs.
 - Context selection must be explicit and must not silently fall back from local project data to global data.
 - The skill package must remain concise and route detailed contracts to direct references.
 
@@ -85,6 +93,9 @@ Provide a project-scoped automation companion that coordinates persistent planni
 - Invalid config, path traversal, context scope, ownership, and state transitions fail explicitly.
 - A Worker without a current passing gate cannot enqueue or acquire the Tester pool.
 - Failure releases project and host capacity before repair.
+- Two same-project archive Tasks serialize in FIFO order, and normal release makes the next eligible Worker ready without marking ordinary contention blocked.
+- Two independent projects may hold archive leases concurrently even when Tester host capacity is one or exhausted.
+- Worktree or base-head drift after validation rejects archive admission and returns the Task to execution without a lease.
 - Existing workflow contract tests continue passing.
 - Source, distribution, and installed package copies match after validation and sync.
 
@@ -99,6 +110,7 @@ Provide a project-scoped automation companion that coordinates persistent planni
 
 ## Related Decisions
 
+- [2026-08-15_project-scoped-archive-resume.md](../decisions/2026-08-15_project-scoped-archive-resume.md)
 - [2026-08-04_orchestrator-multi-repo-runtime.md](../decisions/2026-08-04_orchestrator-multi-repo-runtime.md)
 - [2026-07-31_project-orchestrator.md](../decisions/2026-07-31_project-orchestrator.md)
 

@@ -54,6 +54,8 @@ Do not leave reusable knowledge only in `docs/change`.
 
 Stop after archive only when the user explicitly asks for archive-only handling, no merge, no cleanup, or an equivalent pause.
 
+When an orchestrated Worker enters this phase, verify that the Task owns the active project integration lease before the first archive or integration mutation. `WAITING_FOR_MERGE`, `next_ready`, and host messages are retry signals only. Archive does not acquire Tester host capacity and does not create a global archive lock; project scheduling remains owned by `$m-orchestrator`. Direct standalone archive invocations retain the normal entry gate above.
+
 Default closeout sequence:
 
 1. verify worktree and repo status

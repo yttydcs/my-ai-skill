@@ -4,7 +4,7 @@
 
 A pool limits concurrent temporary role executions. It does not represent reusable Tester identities or shared project environments.
 
-Every project owns independent queues and leases. An optional host budget limits aggregate numeric resource consumption across projects without sharing their context or commands.
+Every project owns independent queues and leases. An optional host budget limits aggregate temporary Tester consumption across projects without sharing their context or commands. Archive/integration pools never acquire host capacity.
 
 A Tester lease belongs to one Task, not one repository. For a multi-repository Task, the temporary Tester receives the exact persisted repository/worktree set and validates the affected cross-repository flow while holding one project permit (and one optional host permit).
 
@@ -44,6 +44,8 @@ Use one consistent order:
 
 If any step after host acquisition fails, release the host lease before returning. Never keep partial capacity while reporting `Waiting` or `Failed`.
 
+For archive/integration pools, omit step 3 entirely. Capacity one is enforced only inside that project's runtime root, so independent projects can hold archive leases concurrently.
+
 ## Release
 
 Persist the Tester result or blocker by transitioning `TESTING` to `TEST_FAILED`, `TEST_PASSED`, or `BLOCKED` before release. Then release the optional host lease and project lease in an owner-safe retryable operation. Only after capacity is released may the Worker enter `EXECUTING`, `WAITING_FOR_MERGE`, or another non-testing state. A missing already-released lease may return `Released` only when no current lease exists for another owner.
@@ -59,3 +61,5 @@ Pool implementation locks may use a short internal stale threshold for crash rec
 ## Waiting Behavior
 
 Acquisition is non-blocking. A waiting Worker may retry after a bounded interval and report meaningful progress, but it must not hold a permit, busy-loop, or prevent the Planner from accepting new conversation.
+
+For a normal completed archive release, return `next_ready` for the eligible same-project queue head and its persisted Worker callback. Project status returns the same value so the Planner can recover a missed wakeup. The callback is a retry hint, not a lease. Explicit archive reclaim or partial integration creates a project-local recovery hold; unrelated queued Tasks remain waiting until the affected owner is deliberately resumed.

@@ -49,7 +49,9 @@ Use the existing `$m-continue` only when the user explicitly invokes that compan
 
 ## Success
 
-Persist the passing `$m-test` result for the complete repository set, release Tester capacity, transition through `TEST_PASSED` to `WAITING_FOR_MERGE`, and enqueue the capacity-one integration pool. After admission, invoke `$m-archive` as the archive, per-repository merge, and cleanup authority. Report partial integration as blocked; never claim cross-repository atomicity.
+Persist the passing `$m-test` result for the complete repository set, release Tester capacity, transition through `TEST_PASSED` to `WAITING_FOR_MERGE`, and enqueue the project's capacity-one integration pool. Waiting holds no archive or host permit and is not `BLOCKED`.
+
+When the Planner sends a `next_ready` wakeup, retry acquisition idempotently. The wakeup is not a lease. Admission revalidates the tested composite change identifier and selected repository base heads; `NeedsRevalidation` returns the Task to `EXECUTING`, where the Worker reruns the applicable gate and heavyweight validation before requeueing. After successful admission, confirm the active integration lease and invoke `$m-archive` as the archive, per-repository merge, and cleanup authority. Report partial integration as blocked; never claim cross-repository atomicity.
 
 ## Blockers
 

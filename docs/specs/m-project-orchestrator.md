@@ -34,7 +34,7 @@ The manifest declares dependencies on `m-autoflow`, `m-context`, `m-discuss`, `m
 - Execution mapping: `require_lightweight_gate = true`.
 - Tester pool: capacity 1-64, FIFO, lease timeout 60-86400 seconds.
 - Integration pool: the same constraints plus capacity exactly 1.
-- Optional host budget: stable host/resource key, numeric capacity, and timeout only.
+- Optional Tester host budget: stable host/resource key, numeric capacity, and timeout only. Integration admission never acquires it.
 
 Invalid or inconsistent configuration is terminal for dependent orchestration actions.
 
@@ -52,7 +52,7 @@ All successful commands emit structured JSON. Validation and ownership errors em
 
 ## State Contract
 
-Normal states are `PLANNED`, `DISPATCHING`, `EXECUTING`, `EXECUTE_GATE_FAILED`, `WAITING_FOR_TESTER`, `TESTING`, `TEST_FAILED`, `TEST_PASSED`, `WAITING_FOR_MERGE`, `ARCHIVING`, and `COMPLETED`. Any non-terminal state may enter `BLOCKED` with evidence.
+Normal states are `PLANNED`, `DISPATCHING`, `EXECUTING`, `EXECUTE_GATE_FAILED`, `WAITING_FOR_TESTER`, `TESTING`, `TEST_FAILED`, `TEST_PASSED`, `WAITING_FOR_MERGE`, `ARCHIVING`, and `COMPLETED`. Archive-candidate drift allows `WAITING_FOR_MERGE -> EXECUTING` with a structured revalidation reason. Any non-terminal state may enter `BLOCKED` with evidence.
 
 Transitions use expected-state compare-and-set. Evidence bodies are not copied into Task JSON; the runtime stores only paths, hashes, statuses, timestamps, and opaque IDs.
 
@@ -74,10 +74,18 @@ Schema version 1 retains `task create --task-id --plan` and its existing Task/ru
 - `$m-test` failure releases capacity before execute repair.
 - `$m-test` success releases Tester capacity before integration admission.
 
+## Archive Candidate Contract
+
+- A manifest-backed Task entering `WAITING_FOR_MERGE` persists the validated composite change identifier and one resolved commit head per selected configured base ref.
+- Enqueue and acquisition compare the current composite identifier and base heads with that candidate.
+- A missing candidate on an upgraded manifest-backed Task, worktree drift, or base drift removes its stale ticket, transitions the Task to `EXECUTING`, clears obsolete validation identity, returns `NeedsRevalidation`, and creates no lease.
+- Legacy schema version 1 Tasks without repository manifests keep their existing advisory integration behavior.
+
 ## Queue And Lease Contract
 
 - One ticket per Task/pool; enqueue is idempotent.
 - Project tickets use FIFO order.
+- Integration tickets and leases are scoped to one project runtime root; unrelated projects may acquire their own capacity-one integration leases concurrently.
 - Pool metadata mutations are serialized with atomic local locks.
 - A lease has an opaque ID and exact Task owner.
 - Heartbeat and release reject ownership mismatch.
@@ -85,11 +93,13 @@ Schema version 1 retains `task create --task-id --plan` and its existing Task/ru
 - Normal release rejects a Task that has not persisted its test, archive, or blocker result.
 - Expiry lists stale project and host candidates but never silently reclaims them; explicit project reclaim requires an actor and reason, blocks the Task, and persists an audit event.
 - An audited host-orphan reclaim is allowed only when no project lease exists and the Task remains in its pool waiting state.
-- Optional host capacity is acquired while project admission is serialized; any partial failure rolls host capacity back.
+- Optional host capacity is acquired only for the configured Tester pool while project admission is serialized; any partial failure rolls host capacity back.
+- A normal integration release after persisted completion returns `next_ready` for the next eligible same-project Worker. Project status exposes the same value for missed-wakeup recovery.
+- Explicit stale or partial integration recovery records a project-pool hold and does not advertise or admit unrelated queued Tasks until the recovery owner is deliberately resumed.
 
 ## Host Tool Contract
 
-The skill uses available Codex project/task tools for background Worker creation, compact waits/status, and task messages. A schema version 1 Git project Worker may use one host-created dedicated Worktree. A schema version 2 Planner prepares every selected repository worktree before dispatch and creates one Worker with access to the complete absolute map, using the umbrella local project or an explicit primary worktree as the host environment. Tool or multi-path access failure blocks dispatch; the Planner does not implement as a fallback.
+The skill uses available Codex project/task tools for background Worker creation, compact waits/status, and task messages. A schema version 1 Git project Worker may use one host-created dedicated Worktree. A schema version 2 Planner prepares every selected repository worktree before dispatch and creates one Worker with access to the complete absolute map, using the umbrella local project or an explicit primary worktree as the host environment. Tool or multi-path access failure blocks dispatch; the Planner does not implement as a fallback. Runtime release/status output supplies callback metadata; the host sends a wakeup to that same-project Worker, and the Worker must still retry admission rather than treating the message as a lease.
 
 Archive admission remains capacity one at project scope. `$m-archive` preflights and integrates repositories in manifest order. Independent Git merges are not atomic; partial integration persists completed/pending results and blocks cleanup until recovery is explicitly decided.
 
@@ -107,6 +117,7 @@ Archive admission remains capacity one at project scope. `$m-archive` preflights
 - `tools/validate-skills.ps1 -Skill m-orchestrator`
 - focused contract tests for package, routing, contexts, gate ordering, and phase ownership
 - focused runtime tests for config, isolation, state, concurrency, FIFO, leases, stale reporting, and optional host capacity
+- process-level archive tests for same-project serialization/resume, cross-project parallelism, drift rejection, recovery holds, and no archive host lease
 - temporary non-Git umbrella fixtures with multiple real child repositories and per-repository worktrees
 - manifest, composite change identity, gate drift, schema version 1 compatibility, and schema version 2 migration-error tests
 - full repository unittest discovery
@@ -124,6 +135,7 @@ Archive admission remains capacity one at project scope. `$m-archive` preflights
 
 ## Related Decision
 
+- [2026-08-15_project-scoped-archive-resume.md](../decisions/2026-08-15_project-scoped-archive-resume.md)
 - [2026-08-04_orchestrator-multi-repo-runtime.md](../decisions/2026-08-04_orchestrator-multi-repo-runtime.md)
 - [2026-07-31_project-orchestrator.md](../decisions/2026-07-31_project-orchestrator.md)
 

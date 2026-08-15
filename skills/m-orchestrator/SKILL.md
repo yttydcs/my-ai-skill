@@ -32,11 +32,11 @@ A temporary Worker owns exactly one approved task workflow and its persisted rep
 
 ### Tester
 
-A temporary Tester runs only after a Worker owns a valid project Tester lease. Load the configured local Tester context, invoke `$m-test`, report structured evidence, and release the lease before repair or archive work.
+A temporary Tester runs only after a Worker owns a valid project Tester lease. Load the configured local Tester context, invoke `$m-test`, report structured evidence, and release the project and optional host lease before repair or archive work. Host budget applies only to Testers.
 
 ### Archive / Integration
 
-Use the configured capacity-one merge pool to serialize archive and integration admission. Invoke `$m-archive` as the authority for archive, merge, and cleanup behavior. This skill does not redefine those actions.
+Use each project's configured capacity-one merge pool to serialize its archive and integration admission. Independent projects may archive concurrently; never introduce a machine-wide archive lock or consume Tester host capacity. Ordinary contention remains `WAITING_FOR_MERGE`. On normal release, wake only the reported same-project `next_ready` Worker; the wakeup is advisory and that Worker must retry acquisition. Invoke `$m-archive` only after candidate revalidation and an active integration lease. This skill does not redefine archive actions.
 
 ## Workflow
 
@@ -47,7 +47,9 @@ Use the configured capacity-one merge pool to serialize archive and integration 
 5. Let the Worker run configured contexts plus `$m-execute` and record lightweight-gate evidence for the current change state.
 6. Queue only eligible work, acquire the project Tester permit and optional host resource permit, then create a temporary Tester with the complete Worker worktree set.
 7. On failure, release all permits, return evidence to the Worker, and repeat execute, gate, and queue behavior inside the approved scope.
-8. On success, release Tester permits, queue for capacity-one archive/integration admission, and invoke `$m-archive` only after admission.
+8. On success, release Tester permits, persist the archive candidate, and queue for project-local capacity-one archive/integration admission.
+9. Revalidate worktree identity and base heads at archive admission; return drift to execution without a lease.
+10. Invoke `$m-archive` only after admission. After normal release, deliver any `next_ready` callback to that same project's existing Worker; use project status to recover a missed wakeup.
 9. Keep the Planner non-blocking. Inspect background tasks with compact host status/wait tools when status is requested or a transition needs verification.
 
 ## Host Tool Gate

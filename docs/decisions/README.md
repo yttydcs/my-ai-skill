@@ -24,6 +24,7 @@ Store append-only architecture decision records for choices that shape structure
 
 ## Current Docs
 
+- [2026-08-15_project-scoped-archive-resume.md](2026-08-15_project-scoped-archive-resume.md)
 - [2026-08-04_orchestrator-multi-repo-runtime.md](2026-08-04_orchestrator-multi-repo-runtime.md)
 - [2026-07-31_project-orchestrator.md](2026-07-31_project-orchestrator.md)
 - [2026-07-20_m-discuss-grill-mode.md](2026-07-20_m-discuss-grill-mode.md)

@@ -6,7 +6,7 @@ Active.
 
 ## Feature Goal
 
-Let one persistent Planner task per project continue discussing and planning while approved task workflows execute in isolated background Workers, pass an execution-stage quality gate, use bounded temporary Testers, and enter serialized archive/integration.
+Let one persistent Planner task per project continue discussing and planning while approved task workflows execute in isolated background Workers, pass an execution-stage quality gate, use bounded temporary Testers, and enter project-serialized archive/integration that resumes the next eligible same-project Worker without serializing independent projects.
 
 ## Actors
 
@@ -33,8 +33,9 @@ The project supplies `.codex/m-orchestrator.toml`. Schema version 1 supports a c
 5. A passing aggregate change enters the project FIFO Tester queue with per-repository gate evidence bound to a composite change identifier.
 6. A temporary Tester loads the project's local Tester context and runs `$m-test` while holding project and optional host permits.
 7. Test failure releases permits and returns structured evidence to the Worker for repair and full gate rerun.
-8. Test success releases Tester capacity and enters the capacity-one archive/integration queue.
-9. `$m-archive` remains responsible for archive, merge, and cleanup behavior.
+8. Test success releases Tester capacity, records the tested archive candidate, and enters the project's capacity-one archive/integration queue.
+9. Ordinary contention remains `WAITING_FOR_MERGE`; after normal release, the next eligible same-project Worker is exposed for wakeup and may retry admission.
+10. Admission revalidates tested worktree identity and repository base heads before `$m-archive` becomes responsible for archive, merge, and cleanup behavior.
 
 ## Project Isolation
 
@@ -42,7 +43,8 @@ The project supplies `.codex/m-orchestrator.toml`. Schema version 1 supports a c
 - Schema version 2 runtime state is bound to the canonical umbrella root and `project_id`, independently of any one child repository. Schema version 1 retains Git-common-directory identity for compatibility.
 - Different logical projects inside one umbrella or repository require different IDs and environment namespaces.
 - Tasks select only configured repositories; ordinary validation and status never recursively scan or silently adopt child repositories.
-- A machine-level host budget shares only numeric capacity and opaque lease ownership. It never stores project commands, secrets, plans, diffs, or test results.
+- Archive/integration queues and leases are project-local. Independent projects may archive concurrently and are never serialized by a machine-wide archive lock.
+- A machine-level host budget applies only to temporary Testers and shares only numeric capacity and opaque lease ownership. Archive admission never consumes it.
 
 ## Configuration And Context
 
@@ -57,9 +59,10 @@ The project supplies `.codex/m-orchestrator.toml`. Schema version 1 supports a c
 - Missing host task tools: block background dispatch; never implement silently in the Planner.
 - Lightweight gate failed: remain in Worker execution.
 - Waiting for Tester: keep a FIFO ticket without holding capacity.
+- Waiting for archive: keep a project-local FIFO ticket without holding project or host capacity.
 - Stale Tester lease: report owner and heartbeat; inspect the Worker before explicit recovery.
 - New scope or authority: block and return to the Planner/user.
-- Integration drift: reconcile with the latest base and rerun affected validation before archive.
+- Integration drift: remove the stale archive ticket, return the Task to execution, and rerun affected validation before archive.
 - Partial multi-repository integration: stop, preserve recovery worktrees, and report completed and pending repositories; independent Git merges are not atomic.
 
 ## Acceptance Scenarios
@@ -80,6 +83,18 @@ Given more eligible Tasks than the configured capacity, when they request Tester
 
 Given two configured projects on one machine, when both run Workers and Testers, then their contexts, environments, Task records, queues, and project leases remain separate even if an optional host budget limits aggregate concurrency.
 
+### Resume Same-project Archive Waiters
+
+Given two eligible Tasks in one project, when the first completes archive and releases its integration lease, then the second remains queued in FIFO order, appears as `next_ready` with its existing Worker callback, and can acquire without entering `BLOCKED`.
+
+### Keep Project Archives Parallel
+
+Given eligible Tasks in two independent projects, when both request archive admission, then each may hold its own project integration lease concurrently and neither consumes Tester host capacity.
+
+### Reject Drift Before Archive
+
+Given a queued archive candidate whose worktree identifier or recorded base head changes, when admission is retried, then no archive lease is created and the Task returns to execution for validation.
+
 ### Support A Non-Git Umbrella
 
 Given a schema version 2 project root that is not Git and declares multiple valid child repositories, when configuration is validated and its Planner is registered, then orchestration succeeds without inspecting or initializing Git at the umbrella root.
@@ -94,6 +109,7 @@ Given `$m-test` fails, when the result is persisted, then all Tester permits are
 
 ## Related Intake
 
+- [2026-08-15_orchestrator-archive-queue-resume.md](../intake/2026-08-15_orchestrator-archive-queue-resume.md)
 - [2026-08-04_orchestrator-multi-repo.md](../intake/2026-08-04_orchestrator-multi-repo.md)
 - [2026-07-31_project-orchestrator.md](../intake/2026-07-31_project-orchestrator.md)
 
@@ -107,6 +123,7 @@ Given `$m-test` fails, when the result is persisted, then all Tester permits are
 
 ## Related Decisions
 
+- [2026-08-15_project-scoped-archive-resume.md](../decisions/2026-08-15_project-scoped-archive-resume.md)
 - [2026-08-04_orchestrator-multi-repo-runtime.md](../decisions/2026-08-04_orchestrator-multi-repo-runtime.md)
 - [2026-07-31_project-orchestrator.md](../decisions/2026-07-31_project-orchestrator.md)
 
