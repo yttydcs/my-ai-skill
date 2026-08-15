@@ -9,7 +9,7 @@
 - Docs Root: `D:\project\my-ai-skills\worktrees\archive-project-queue-resume\docs`
 - Code Repos: `D:\project\my-ai-skills`
 - Worktree: `D:\project\my-ai-skills\worktrees\archive-project-queue-resume`
-- Current Stage: `$m-execute`; ARQ-1 through ARQ-4 approved on 2026-08-15
+- Current Stage: `$m-execute` complete for ARQ-1 through ARQ-4; ARQ-5 and ARQ-6 remain deferred
 
 ## Stage Records
 
@@ -330,12 +330,12 @@ The repository already provides project-isolated queues and capacity-one archive
 
 #### Executable Task List
 
-- `ARQ-1`: align stable docs and skill contracts.
-- `ARQ-2`: implement project-scoped archive eligibility, release readiness, and capacity separation.
-- `ARQ-3`: add focused concurrency, drift, wakeup, compatibility, and cross-process tests.
-- `ARQ-4`: validate, synchronize installed skills, review diff/state, and commit implementation.
-- `ARQ-5`: run real Linux-host validation when an environment is available.
-- `ARQ-6`: archive, merge, and clean the workflow after execution/testing passes.
+- `ARQ-1` — completed: align stable docs and skill contracts.
+- `ARQ-2` — completed: implement project-scoped archive eligibility, release readiness, and capacity separation.
+- `ARQ-3` — completed: add focused concurrency, drift, wakeup, compatibility, and cross-process tests.
+- `ARQ-4` — completed: validate, synchronize installed skills, review diff/state, and commit implementation.
+- `ARQ-5` — deferred: run real Linux-host validation when an environment is available.
+- `ARQ-6` — deferred: archive, merge, and clean the workflow after execution/testing passes.
 
 #### Execution Scope After Approval
 
@@ -489,5 +489,17 @@ The repository already provides project-isolated queues and capacity-one archive
 
 #### Issue List
 
-- Blocked: no for planning.
+- Blocked: no for approved execution.
 - Implementation authorization: user approved `ARQ-1` through `ARQ-4` on 2026-08-15.
+
+#### Execution Results
+
+- `ARQ-1` commit: `3fcfbab docs: define project-scoped archive resume`.
+- `ARQ-2` commit: `3c8a633 fix: resume project-scoped archive queues`.
+- `ARQ-3` commit: `6231d89 test: cover archive queue continuation`.
+- Focused orchestrator contract/process regression run: 12 tests passed.
+- Full Windows repository discovery: 94 tests passed and 1 skipped.
+- `m-orchestrator` and `m-archive` skill validation: passed.
+- Source/dist/installed SHA-256 parity: passed for 10 `m-orchestrator` files and 3 `m-archive` files, excluding generated `.build-info.json`.
+- `git diff --check`: passed.
+- Residual risk: ARQ-5 still requires execution on a real Linux host; portability is currently supported by standard-library APIs and platform-neutral subprocess tests run on Windows, not by a completed Linux-host run.
