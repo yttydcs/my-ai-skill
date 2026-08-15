@@ -60,7 +60,7 @@ NORMAL_TRANSITIONS = {
     "TESTING": {"TEST_FAILED", "TEST_PASSED"},
     "TEST_FAILED": {"EXECUTING"},
     "TEST_PASSED": {"WAITING_FOR_MERGE"},
-    "WAITING_FOR_MERGE": {"ARCHIVING"},
+    "WAITING_FOR_MERGE": {"ARCHIVING", "EXECUTING"},
     "ARCHIVING": {"COMPLETED"},
     "COMPLETED": set(),
     "BLOCKED": STATES - {"COMPLETED", "BLOCKED"},
@@ -419,6 +419,8 @@ def load_config(project_root: str | os.PathLike[str]) -> ProjectConfig:
         raise OrchestratorError(f"Configured test pool does not exist: {test_pool}")
     if merge_pool not in validated_pools:
         raise OrchestratorError(f"Configured archive pool does not exist: {merge_pool}")
+    if test_pool == merge_pool:
+        raise OrchestratorError("Configured test and archive pools must be different")
     if validated_pools[merge_pool]["capacity"] != 1:
         raise OrchestratorError("The configured archive pool capacity must be 1")
 
@@ -934,6 +936,53 @@ def compute_task_change_id(config: ProjectConfig, task_id: str) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def task_base_heads(config: ProjectConfig, task: dict[str, Any]) -> dict[str, str]:
+    repositories = task.get("repositories")
+    if not isinstance(repositories, list) or not repositories:
+        return {}
+    heads: dict[str, str] = {}
+    for item_value in repositories:
+        item = require_mapping(item_value, "Task repository")
+        repository_id = validate_identifier(item.get("id"), "Task repository id", ID_PATTERN)
+        configured = config.repositories.get(repository_id)
+        if configured is None:
+            raise OrchestratorError(
+                f"Task repository is no longer configured for archive validation: {repository_id}"
+            )
+        base_ref = require_string(item.get("base_ref"), f"Task repository {repository_id} base_ref")
+        if base_ref != configured.base_branch:
+            raise OrchestratorError(
+                f"Task repository {repository_id} base_ref no longer matches project configuration"
+            )
+        heads[repository_id] = git_commit(
+            configured.root,
+            base_ref,
+            f"Task repository {repository_id} archive base",
+        )
+    return dict(sorted(heads.items()))
+
+
+def archive_candidate_issue(config: ProjectConfig, task: dict[str, Any]) -> str | None:
+    repositories = task.get("repositories")
+    if not isinstance(repositories, list) or not repositories:
+        return None
+    candidate = task.get("archive_candidate")
+    if not isinstance(candidate, dict):
+        return "missing-archive-candidate"
+    candidate_change_id = candidate.get("change_id")
+    candidate_base_heads = candidate.get("base_heads")
+    if not isinstance(candidate_change_id, str) or not candidate_change_id:
+        return "missing-archive-candidate"
+    if not isinstance(candidate_base_heads, dict):
+        return "missing-archive-candidate"
+    task_id = require_string(task.get("task_id"), "task_id")
+    if compute_task_change_id(config, task_id) != candidate_change_id:
+        return "worktree-drift"
+    if task_base_heads(config, task) != candidate_base_heads:
+        return "base-drift"
+    return None
+
+
 def validate_repository_gate_evidence(task: dict[str, Any], evidence_body: dict[str, Any]) -> None:
     task_repositories = task.get("repositories")
     if not isinstance(task_repositories, list) or not task_repositories:
@@ -1182,9 +1231,34 @@ def transition_task(
         if target == "WAITING_FOR_TESTER":
             task["gate"] = evidence
             task["change_id"] = change_id
+            if task.get("repositories"):
+                task["validation_base_heads"] = task_base_heads(config, task)
+        elif target == "WAITING_FOR_MERGE" and task.get("repositories"):
+            if expected == "TEST_PASSED":
+                candidate_change_id = require_string(
+                    task.get("change_id"), "validated Task change_id"
+                )
+                candidate_base_heads = task.get("validation_base_heads")
+                if not isinstance(candidate_base_heads, dict) or not candidate_base_heads:
+                    raise OrchestratorError(
+                        "Manifest-backed archive admission requires validated repository base heads"
+                    )
+                source = "test-passed"
+            else:
+                candidate_change_id = compute_task_change_id(config, task_id)
+                candidate_base_heads = task_base_heads(config, task)
+                source = "test-skipped"
+            task["archive_candidate"] = {
+                "change_id": candidate_change_id,
+                "base_heads": candidate_base_heads,
+                "captured_at": utc_now(),
+                "source": source,
+            }
         elif target in {"EXECUTING", "EXECUTE_GATE_FAILED"}:
             task["gate"] = None
             task["change_id"] = None
+            task.pop("validation_base_heads", None)
+            task.pop("archive_candidate", None)
         if evidence is not None:
             task["latest_evidence"] = evidence
         if reason:
@@ -1258,6 +1332,14 @@ def pool_expected_state(config: ProjectConfig, pool_name: str) -> tuple[str, str
     raise OrchestratorError(f"Pool is not assigned to a command: {pool_name}")
 
 
+def is_tester_pool(config: ProjectConfig, pool_name: str) -> bool:
+    return pool_name == config.commands["test"]["pool"]
+
+
+def is_archive_pool(config: ProjectConfig, pool_name: str) -> bool:
+    return pool_name == config.commands["archive"]["pool"]
+
+
 def list_records(directory: Path) -> list[tuple[Path, dict[str, Any]]]:
     if not directory.is_dir():
         return []
@@ -1273,19 +1355,119 @@ def find_owned_record(
     return matches[0] if matches else None
 
 
+def recovery_hold_path(root: Path) -> Path:
+    return root / "recovery-hold.json"
+
+
+def read_recovery_hold(root: Path) -> dict[str, Any] | None:
+    path = recovery_hold_path(root)
+    return read_json(path) if path.is_file() else None
+
+
+def write_recovery_hold(
+    config: ProjectConfig,
+    root: Path,
+    pool_name: str,
+    task_id: str,
+    lease_id: str,
+    reason: str,
+) -> dict[str, Any]:
+    hold = {
+        "project_id": config.project_id,
+        "pool": pool_name,
+        "task_id": task_id,
+        "lease_id": lease_id,
+        "reason": reason,
+        "created_at": utc_now(),
+    }
+    path = recovery_hold_path(root)
+    if path.exists():
+        existing = read_json(path)
+        if existing.get("task_id") != task_id:
+            raise OrchestratorError(
+                f"Archive recovery is already held by Task {existing.get('task_id')}"
+            )
+        if existing.get("lease_id") == lease_id:
+            return existing
+        hold["created_at"] = existing.get("created_at", hold["created_at"])
+        hold["updated_at"] = utc_now()
+    atomic_write_json(path, hold)
+    return hold
+
+
+def archive_next_ready(
+    config: ProjectConfig, pool_name: str, root: Path
+) -> dict[str, Any] | None:
+    if not is_archive_pool(config, pool_name):
+        return None
+    if read_recovery_hold(root) is not None:
+        return None
+    if len(list_records(root / "leases")) >= config.pools[pool_name]["capacity"]:
+        return None
+    tickets = list_records(root / "queue")
+    if not tickets:
+        return None
+    _, ticket = tickets[0]
+    task_id = require_string(ticket.get("task_id"), "archive queue task_id")
+    task = load_task(config, task_id)
+    if task.get("state") != "WAITING_FOR_MERGE" or task.get("active_lease"):
+        return None
+    worker_value = task.get("worker")
+    worker = worker_value if isinstance(worker_value, dict) else {}
+    return {
+        "task_id": task_id,
+        "ticket_id": ticket.get("ticket_id"),
+        "thread_id": worker.get("thread_id"),
+        "host_id": worker.get("host_id"),
+    }
+
+
+def return_archive_task_to_revalidation(
+    config: ProjectConfig,
+    pool_name: str,
+    task: dict[str, Any],
+    issue: str,
+    ticket: tuple[Path, dict[str, Any]] | None,
+) -> dict[str, Any]:
+    task_id = require_string(task.get("task_id"), "task_id")
+    reason = f"Archive candidate requires revalidation: {issue}"
+    transition_task(
+        config,
+        task_id,
+        "WAITING_FOR_MERGE",
+        "EXECUTING",
+        reason=reason,
+    )
+    if ticket is not None:
+        ticket[0].unlink(missing_ok=True)
+    return {
+        "status": "NeedsRevalidation",
+        "task_id": task_id,
+        "pool": pool_name,
+        "reason": issue,
+        "state": "EXECUTING",
+    }
+
+
 def enqueue_task(config: ProjectConfig, pool_name: str, task_id: str) -> dict[str, Any]:
     ensure_runtime(config)
     root = pool_root(config, pool_name)
     expected_state, _ = pool_expected_state(config, pool_name)
-    task = load_task(config, task_id)
-    if task.get("state") != expected_state:
-        raise OrchestratorError(
-            f"Task {task_id} must be {expected_state} before enqueue; found {task.get('state')}"
-        )
-    if expected_state == "WAITING_FOR_TESTER":
-        ensure_current_passing_gate(config, task)
     with directory_lock(root / ".lock"):
+        task = load_task(config, task_id)
+        if task.get("state") != expected_state:
+            raise OrchestratorError(
+                f"Task {task_id} must be {expected_state} before enqueue; found {task.get('state')}"
+            )
         existing = find_owned_record(list_records(root / "queue"), task_id)
+        if is_tester_pool(config, pool_name):
+            ensure_current_passing_gate(config, task)
+        elif is_archive_pool(config, pool_name):
+            issue = archive_candidate_issue(config, task)
+            if issue is not None:
+                return return_archive_task_to_revalidation(
+                    config, pool_name, task, issue, existing
+                )
         if existing:
             return {"status": "Queued", "ticket": existing[1], "idempotent": True}
         now_ns = time.time_ns()
@@ -1467,7 +1649,14 @@ def try_acquire(config: ProjectConfig, pool_name: str, task_id: str) -> dict[str
             raise OrchestratorError(
                 f"Task {task_id} must be {expected_state} before acquire; found {task.get('state')}"
             )
-        if expected_state == "WAITING_FOR_TESTER":
+        recovery_hold = read_recovery_hold(root) if is_archive_pool(config, pool_name) else None
+        if recovery_hold is not None and recovery_hold.get("task_id") != task_id:
+            return {
+                "status": "Blocked",
+                "reason": "archive-recovery",
+                "recovery_hold": recovery_hold,
+            }
+        if is_tester_pool(config, pool_name):
             ensure_current_passing_gate(config, task)
         tickets = list_records(root / "queue")
         owned_ticket = find_owned_record(tickets, task_id)
@@ -1476,12 +1665,20 @@ def try_acquire(config: ProjectConfig, pool_name: str, task_id: str) -> dict[str
         position = next(
             index for index, (_, ticket) in enumerate(tickets, start=1) if ticket.get("task_id") == task_id
         )
-        if position != 1:
+        recovering_owner = recovery_hold is not None and recovery_hold.get("task_id") == task_id
+        if position != 1 and not recovering_owner:
             return {"status": "Waiting", "position": position, "reason": "fifo"}
         if len(leases) >= config.pools[pool_name]["capacity"]:
             return {"status": "Waiting", "position": position, "reason": "project-capacity"}
 
-        host_lease = acquire_host_lease(config, task_id)
+        if is_archive_pool(config, pool_name):
+            issue = archive_candidate_issue(config, task)
+            if issue is not None:
+                return return_archive_task_to_revalidation(
+                    config, pool_name, task, issue, owned_ticket
+                )
+
+        host_lease = acquire_host_lease(config, task_id) if is_tester_pool(config, pool_name) else None
         if host_lease and host_lease.get("status") == "Waiting":
             return {"status": "Waiting", "position": position, "reason": "host-capacity"}
         lease_id = uuid.uuid4().hex
@@ -1543,6 +1740,7 @@ def release_lease(
     root = pool_root(config, pool_name)
     path = root / "leases" / f"{lease_id}.json"
     _, acquired_state = pool_expected_state(config, pool_name)
+    archive_pool = is_archive_pool(config, pool_name)
     with directory_lock(root / ".lock"):
         if not path.exists():
             other = find_owned_record(list_records(root / "leases"), task_id)
@@ -1555,7 +1753,11 @@ def release_lease(
                 raise OrchestratorError(
                     f"Task {task_id} is still {acquired_state} but its lease is missing; inspect runtime state"
                 )
-            return {"status": "Released", "lease_id": lease_id, "idempotent": True}
+            result = {"status": "Released", "lease_id": lease_id, "idempotent": True}
+            if archive_pool:
+                result["next_ready"] = archive_next_ready(config, pool_name, root)
+                result["recovery_hold"] = read_recovery_hold(root)
+            return result
         lease = read_json(path)
         if lease.get("task_id") != task_id or lease.get("lease_id") != lease_id:
             raise OrchestratorError("Project lease ownership mismatch")
@@ -1564,10 +1766,28 @@ def release_lease(
             raise OrchestratorError(
                 f"Persist the Tester or archive result, or use explicit stale reclaim, before releasing {acquired_state}"
             )
+        if archive_pool:
+            if task.get("state") == "COMPLETED":
+                hold = read_recovery_hold(root)
+                if hold is not None and hold.get("task_id") == task_id:
+                    recovery_hold_path(root).unlink(missing_ok=True)
+            else:
+                write_recovery_hold(
+                    config,
+                    root,
+                    pool_name,
+                    task_id,
+                    lease_id,
+                    str(task.get("latest_reason") or "archive did not complete normally"),
+                )
         if lease.get("host_lease_id"):
             release_host_lease(config, lease["host_lease_id"], task_id)
         path.unlink()
-        return {"status": "Released", "lease_id": lease_id, "idempotent": False}
+        result = {"status": "Released", "lease_id": lease_id, "idempotent": False}
+        if archive_pool:
+            result["next_ready"] = archive_next_ready(config, pool_name, root)
+            result["recovery_hold"] = read_recovery_hold(root)
+        return result
 
 
 def reclaim_lease(
@@ -1616,10 +1836,16 @@ def reclaim_lease(
                         event["status"] = "Completed"
                         event["completed_at"] = utc_now()
                         atomic_write_json(event_path, event)
+                    recovery_hold = None
+                    if is_archive_pool(config, pool_name):
+                        recovery_hold = write_recovery_hold(
+                            config, root, pool_name, task_id, lease_id, resolution
+                        )
                     return {
                         "status": "Reclaimed",
                         "lease_id": lease_id,
                         "event": event,
+                        "recovery_hold": recovery_hold,
                         "idempotent": True,
                     }
             raise OrchestratorError(f"Lease does not exist and has no reclaim audit: {lease_id}")
@@ -1674,6 +1900,11 @@ def reclaim_lease(
                 "started_at": utc_now(),
             }
             atomic_write_json(event_path, event)
+        recovery_hold = None
+        if is_archive_pool(config, pool_name):
+            recovery_hold = write_recovery_hold(
+                config, root, pool_name, task_id, lease_id, resolution
+            )
         if lease.get("host_lease_id"):
             release_host_lease(config, lease["host_lease_id"], task_id)
         if not recovery_started:
@@ -1692,6 +1923,7 @@ def reclaim_lease(
             "status": "Reclaimed",
             "lease_id": lease_id,
             "event": event,
+            "recovery_hold": recovery_hold,
             "idempotent": False,
         }
 
@@ -1791,7 +2023,8 @@ def stale_leases(config: ProjectConfig, pool_name: str) -> dict[str, Any]:
     root = pool_root(config, pool_name)
     now = datetime.now(timezone.utc)
     stale: list[dict[str, Any]] = []
-    for _, lease in list_records(root / "leases"):
+    project_leases = list_records(root / "leases")
+    for _, lease in project_leases:
         age, timeout = lease_age_seconds(lease, now)
         if age > timeout:
             stale.append({**lease, "age_seconds": int(age)})
@@ -1800,11 +2033,21 @@ def stale_leases(config: ProjectConfig, pool_name: str) -> dict[str, Any]:
     if host_root is not None:
         instance_id = project_instance_id(config)
         legacy_owner_prefix = f"{config.project_id}:"
+        legacy_archive_host_ids = {
+            lease.get("host_lease_id")
+            for _, lease in project_leases
+            if lease.get("host_lease_id")
+        }
         with directory_lock(host_root / ".lock"):
             for _, lease in list_records(host_root / "leases"):
-                if lease.get("project_instance_id") != instance_id and not str(
+                belongs_to_project = lease.get("project_instance_id") == instance_id or str(
                     lease.get("owner", "")
-                ).startswith(legacy_owner_prefix):
+                ).startswith(legacy_owner_prefix)
+                if not belongs_to_project:
+                    continue
+                if not is_tester_pool(config, pool_name) and lease.get(
+                    "lease_id"
+                ) not in legacy_archive_host_ids:
                     continue
                 age, timeout = lease_age_seconds(lease, now)
                 if age > timeout:
@@ -1824,11 +2067,16 @@ def project_status(config: ProjectConfig) -> dict[str, Any]:
     pools: dict[str, Any] = {}
     for name in sorted(config.pools):
         root = pool_root(config, name)
-        pools[name] = {
-            "capacity": config.pools[name]["capacity"],
-            "queued": [record for _, record in list_records(root / "queue")],
-            "leases": [record for _, record in list_records(root / "leases")],
-        }
+        with directory_lock(root / ".lock"):
+            pool_status = {
+                "capacity": config.pools[name]["capacity"],
+                "queued": [record for _, record in list_records(root / "queue")],
+                "leases": [record for _, record in list_records(root / "leases")],
+            }
+            if is_archive_pool(config, name):
+                pool_status["next_ready"] = archive_next_ready(config, name, root)
+                pool_status["recovery_hold"] = read_recovery_hold(root)
+            pools[name] = pool_status
     return {
         "status": "Ready",
         "project_id": config.project_id,
