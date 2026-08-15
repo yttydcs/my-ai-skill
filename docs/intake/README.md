@@ -25,6 +25,7 @@ Store original request evidence before it is refined into feature, requirement, 
 
 ## Current Docs
 
+- [2026-08-15_orchestrator-archive-queue-resume.md](2026-08-15_orchestrator-archive-queue-resume.md) - source: Codex chat, project-scoped archive FIFO waiting, automatic continuation, drift revalidation, and Windows/Linux portability
 - [2026-08-04_orchestrator-multi-repo.md](2026-08-04_orchestrator-multi-repo.md) - source: Codex chat, correct `m-orchestrator` for non-Git umbrella projects with multiple child repositories
 - [2026-07-31_project-orchestrator.md](2026-07-31_project-orchestrator.md) - source: Codex chat, persistent per-project Planner with temporary Workers and bounded Tester Pools
 - [2026-07-20_m-discuss-grill-mode.md](2026-07-20_m-discuss-grill-mode.md) - source: Codex chat, explicitly triggered Grill Mode inside `$m-discuss`
