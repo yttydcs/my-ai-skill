@@ -60,8 +60,8 @@ The confirmed design does not introduce a machine-wide archive lock. Project ide
 - [Original project orchestrator decision](../decisions/2026-07-31_project-orchestrator.md)
 - [Multi-repository runtime decision](../decisions/2026-08-04_orchestrator-multi-repo-runtime.md)
 - [Lease recovery lesson](../lessons/orchestrator-lease-recovery.md)
-- Active workflow plan: `../../plan.md`
+- [Archived workflow plan](../plan/2026-08-15_orchestrator-archive-queue-resume.md)
 
 ## Related Changes
 
-- To be created by `$m-archive` after implementation and validation.
+- [2026-08-17_orchestrator-archive-queue-resume.md](../change/2026-08-17_orchestrator-archive-queue-resume.md)

@@ -37,4 +37,6 @@ Stale ownership or partial integration remains explicit recovery. A project-loca
 - [Feature](../features/m-project-orchestrator.md)
 - [Requirements](../requirements/m-project-orchestrator.md)
 - [Specification](../specs/m-project-orchestrator.md)
-- [Plan](../../plan.md)
+- [Plan](../plan/2026-08-15_orchestrator-archive-queue-resume.md)
+- [Change](../change/2026-08-17_orchestrator-archive-queue-resume.md)
+- [Lesson](../lessons/orchestrator-lease-recovery.md)

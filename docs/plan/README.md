@@ -23,6 +23,7 @@ Store archived workflow planning documents when they need to be retained beyond 
 
 ## Current Docs
 
+- [2026-08-15_orchestrator-archive-queue-resume.md](2026-08-15_orchestrator-archive-queue-resume.md) - project-scoped archive FIFO continuation, crash-safe admission recovery, and cross-project parallelism
 - [2026-08-04_orchestrator-multi-repo.md](2026-08-04_orchestrator-multi-repo.md) - schema v2 non-Git umbrella runtime, explicit repository catalogs, Task manifests, and cross-project isolation
 - [2026-07-31_project-orchestrator.md](2026-07-31_project-orchestrator.md) - project-scoped persistent Planner, temporary Workers, bounded Testers, and isolated runtime orchestration
 - [2026-07-20_m-discuss-grill-mode.md](2026-07-20_m-discuss-grill-mode.md) - explicit Grill Mode integration for `$m-discuss`

@@ -519,4 +519,34 @@ The repository already provides project-isolated queues and capacity-one archive
 - `git diff --check`: passed.
 - `ARQ-1` through `ARQ-4`: complete after the repair cycle.
 - `ARQ-5`: still deferred; no real Linux runner is available, so Linux execution remains the only residual validation risk.
-- `ARQ-6`: still deferred to an explicit later `$m-archive` invocation; no merge, worktree cleanup, push, or publication was performed by `$m-continue`.
+- `ARQ-6`: entered after the user explicitly invoked `$m-archive`; archive records and governed indexes are prepared before control-plane merge and cleanup.
+
+## Stage 4 - Archive and Closeout
+
+### Archive Records
+
+- Change archive: `docs/change/2026-08-17_orchestrator-archive-queue-resume.md`.
+- Retained plan: `docs/plan/2026-08-15_orchestrator-archive-queue-resume.md`.
+- Reusable lesson: updated `docs/lessons/orchestrator-lease-recovery.md`.
+
+### Docs Impact
+
+- Intake impact: updated with completed plan/change links.
+- Feature impact: updated during execution and linked to the completed change.
+- Requirements impact: updated with interruption recovery, live-lock ownership, and legacy host-orphan guarantees.
+- Specs impact: updated with owner-heartbeat, operation-journal, and audited orphan-recovery contracts.
+- Decision impact: updated the accepted project-scoped archive-resume decision with crash-safe recovery consequences.
+- Lessons impact: updated the searchable lease-recovery lesson and its index cues.
+- Root docs index impact: none; category topology and reading order are unchanged.
+- Category indexes: change, plan, and lessons updated.
+
+### Validation Decision
+
+- `$m-test` findings were repaired through one `$m-continue` cycle.
+- Evidence: 15 contract tests and 53 runtime tests passed; full Windows discovery passed 108 tests with one established symlink-privilege skip; skill validators, source/dist/installed parity, and `git diff --check` passed.
+- Residual risk accepted for closeout: the portable tests were not executed on a real Linux host; Linux-host execution remains recommended follow-up validation, not a merge blocker for this local workflow.
+
+### Publication and Closeout
+
+- Docs and code changes are local/versioned only; no push, publication, remote modification, deployment, or backup action was authorized.
+- Default `$m-archive` closeout commits these records, merges `fix/archive-project-queue-resume` from the clean control-plane checkout, verifies the merge, removes/prunes the dedicated worktree, and deletes the merged local feature branch when safe.

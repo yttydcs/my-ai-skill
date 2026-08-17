@@ -143,6 +143,7 @@ Archive admission remains capacity one at project scope. `$m-archive` preflights
 
 ## Related Change
 
+- [2026-08-17_orchestrator-archive-queue-resume.md](../change/2026-08-17_orchestrator-archive-queue-resume.md)
 - [2026-08-04_orchestrator-multi-repo.md](../change/2026-08-04_orchestrator-multi-repo.md)
 - [2026-07-31_project-orchestrator.md](../change/2026-07-31_project-orchestrator.md)
 

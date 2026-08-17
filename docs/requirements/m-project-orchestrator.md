@@ -119,6 +119,7 @@ Provide a project-scoped automation companion that coordinates persistent planni
 
 ## Related Changes
 
+- [2026-08-17_orchestrator-archive-queue-resume.md](../change/2026-08-17_orchestrator-archive-queue-resume.md)
 - [2026-08-04_orchestrator-multi-repo.md](../change/2026-08-04_orchestrator-multi-repo.md)
 - [2026-07-31_project-orchestrator.md](../change/2026-07-31_project-orchestrator.md)
 

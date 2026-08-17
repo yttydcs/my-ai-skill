@@ -84,6 +84,9 @@ A lease file alone is not the full ownership state. Correct ownership is the con
 
 ## Related Docs
 
+- [Archive queue resume intake](../intake/2026-08-15_orchestrator-archive-queue-resume.md)
+- [Archive queue resume plan](../plan/2026-08-15_orchestrator-archive-queue-resume.md)
+- [Archive queue resume change](../change/2026-08-17_orchestrator-archive-queue-resume.md)
 - [Project orchestrator intake](../intake/2026-07-31_project-orchestrator.md)
 - [Project orchestrator feature](../features/m-project-orchestrator.md)
 - [Project orchestrator requirements](../requirements/m-project-orchestrator.md)
