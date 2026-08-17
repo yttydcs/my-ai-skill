@@ -503,3 +503,20 @@ The repository already provides project-isolated queues and capacity-one archive
 - Source/dist/installed SHA-256 parity: passed for 10 `m-orchestrator` files and 3 `m-archive` files, excluding generated `.build-info.json`.
 - `git diff --check`: passed.
 - Residual risk: ARQ-5 still requires execution on a real Linux host; portability is currently supported by standard-library APIs and platform-neutral subprocess tests run on Windows, not by a completed Linux-host run.
+
+#### `$m-continue` Repair Cycle - 2026-08-17
+
+- Cycle 1 repaired the failed `$m-test` findings without expanding ARQ-1 through ARQ-4: active internal locks now heartbeat and require confirmed process exit before stale recovery; archive Task/lease/ticket mutations use a reconciled operation record; `BLOCKED` archive resume preserves the validated candidate; incomplete project admission and legacy archive host-only leases have explicit recovery paths.
+- Package hygiene commit: `c67e799 fix: exclude bytecode from skill sync`.
+- Runtime, contract, documentation, and regression commit: `8b525ea fix: make archive admission crash-safe`.
+- Deterministic lock coverage includes a real subprocess holder crossing the scaled stale threshold, an exited-owner reclaim, and concurrent same-Task enqueue proving one durable ticket.
+- Fault-injection coverage includes interrupted revalidation, interrupted acquisition after lease write, recovery-time worktree drift, partial project lease reclaim, and legacy archive host-only discovery/reclaim.
+- Focused contract suite: 15 tests passed.
+- Focused runtime suite: 53 tests passed.
+- Full Windows repository discovery: 108 tests passed and 1 skipped because the current account lacks symlink creation privilege.
+- `m-orchestrator` and `m-archive` skill validation: passed.
+- Source/dist/installed SHA-256 parity: passed for 9 `m-orchestrator` source files and 3 `m-archive` source files; generated `__pycache__`, `.pyc`, `.pyo`, and `.build-info.json` are excluded.
+- `git diff --check`: passed.
+- `ARQ-1` through `ARQ-4`: complete after the repair cycle.
+- `ARQ-5`: still deferred; no real Linux runner is available, so Linux execution remains the only residual validation risk.
+- `ARQ-6`: still deferred to an explicit later `$m-archive` invocation; no merge, worktree cleanup, push, or publication was performed by `$m-continue`.
