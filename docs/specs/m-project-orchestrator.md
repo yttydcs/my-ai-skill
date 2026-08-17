@@ -87,12 +87,14 @@ Schema version 1 retains `task create --task-id --plan` and its existing Task/ru
 - Project tickets use FIFO order.
 - Integration tickets and leases are scoped to one project runtime root; unrelated projects may acquire their own capacity-one integration leases concurrently.
 - Pool metadata mutations are serialized with atomic local locks.
+- Internal lock owners heartbeat while active; stale lock recovery requires confirmed process exit, so a long metadata operation is never stolen only because its age crossed a threshold.
+- Archive acquisition and revalidation use a project-local operation record to reconcile interrupted Task/lease/ticket mutations before later pool work. Recovery revalidates the persisted candidate before entering `ARCHIVING`.
 - A lease has an opaque ID and exact Task owner.
 - Heartbeat and release reject ownership mismatch.
 - Same-owner repeated release is idempotent.
 - Normal release rejects a Task that has not persisted its test, archive, or blocker result.
-- Expiry lists stale project and host candidates but never silently reclaims them; explicit project reclaim requires an actor and reason, blocks the Task, and persists an audit event.
-- An audited host-orphan reclaim is allowed only when no project lease exists and the Task remains in its pool waiting state.
+- Expiry lists stale project and host candidates but never silently reclaims them; explicit project reclaim requires an actor and reason, blocks an actively acquired Task, and persists an audit event. A stale pre-acquisition project lease is audited and removed while its Task remains waiting.
+- An audited host-orphan reclaim is allowed only when no project lease exists and the Task remains in its pool waiting state; merge inspection includes legacy archive host-only records so they are not hidden from recovery.
 - Optional host capacity is acquired only for the configured Tester pool while project admission is serialized; any partial failure rolls host capacity back.
 - A normal integration release after persisted completion returns `next_ready` for the next eligible same-project Worker. Project status exposes the same value for missed-wakeup recovery.
 - Explicit stale or partial integration recovery records a project-pool hold and does not advertise or admit unrelated queued Tasks until the recovery owner is deliberately resumed.

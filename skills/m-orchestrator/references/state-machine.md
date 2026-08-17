@@ -29,7 +29,7 @@ WAITING_FOR_MERGE -> ARCHIVING -> COMPLETED
 WAITING_FOR_MERGE -> EXECUTING (archive candidate needs revalidation)
 ```
 
-Any non-terminal state may enter `BLOCKED` with evidence. Leaving `BLOCKED` requires the exact prior state or approved resume target plus a recorded resolution. `COMPLETED` is terminal.
+Any non-terminal state may enter `BLOCKED` with evidence. Leaving `BLOCKED` requires the exact prior state or approved resume target plus a recorded resolution. Resuming an interrupted archive owner to `WAITING_FOR_MERGE` preserves its prior validated archive candidate; enqueue/acquisition revalidates that candidate and returns drift to `EXECUTING` instead of recapturing untested state. `COMPLETED` is terminal.
 
 ## Evidence Invariants
 
@@ -43,7 +43,7 @@ Any non-terminal state may enter `BLOCKED` with evidence. Leaving `BLOCKED` requ
 - `COMPLETED` requires `$m-archive` completion evidence.
 - Multi-repository archive evidence must record an ordered result for every selected repository. A partial integration enters `BLOCKED`; it is not `COMPLETED`.
 
-The runtime stores evidence paths, hashes, statuses, timestamps, and opaque identifiers. It never copies evidence bodies or loaded contexts into Task state.
+The runtime stores evidence paths, hashes, statuses, timestamps, and opaque identifiers. It never copies evidence bodies or loaded contexts into Task state. Project-local archive operation records make the Task/lease/ticket mutations retryable after process interruption; reconciliation cannot bypass archive-candidate revalidation.
 
 Ordinary archive capacity/FIFO contention stays `WAITING_FOR_MERGE`; `BLOCKED` is reserved for explicit recovery or external handoff. Archive recovery holds prevent unrelated queue progress after stale ownership or partial integration.
 

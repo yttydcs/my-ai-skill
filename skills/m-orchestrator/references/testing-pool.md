@@ -44,7 +44,7 @@ Use one consistent order:
 
 If any step after host acquisition fails, release the host lease before returning. Never keep partial capacity while reporting `Waiting` or `Failed`.
 
-For archive/integration pools, omit step 3 entirely. Capacity one is enforced only inside that project's runtime root, so independent projects can hold archive leases concurrently.
+For archive/integration pools, omit step 3 entirely. Before steps 4-5, persist a project-local operation record; then write the lease, compare-and-set the Task to `ARCHIVING`, remove the ticket, and complete the operation. A later pool mutation reconciles an interrupted operation before new admission and revalidates the archive candidate again before completing a partial acquisition. Capacity one is enforced only inside that project's runtime root, so independent projects can hold archive leases concurrently.
 
 ## Release
 
@@ -52,11 +52,11 @@ Persist the Tester result or blocker by transitioning `TESTING` to `TEST_FAILED`
 
 ## Stale Leases
 
-Expiry is a diagnostic threshold, not automatic proof that a Tester is dead. List stale project and host candidates with their owner and last heartbeat. The Planner or owning Worker must inspect live task status before explicit reclaim through `pool reclaim`, supplying the exact lease ID, actor, and reason. Project reclaim rejects a fresh lease, transitions its Task to `BLOCKED`, releases host and project capacity, and writes a project-local audit event. It never resumes or expands the Task automatically.
+Expiry is a diagnostic threshold, not automatic proof that a Tester is dead. List stale project and host candidates with their owner and last heartbeat. The Planner or owning Worker must inspect live task status before explicit reclaim through `pool reclaim`, supplying the exact lease ID, actor, and reason. Reclaim of a lease paired with an active Task transitions that Task to `BLOCKED`, releases capacity, and writes a project-local audit event. A stale project lease left before Task acquisition is recorded as an orphan admission, removed without blocking the still-waiting Task, and remains retryable and audited.
 
-If a process stopped after host admission but before the project lease was durable, `pool reclaim-host` may release that stale orphan only when the Task is still in the pool's waiting state and owns no project lease. The command requires the exact host lease ID, actor, and reason, writes an audit event, and leaves the Task queued for a normal retry.
+If a process stopped after host admission but before the project lease was durable, `pool stale` reports the host-only orphan for either the Tester or legacy archive owner. `pool reclaim-host` may release it only when the Task is still in that pool's waiting state and owns no project lease. The command requires the exact host lease ID, actor, and reason, writes an audit event, and leaves the Task queued for a normal retry.
 
-Pool implementation locks may use a short internal stale threshold for crash recovery because they protect metadata operations only; they must not be confused with Tester leases.
+Pool implementation locks carry an owner token, process ID, and heartbeat. A contender waits for normal release and may recover an expired internal lock only after the recorded process is confirmed exited; elapsed time alone never authorizes stealing a live lock. This uses portable directory metadata plus safe process-liveness checks on Windows and Linux, not platform-specific file-lock APIs. Internal locks must not be confused with Tester leases.
 
 ## Waiting Behavior
 

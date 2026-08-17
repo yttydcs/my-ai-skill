@@ -194,6 +194,20 @@ class MOrchestratorContractTests(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertIn(text, source)
 
+    def test_archive_recovery_contract_covers_live_locks_and_partial_writes(self):
+        pool = self.references["testing-pool.md"]
+        state_machine = self.references["state-machine.md"]
+        required = (
+            (pool, "may recover an expired internal lock only after the recorded process is confirmed exited"),
+            (pool, "persist a project-local operation record"),
+            (pool, "legacy archive owner"),
+            (state_machine, "preserves its prior validated archive candidate"),
+            (state_machine, "reconciliation cannot bypass archive-candidate revalidation"),
+        )
+        for source, text in required:
+            with self.subTest(text=text):
+                self.assertIn(text, source)
+
     def test_autoflow_routes_orchestrator_as_non_phase_companion(self):
         umbrella = (REPO_ROOT / "skills" / "m-autoflow" / "SKILL.md").read_text(
             encoding="utf-8"

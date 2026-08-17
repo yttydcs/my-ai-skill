@@ -68,6 +68,9 @@ Provide a project-scoped automation companion that coordinates persistent planni
 - Normal integration release must identify the next eligible same-project queue head and its persisted Worker callback for retryable host wakeup.
 - Project status must expose the same archive readiness so a missed wakeup can be recovered without busy waiting.
 - Integration acquisition must revalidate the persisted archive candidate under the project-pool critical section; worktree or base drift must remove the stale ticket, return the Task to execution, and consume no permit.
+- Interrupted integration admission must converge from durable project-local operation state without leaving a permanent queue head or inconsistent lease, and recovery must revalidate the candidate before entering archive.
+- Internal metadata locks must wait for a live owner and may reclaim stale ownership only after the recorded process is confirmed exited on both Windows and Linux.
+- Legacy archive host-only leases must remain discoverable and explicitly reclaimable from the integration pool while no project lease exists.
 - Stale or partial integration recovery must not advertise unrelated queued work until an explicit recovery decision is recorded.
 - Base reconciliation that changes executable content must invalidate earlier validation as appropriate.
 - Multi-repository integration must preflight every selected repository, use recorded dependency order, and report partial completion as blocked rather than atomic success.

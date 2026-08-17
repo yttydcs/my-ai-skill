@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 
 
@@ -177,6 +178,15 @@ def start_archive_acquire(project_root: Path, task_id: str) -> subprocess.Popen[
         text=True,
         env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
     )
+
+
+def finish_process(process: subprocess.Popen[str], timeout: float = 20) -> tuple[str, str]:
+    try:
+        return process.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        process.communicate()
+        raise
 
 
 class ProjectFixture:
@@ -448,6 +458,91 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
         else:
             os.environ["M_ORCHESTRATOR_HOME"] = self.previous_home
         self.temporary.cleanup()
+
+    def test_process_liveness_probe_is_safe_for_current_process(self):
+        self.assertTrue(runtime.process_is_alive(os.getpid()))
+
+    def test_stale_lock_from_exited_process_is_reclaimed(self):
+        lock_path = self.root / "runtime" / ".lock"
+        lock_path.parent.mkdir(parents=True)
+        lock_path.mkdir()
+        owner_path = lock_path / "owner.json"
+        runtime.atomic_write_json(
+            owner_path,
+            {
+                "owner_token": "abandoned",
+                "pid": 2147483647,
+                "acquired_at": runtime.utc_now(),
+            },
+        )
+        stale_at = time.time() - 60
+        os.utime(owner_path, (stale_at, stale_at))
+        original_stale = runtime.LOCK_STALE_SECONDS
+        runtime.LOCK_STALE_SECONDS = 0.01
+        try:
+            with runtime.directory_lock(lock_path):
+                self.assertTrue(lock_path.is_dir())
+        finally:
+            runtime.LOCK_STALE_SECONDS = original_stale
+        self.assertFalse(lock_path.exists())
+
+    def test_live_lock_is_not_reclaimed_across_processes(self):
+        lock_path = self.root / "runtime" / ".lock"
+        lock_path.parent.mkdir(parents=True)
+        ready_path = self.root / "lock-ready"
+        program = """
+import importlib.util
+from pathlib import Path
+import sys
+import time
+
+runtime_path = Path(sys.argv[1])
+spec = importlib.util.spec_from_file_location("lock_holder_runtime", runtime_path)
+module = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = module
+spec.loader.exec_module(module)
+with module.directory_lock(Path(sys.argv[2])):
+    Path(sys.argv[3]).write_text("ready", encoding="utf-8")
+    time.sleep(0.5)
+"""
+        process = subprocess.Popen(
+            [
+                sys.executable,
+                "-B",
+                "-c",
+                program,
+                str(RUNTIME_PATH),
+                str(lock_path),
+                str(ready_path),
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+        original_stale = runtime.LOCK_STALE_SECONDS
+        original_timeout = runtime.LOCK_TIMEOUT_SECONDS
+        try:
+            deadline = time.monotonic() + 5
+            while not ready_path.exists() and process.poll() is None:
+                if time.monotonic() >= deadline:
+                    self.fail("Child process did not acquire the runtime lock")
+                time.sleep(0.01)
+            self.assertIsNone(process.poll())
+            runtime.LOCK_STALE_SECONDS = 0.05
+            runtime.LOCK_TIMEOUT_SECONDS = 2.0
+            with runtime.directory_lock(lock_path):
+                self.assertTrue(lock_path.is_dir())
+        finally:
+            runtime.LOCK_STALE_SECONDS = original_stale
+            runtime.LOCK_TIMEOUT_SECONDS = original_timeout
+            try:
+                stdout, stderr = process.communicate(timeout=2)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                stdout, stderr = process.communicate()
+        self.assertEqual(process.returncode, 0, f"{stdout}\n{stderr}")
+        self.assertFalse(lock_path.exists())
 
     def test_valid_config_resolves_isolated_git_runtime(self):
         project = ProjectFixture(self.root / "project-a", "project-a")
@@ -1240,7 +1335,7 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
         ]
         results = []
         for process in processes:
-            stdout, stderr = process.communicate(timeout=20)
+            stdout, stderr = finish_process(process)
             self.assertEqual(process.returncode, 0, stderr)
             results.append(json.loads(stdout))
 
@@ -1293,7 +1388,7 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
         ]
         results = []
         for process in processes:
-            stdout, stderr = process.communicate(timeout=20)
+            stdout, stderr = finish_process(process)
             self.assertEqual(process.returncode, 0, stderr)
             results.append(json.loads(stdout))
 
@@ -1304,6 +1399,312 @@ class MOrchestratorRuntimeTests(unittest.TestCase):
         runtime.release_host_lease(
             first.config, host_holder["lease_id"], "TESTER-HOLDER"
         )
+
+    def test_live_pool_lock_is_not_reclaimed_after_stale_threshold(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        project.prepare_archive_task("T-1")
+        merge_root = runtime.pool_root(project.config, "merge")
+        for ticket_path in (merge_root / "queue").glob("*.json"):
+            ticket_path.unlink()
+
+        original_issue = runtime.archive_candidate_issue
+        original_stale = runtime.LOCK_STALE_SECONDS
+        original_timeout = runtime.LOCK_TIMEOUT_SECONDS
+
+        def slow_issue(config, task):
+            time.sleep(0.25)
+            return original_issue(config, task)
+
+        runtime.archive_candidate_issue = slow_issue
+        runtime.LOCK_STALE_SECONDS = 0.05
+        runtime.LOCK_TIMEOUT_SECONDS = 2.0
+        try:
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                futures = [
+                    executor.submit(
+                        runtime.enqueue_task, project.config, "merge", "T-1"
+                    )
+                    for _ in range(2)
+                ]
+                results = [future.result() for future in futures]
+        finally:
+            runtime.archive_candidate_issue = original_issue
+            runtime.LOCK_STALE_SECONDS = original_stale
+            runtime.LOCK_TIMEOUT_SECONDS = original_timeout
+
+        self.assertEqual([item["status"] for item in results], ["Queued", "Queued"])
+        self.assertEqual(sorted(item["idempotent"] for item in results), [False, True])
+        self.assertEqual(len(list((merge_root / "queue").glob("*.json"))), 1)
+
+    def test_blocked_archive_resume_preserves_candidate_and_rejects_drift(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        task = project.prepare_archive_task("T-1")
+        lease = runtime.try_acquire(project.config, "merge", "T-1")["lease"]
+        runtime.transition_task(
+            project.config,
+            "T-1",
+            "ARCHIVING",
+            "BLOCKED",
+            reason="archive process stopped before integration",
+        )
+        runtime.release_lease(
+            project.config, "merge", "T-1", lease["lease_id"]
+        )
+        worktree = Path(task["repositories"][0]["worktree"])
+        (worktree / "seed.txt").write_text("drift while blocked\n", encoding="utf-8")
+
+        resumed = runtime.transition_task(
+            project.config,
+            "T-1",
+            "BLOCKED",
+            "WAITING_FOR_MERGE",
+            reason="resume the interrupted archive owner",
+        )
+        self.assertEqual(resumed["archive_candidate"], task["archive_candidate"])
+        result = runtime.enqueue_task(project.config, "merge", "T-1")
+
+        self.assertEqual(result["status"], "NeedsRevalidation")
+        self.assertEqual(result["reason"], "worktree-drift")
+        self.assertEqual(runtime.load_task(project.config, "T-1")["state"], "EXECUTING")
+        merge_root = runtime.pool_root(project.config, "merge")
+        self.assertEqual(list((merge_root / "queue").glob("*.json")), [])
+        self.assertEqual(list((merge_root / "operations").glob("*.json")), [])
+
+    def test_archive_revalidation_operation_recovers_stale_head_ticket(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        project.prepare_archive_task("T-1")
+        project.prepare_archive_task("T-2")
+        merge_root = runtime.pool_root(project.config, "merge")
+        owned_ticket = runtime.find_owned_record(
+            runtime.list_records(merge_root / "queue"), "T-1"
+        )
+        self.assertIsNotNone(owned_ticket)
+        reason = "Archive candidate requires revalidation: worktree-drift"
+        runtime.atomic_write_json(
+            runtime.archive_operation_path(merge_root, "T-1"),
+            {
+                "kind": "archive-revalidation",
+                "project_id": project.config.project_id,
+                "pool": "merge",
+                "task_id": "T-1",
+                "ticket_id": owned_ticket[1]["ticket_id"],
+                "reason": reason,
+                "started_at": runtime.utc_now(),
+            },
+        )
+        runtime.transition_task(
+            project.config,
+            "T-1",
+            "WAITING_FOR_MERGE",
+            "EXECUTING",
+            reason=reason,
+        )
+
+        acquired = runtime.try_acquire(project.config, "merge", "T-2")
+
+        self.assertEqual(acquired["status"], "Acquired")
+        self.assertEqual(acquired["lease"]["task_id"], "T-2")
+        self.assertEqual(list((merge_root / "operations").glob("*.json")), [])
+        self.assertIsNone(
+            runtime.find_owned_record(runtime.list_records(merge_root / "queue"), "T-1")
+        )
+
+    def test_archive_acquire_operation_recovers_partial_lease_write(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        project.prepare_archive_task("T-1")
+        project.prepare_archive_task("T-2")
+        merge_root = runtime.pool_root(project.config, "merge")
+        owned_ticket = runtime.find_owned_record(
+            runtime.list_records(merge_root / "queue"), "T-1"
+        )
+        self.assertIsNotNone(owned_ticket)
+        lease_id = "b" * 32
+        now = runtime.utc_now()
+        lease = {
+            "project_id": project.config.project_id,
+            "pool": "merge",
+            "task_id": "T-1",
+            "lease_id": lease_id,
+            "acquired_at": now,
+            "heartbeat_at": now,
+            "lease_timeout_seconds": 60,
+            "host_lease_id": None,
+        }
+        runtime.atomic_write_json(
+            runtime.archive_operation_path(merge_root, "T-1"),
+            {
+                "kind": "archive-acquire",
+                "project_id": project.config.project_id,
+                "pool": "merge",
+                "task_id": "T-1",
+                "ticket_id": owned_ticket[1]["ticket_id"],
+                "lease": lease,
+                "started_at": now,
+            },
+        )
+        runtime.atomic_write_json(
+            merge_root / "leases" / f"{lease_id}.json", lease
+        )
+
+        waiting = runtime.try_acquire(project.config, "merge", "T-2")
+
+        self.assertEqual(waiting["status"], "Waiting")
+        self.assertEqual(waiting["reason"], "project-capacity")
+        task = runtime.load_task(project.config, "T-1")
+        self.assertEqual(task["state"], "ARCHIVING")
+        self.assertEqual(task["active_lease"], {"pool": "merge", "lease_id": lease_id})
+        self.assertEqual(list((merge_root / "operations").glob("*.json")), [])
+        self.assertTrue(runtime.try_acquire(project.config, "merge", "T-1")["idempotent"])
+
+    def test_archive_acquire_operation_revalidates_drift_before_recovery(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        task = project.prepare_archive_task("T-1")
+        merge_root = runtime.pool_root(project.config, "merge")
+        owned_ticket = runtime.find_owned_record(
+            runtime.list_records(merge_root / "queue"), "T-1"
+        )
+        self.assertIsNotNone(owned_ticket)
+        lease_id = "e" * 32
+        now = runtime.utc_now()
+        lease = {
+            "project_id": project.config.project_id,
+            "pool": "merge",
+            "task_id": "T-1",
+            "lease_id": lease_id,
+            "acquired_at": now,
+            "heartbeat_at": now,
+            "lease_timeout_seconds": 60,
+            "host_lease_id": None,
+        }
+        runtime.atomic_write_json(
+            runtime.archive_operation_path(merge_root, "T-1"),
+            {
+                "kind": "archive-acquire",
+                "project_id": project.config.project_id,
+                "pool": "merge",
+                "task_id": "T-1",
+                "ticket_id": owned_ticket[1]["ticket_id"],
+                "lease": lease,
+                "started_at": now,
+            },
+        )
+        runtime.atomic_write_json(
+            merge_root / "leases" / f"{lease_id}.json", lease
+        )
+        worktree = Path(task["repositories"][0]["worktree"])
+        (worktree / "seed.txt").write_text(
+            "drift after partial admission\n", encoding="utf-8"
+        )
+
+        result = runtime.try_acquire(project.config, "merge", "T-1")
+
+        self.assertEqual(result["status"], "NeedsRevalidation")
+        self.assertEqual(result["reason"], "worktree-drift")
+        self.assertTrue(result["reconciled"])
+        self.assertEqual(runtime.load_task(project.config, "T-1")["state"], "EXECUTING")
+        self.assertEqual(list((merge_root / "queue").glob("*.json")), [])
+        self.assertEqual(list((merge_root / "leases").glob("*.json")), [])
+        self.assertEqual(list((merge_root / "operations").glob("*.json")), [])
+
+    def test_stale_partial_archive_lease_reclaims_without_recovery_hold(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella", repository_ids=("service-a",)
+        )
+        project.prepare_archive_task("T-1")
+        merge_root = runtime.pool_root(project.config, "merge")
+        lease_id = "c" * 32
+        runtime.atomic_write_json(
+            merge_root / "leases" / f"{lease_id}.json",
+            {
+                "project_id": project.config.project_id,
+                "pool": "merge",
+                "task_id": "T-1",
+                "lease_id": lease_id,
+                "acquired_at": runtime.utc_now(),
+                "heartbeat_at": (
+                    datetime.now(timezone.utc) - timedelta(minutes=5)
+                ).isoformat(),
+                "lease_timeout_seconds": 60,
+                "host_lease_id": None,
+            },
+        )
+
+        reclaimed = runtime.reclaim_lease(
+            project.config,
+            "merge",
+            "T-1",
+            lease_id,
+            "planner-thread",
+            "recover partial archive admission",
+        )
+        repeated = runtime.reclaim_lease(
+            project.config,
+            "merge",
+            "T-1",
+            lease_id,
+            "planner-thread",
+            "recover partial archive admission",
+        )
+
+        self.assertTrue(reclaimed["orphan_admission"])
+        self.assertIsNone(reclaimed["recovery_hold"])
+        self.assertTrue(repeated["idempotent"])
+        self.assertEqual(runtime.load_task(project.config, "T-1")["state"], "WAITING_FOR_MERGE")
+        self.assertEqual(runtime.try_acquire(project.config, "merge", "T-1")["status"], "Acquired")
+
+    def test_legacy_archive_host_orphan_is_discoverable_and_reclaimable(self):
+        project = MultiRepoProjectFixture(
+            self.root / "umbrella",
+            repository_ids=("service-a",),
+            host_enabled=True,
+        )
+        project.prepare_archive_task("T-1")
+        host_root = runtime.ensure_host_pool(project.config)
+        lease_id = "d" * 32
+        runtime.atomic_write_json(
+            host_root / "leases" / f"{lease_id}.json",
+            {
+                "host_id": "local",
+                "resource": "testers",
+                "owner": runtime.legacy_host_lease_owner(project.config, "T-1"),
+                "lease_id": lease_id,
+                "acquired_at": runtime.utc_now(),
+                "heartbeat_at": (
+                    datetime.now(timezone.utc) - timedelta(minutes=5)
+                ).isoformat(),
+                "lease_timeout_seconds": 60,
+            },
+        )
+
+        inspected = runtime.stale_leases(project.config, "merge")
+        blocked = runtime.try_acquire(project.config, "merge", "T-1")
+
+        self.assertEqual([item["lease_id"] for item in inspected["stale_host"]], [lease_id])
+        self.assertEqual(blocked["status"], "Blocked")
+        self.assertEqual(blocked["reason"], "legacy-host-orphan")
+        reclaimed = runtime.reclaim_host_lease(
+            project.config,
+            "merge",
+            "T-1",
+            lease_id,
+            "planner-thread",
+            "remove pre-upgrade archive host orphan",
+        )
+        self.assertEqual(reclaimed["status"], "HostReclaimed")
+        acquired = runtime.try_acquire(project.config, "merge", "T-1")
+        self.assertEqual(acquired["status"], "Acquired")
+        self.assertIsNone(acquired["lease"]["host_lease_id"])
+        self.assertFalse((host_root / "leases" / f"{lease_id}.json").exists())
 
     def test_archive_acquire_rejects_worktree_drift_without_a_lease(self):
         project = MultiRepoProjectFixture(

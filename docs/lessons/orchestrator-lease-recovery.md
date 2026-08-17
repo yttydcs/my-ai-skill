@@ -6,8 +6,8 @@ Filesystem-backed admission needs durable agreement between Task state, project 
 
 ## Lookup Hints
 
-- Keywords: `stale lease`, `orphan host lease`, `pool reclaim`, `reclaim-host`, `active_lease`, `archive recovery hold`, `next_ready`, `premature release`, `Started`, `Completed`.
-- Quick checks: compare Task state with the exact project lease; inspect `pool stale`; check for a Tester host-only lease; verify the result transition preceded normal release; inspect `recovery_hold` and the project-local reclaim event.
+- Keywords: `stale lease`, `orphan host lease`, `pool reclaim`, `reclaim-host`, `active_lease`, `archive recovery hold`, `archive operation`, `owner heartbeat`, `next_ready`, `premature release`, `Started`, `Completed`.
+- Quick checks: compare Task state with the exact project lease; inspect `pool stale`; check for a Tester or legacy archive host-only lease; inspect pending archive operations; verify the result transition preceded normal release; inspect `recovery_hold` and the project-local reclaim event.
 
 ## Symptoms
 
@@ -16,6 +16,8 @@ Filesystem-backed admission needs durable agreement between Task state, project 
 - Host capacity remains exhausted although no corresponding project lease exists.
 - Retrying acquisition returns an old lease after its heartbeat expired or after the Task state advanced.
 - Retrying recovery fails because the Task was blocked before the reclaim audit was completed.
+- An `EXECUTING` Task leaves an old archive ticket at the FIFO head, or a waiting Task has a project lease without matching `active_lease`.
+- Concurrent enqueue creates duplicate tickets after a long archive-candidate scan crosses the internal lock stale threshold.
 
 ## Impact
 
@@ -28,6 +30,8 @@ Filesystem-backed admission needs durable agreement between Task state, project 
 ## Trigger Conditions
 
 - The process stops after host admission but before the project lease becomes durable.
+- The process stops between archive operation, project lease, Task transition, and ticket deletion writes.
+- An internal lock is reclaimed from elapsed directory age without proving that its owner exited.
 - Normal release is allowed before test/archive/blocker evidence is persisted.
 - Idempotent acquisition checks only for an existing lease and ignores Task state or heartbeat age.
 - Reclaim mutates Task and capacity before writing a durable recovery record.
@@ -45,6 +49,9 @@ A lease file alone is not the full ownership state. Correct ownership is the con
 4. Reviewed first-use host-pool creation and found metadata validation outside the shared host lock.
 5. Injected the host-acquired/project-not-durable crash boundary and identified an unreportable host-only orphan.
 6. Reviewed reclaim ordering and found interruption between Task blocking and audit completion was not retry-safe.
+7. Injected archive revalidation/acquisition interruptions and found stale queue heads and inconsistent pre-acquisition project leases could not converge.
+8. Held a metadata lock past its stale threshold and found time-only recovery could admit two concurrent enqueue mutations.
+9. Constructed a legacy archive host-only orphan and found merge inspection filtered it out because no project lease referenced its ID.
 
 ## Resolution
 
@@ -58,6 +65,11 @@ A lease file alone is not the full ownership state. Correct ownership is the con
 - Serialize host-pool metadata creation and validation with the same host lock used for admission.
 - Restrict host leases to Tester pools; archive pools are already isolated by their project-local capacity-one lease.
 - After normal archive completion, expose the next same-project queue head and persisted Worker callback as advisory readiness. After reclaim or partial integration, persist a recovery hold instead.
+- Journal archive revalidation and acquisition before changing Task/lease/ticket records; reconcile the operation before later pool mutations and rerun candidate drift checks before completing acquisition.
+- Keep a resumed `BLOCKED` archive owner's prior validated candidate instead of recapturing current worktree state as a skipped-test candidate.
+- Treat a stale project lease with a still-waiting Task as an audited pre-acquisition orphan: remove it without creating an archive recovery hold, then retry normal admission.
+- Include legacy archive host-only owners in merge stale inspection and block new archive acquisition until explicit host-orphan recovery.
+- Heartbeat metadata-lock ownership and reclaim it only after safe Windows/Linux process-liveness confirmation; never use directory age alone to steal an active lock.
 
 ## Prevention / Guardrails
 
@@ -68,6 +80,7 @@ A lease file alone is not the full ownership state. Correct ownership is the con
 - Keep recovery commands explicit and auditable, and make repeated calls owner-safe.
 - Treat a wakeup as a retry hint rather than ownership; only a newly created project lease authorizes archive work.
 - Bind every path-derived external identifier to a strict allowlist pattern before filesystem access.
+- Fault-inject every durable boundary in multi-file state changes and verify that the next public mutation converges it without bypassing validation.
 
 ## Related Docs
 

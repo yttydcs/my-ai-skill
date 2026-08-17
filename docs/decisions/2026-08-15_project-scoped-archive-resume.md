@@ -20,7 +20,7 @@ Use option 3. Each project keeps a FIFO, capacity-one integration queue. Ordinar
 
 Manifest-backed Tasks persist a validated archive candidate containing the composite worktree identifier and configured repository base heads. Enqueue and acquisition revalidate it under the project-pool metadata lock. Drift returns the Task to execution and consumes no lease. Archive admission never acquires the optional Tester host budget.
 
-Stale ownership or partial integration remains explicit recovery. A project-local recovery hold prevents unrelated Tasks from being advertised or admitted until the affected owner is deliberately resumed. The runtime uses only short metadata-directory locks, atomic JSON replacement, Git subprocesses, and standard-library facilities shared by Windows and Linux.
+Stale ownership or partial integration remains explicit recovery. A project-local recovery hold prevents unrelated Tasks from being advertised or admitted until the affected owner is deliberately resumed. Archive Task/lease/ticket mutations use a project-local operation record so an interrupted admission converges before later pool work, with candidate drift rechecked during recovery. Metadata-directory locks use owner tokens, heartbeat, and safe process-liveness checks so age alone never steals a live lock. These mechanisms use standard-library facilities on Windows and Linux and do not introduce platform-specific file-lock APIs.
 
 ## Consequences
 
@@ -28,6 +28,7 @@ Stale ownership or partial integration remains explicit recovery. A project-loca
 - Independent projects can archive concurrently.
 - Lost wakeups are recoverable from project status.
 - Base or worktree drift cannot use stale validation to enter archive.
+- Interrupted archive admission and legacy host-only orphan records have explicit, retryable recovery paths.
 - There is no remote or multi-machine coordination guarantee.
 
 ## Related Docs

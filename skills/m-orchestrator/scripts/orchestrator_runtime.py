@@ -15,6 +15,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import tomllib
 from typing import Any, Iterator
@@ -35,6 +36,7 @@ EXPECTED_COMMANDS = {
 ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9._-]{0,63}$")
 TASK_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 LEASE_ID_PATTERN = re.compile(r"^[a-f0-9]{32}$")
+TICKET_ID_PATTERN = re.compile(r"^[0-9]{20}-[a-f0-9]{32}$")
 CONTEXT_PATTERN = re.compile(r"^local:([^/\\#]+)(?:#([^/\\#]+))?$")
 TERMINAL_STATES = {"COMPLETED"}
 STATES = {
@@ -516,18 +518,96 @@ def atomic_write_json(path: Path, value: dict[str, Any]) -> None:
         raise
 
 
+def process_is_alive(pid: Any) -> bool | None:
+    if not isinstance(pid, int) or pid <= 0:
+        return None
+    if os.name == "nt":
+        import ctypes
+        from ctypes import wintypes
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        kernel32.OpenProcess.restype = wintypes.HANDLE
+        kernel32.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+        kernel32.WaitForSingleObject.restype = wintypes.DWORD
+        kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+        kernel32.CloseHandle.restype = wintypes.BOOL
+        handle = kernel32.OpenProcess(0x00100000, False, pid)
+        if not handle:
+            error = ctypes.get_last_error()
+            if error == 5:
+                return True
+            if error == 87:
+                return False
+            return None
+        try:
+            status = kernel32.WaitForSingleObject(handle, 0)
+            if status == 0:
+                return False
+            if status == 258:
+                return True
+            return None
+        finally:
+            kernel32.CloseHandle(handle)
+    if os.name == "posix":
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return False
+        except PermissionError:
+            return True
+        except OSError:
+            return None
+        return True
+    return None
+
+
 @contextmanager
 def directory_lock(path: Path) -> Iterator[None]:
     deadline = time.monotonic() + LOCK_TIMEOUT_SECONDS
+    owner_token = uuid.uuid4().hex
+    owner_path = path / "owner.json"
     while True:
         try:
             path.mkdir(parents=False)
+            try:
+                atomic_write_json(
+                    owner_path,
+                    {
+                        "owner_token": owner_token,
+                        "pid": os.getpid(),
+                        "acquired_at": utc_now(),
+                    },
+                )
+            except Exception:
+                path.rmdir()
+                raise
             break
         except FileExistsError:
             try:
-                age = time.time() - path.stat().st_mtime
+                heartbeat_path = path / "owner.json"
+                heartbeat_stat = heartbeat_path.stat() if heartbeat_path.exists() else path.stat()
+                age = time.time() - heartbeat_stat.st_mtime
                 if age > LOCK_STALE_SECONDS:
-                    path.rmdir()
+                    owner_alive = (
+                        process_is_alive(read_json(heartbeat_path).get("pid"))
+                        if heartbeat_path.exists()
+                        else False
+                    )
+                    if owner_alive is not False:
+                        if time.monotonic() >= deadline:
+                            raise OrchestratorError(f"Timed out waiting for runtime lock: {path}")
+                        time.sleep(0.02)
+                        continue
+                    stale_path = path.with_name(f"{path.name}.stale-{uuid.uuid4().hex}")
+                    path.rename(stale_path)
+                    for child in stale_path.iterdir():
+                        if child.is_dir() and not child.is_symlink():
+                            raise OrchestratorError(
+                                f"Stale runtime lock contains an unexpected directory: {child}"
+                            )
+                        child.unlink(missing_ok=True)
+                    stale_path.rmdir()
                     continue
             except FileNotFoundError:
                 continue
@@ -536,12 +616,32 @@ def directory_lock(path: Path) -> Iterator[None]:
             if time.monotonic() >= deadline:
                 raise OrchestratorError(f"Timed out waiting for runtime lock: {path}")
             time.sleep(0.02)
+    stop_heartbeat = threading.Event()
+
+    def heartbeat() -> None:
+        interval = max(0.01, min(1.0, LOCK_STALE_SECONDS / 3.0))
+        while not stop_heartbeat.wait(interval):
+            try:
+                owner = read_json(owner_path)
+                if owner.get("owner_token") != owner_token:
+                    return
+                os.utime(owner_path, None)
+            except (FileNotFoundError, OrchestratorError, OSError):
+                return
+
+    heartbeat_thread = threading.Thread(target=heartbeat, daemon=True)
+    heartbeat_thread.start()
     try:
         yield
     finally:
+        stop_heartbeat.set()
+        heartbeat_thread.join(timeout=2.0)
         try:
-            path.rmdir()
-        except FileNotFoundError:
+            owner = read_json(owner_path)
+            if owner.get("owner_token") == owner_token:
+                owner_path.unlink(missing_ok=True)
+                path.rmdir()
+        except (FileNotFoundError, OrchestratorError):
             pass
 
 
@@ -1244,16 +1344,29 @@ def transition_task(
                         "Manifest-backed archive admission requires validated repository base heads"
                     )
                 source = "test-passed"
-            else:
+            elif expected == "EXECUTING":
                 candidate_change_id = compute_task_change_id(config, task_id)
                 candidate_base_heads = task_base_heads(config, task)
-                source = "test-skipped"
-            task["archive_candidate"] = {
-                "change_id": candidate_change_id,
-                "base_heads": candidate_base_heads,
-                "captured_at": utc_now(),
-                "source": source,
-            }
+                source = "justified-skip"
+            elif expected == "BLOCKED":
+                if not isinstance(task.get("archive_candidate"), dict):
+                    raise OrchestratorError(
+                        "Resuming archive recovery requires the previously validated archive candidate"
+                    )
+                candidate_change_id = None
+                candidate_base_heads = None
+                source = None
+            else:
+                raise OrchestratorError(
+                    f"Cannot create an archive candidate from Task state {expected}"
+                )
+            if expected != "BLOCKED":
+                task["archive_candidate"] = {
+                    "change_id": candidate_change_id,
+                    "base_heads": candidate_base_heads,
+                    "captured_at": utc_now(),
+                    "source": source,
+                }
         elif target in {"EXECUTING", "EXECUTE_GATE_FAILED"}:
             task["gate"] = None
             task["change_id"] = None
@@ -1321,6 +1434,7 @@ def pool_root(config: ProjectConfig, pool_name: str) -> Path:
     root = config.runtime_root / "pools" / pool_name
     (root / "queue").mkdir(parents=True, exist_ok=True)
     (root / "leases").mkdir(exist_ok=True)
+    (root / "operations").mkdir(exist_ok=True)
     return root
 
 
@@ -1402,6 +1516,8 @@ def archive_next_ready(
         return None
     if read_recovery_hold(root) is not None:
         return None
+    if list_records(root / "operations"):
+        return None
     if len(list_records(root / "leases")) >= config.pools[pool_name]["capacity"]:
         return None
     tickets = list_records(root / "queue")
@@ -1422,15 +1538,155 @@ def archive_next_ready(
     }
 
 
+def archive_operation_path(root: Path, task_id: str) -> Path:
+    validated = validate_identifier(task_id, "task_id", TASK_ID_PATTERN)
+    return root / "operations" / f"{validated}.json"
+
+
+def archive_ticket_path(root: Path, ticket_id: Any) -> Path:
+    validated = validate_identifier(ticket_id, "ticket_id", TICKET_ID_PATTERN)
+    return root / "queue" / f"{validated}.json"
+
+
+def reconcile_archive_operations(
+    config: ProjectConfig, pool_name: str, root: Path
+) -> list[dict[str, Any]]:
+    if not is_archive_pool(config, pool_name):
+        return []
+    expected_state, acquired_state = pool_expected_state(config, pool_name)
+    reconciled: list[dict[str, Any]] = []
+    for operation_path, operation in list_records(root / "operations"):
+        task_id = validate_identifier(operation.get("task_id"), "operation task_id", TASK_ID_PATTERN)
+        if operation_path != archive_operation_path(root, task_id):
+            raise OrchestratorError(f"Archive operation path does not match Task {task_id}")
+        if operation.get("project_id") != config.project_id or operation.get("pool") != pool_name:
+            raise OrchestratorError(f"Archive operation ownership mismatch for Task {task_id}")
+        kind = operation.get("kind")
+        task = load_task(config, task_id)
+        ticket_id = operation.get("ticket_id")
+        ticket_path = archive_ticket_path(root, ticket_id) if ticket_id is not None else None
+        revalidation_issue: str | None = None
+        if kind == "archive-revalidation":
+            reason = require_string(operation.get("reason"), "archive operation reason")
+            revalidation_issue = reason.removeprefix(
+                "Archive candidate requires revalidation: "
+            )
+            if task.get("state") == expected_state:
+                transition_task(
+                    config,
+                    task_id,
+                    expected_state,
+                    "EXECUTING",
+                    reason=reason,
+                )
+            elif task.get("state") != "EXECUTING":
+                raise OrchestratorError(
+                    f"Archive revalidation operation for Task {task_id} cannot reconcile state {task.get('state')}"
+                )
+            if ticket_path is not None and ticket_path.exists():
+                ticket = read_json(ticket_path)
+                if ticket.get("task_id") != task_id:
+                    raise OrchestratorError("Archive revalidation ticket ownership mismatch")
+                ticket_path.unlink()
+        elif kind == "archive-acquire":
+            lease = require_mapping(operation.get("lease"), "archive operation lease")
+            lease_id = validate_identifier(lease.get("lease_id"), "lease_id", LEASE_ID_PATTERN)
+            if lease.get("task_id") != task_id or lease.get("pool") != pool_name:
+                raise OrchestratorError("Archive operation lease ownership mismatch")
+            lease_path = root / "leases" / f"{lease_id}.json"
+            expected_active = {"pool": pool_name, "lease_id": lease_id}
+            if lease_path.exists():
+                stored_lease = read_json(lease_path)
+                if (
+                    stored_lease.get("lease_id") != lease_id
+                    or stored_lease.get("task_id") != task_id
+                    or stored_lease.get("pool") != pool_name
+                ):
+                    raise OrchestratorError("Archive operation stored lease ownership mismatch")
+            if task.get("state") == expected_state:
+                issue = archive_candidate_issue(config, task)
+                if issue is not None:
+                    lease_path.unlink(missing_ok=True)
+                    reason = f"Archive candidate requires revalidation: {issue}"
+                    transition_task(
+                        config,
+                        task_id,
+                        expected_state,
+                        "EXECUTING",
+                        reason=reason,
+                    )
+                    if ticket_path is not None and ticket_path.exists():
+                        ticket = read_json(ticket_path)
+                        if ticket.get("task_id") != task_id:
+                            raise OrchestratorError(
+                                "Archive acquisition ticket ownership mismatch"
+                            )
+                        ticket_path.unlink()
+                    operation_path.unlink()
+                    reconciled.append(
+                        {
+                            "task_id": task_id,
+                            "kind": "archive-acquire-revalidation",
+                            "reason": issue,
+                        }
+                    )
+                    continue
+                if not lease_path.exists():
+                    atomic_write_json(lease_path, lease)
+                transition_task(
+                    config,
+                    task_id,
+                    expected_state,
+                    acquired_state,
+                    internal_lease=lease,
+                )
+            elif task.get("state") == acquired_state and task.get("active_lease") == expected_active:
+                if not lease_path.exists():
+                    atomic_write_json(lease_path, lease)
+            else:
+                raise OrchestratorError(
+                    f"Archive acquisition operation for Task {task_id} cannot reconcile state {task.get('state')}"
+                )
+            if ticket_path is not None and ticket_path.exists():
+                ticket = read_json(ticket_path)
+                if ticket.get("task_id") != task_id:
+                    raise OrchestratorError("Archive acquisition ticket ownership mismatch")
+                ticket_path.unlink()
+        else:
+            raise OrchestratorError(f"Unknown archive operation kind: {kind}")
+        operation_path.unlink()
+        result = {"task_id": task_id, "kind": kind}
+        if revalidation_issue is not None:
+            result["reason"] = revalidation_issue
+        reconciled.append(result)
+    return reconciled
+
+
 def return_archive_task_to_revalidation(
     config: ProjectConfig,
     pool_name: str,
+    root: Path,
     task: dict[str, Any],
     issue: str,
     ticket: tuple[Path, dict[str, Any]] | None,
 ) -> dict[str, Any]:
     task_id = require_string(task.get("task_id"), "task_id")
     reason = f"Archive candidate requires revalidation: {issue}"
+    operation_path = archive_operation_path(root, task_id)
+    if operation_path.exists():
+        raise OrchestratorError(f"Archive operation already exists for Task {task_id}")
+    atomic_write_json(
+        operation_path,
+        {
+            "kind": "archive-revalidation",
+            "project_id": config.project_id,
+            "pool": pool_name,
+            "task_id": task_id,
+            "ticket_id": ticket[1].get("ticket_id") if ticket is not None else None,
+            "reason": reason,
+            "started_at": utc_now(),
+        },
+    )
     transition_task(
         config,
         task_id,
@@ -1440,6 +1696,7 @@ def return_archive_task_to_revalidation(
     )
     if ticket is not None:
         ticket[0].unlink(missing_ok=True)
+    operation_path.unlink()
     return {
         "status": "NeedsRevalidation",
         "task_id": task_id,
@@ -1454,6 +1711,24 @@ def enqueue_task(config: ProjectConfig, pool_name: str, task_id: str) -> dict[st
     root = pool_root(config, pool_name)
     expected_state, _ = pool_expected_state(config, pool_name)
     with directory_lock(root / ".lock"):
+        reconciled = reconcile_archive_operations(config, pool_name, root)
+        recovered_revalidation = next(
+            (
+                item
+                for item in reconciled
+                if item.get("task_id") == task_id and item.get("reason")
+            ),
+            None,
+        )
+        if recovered_revalidation is not None:
+            return {
+                "status": "NeedsRevalidation",
+                "task_id": task_id,
+                "pool": pool_name,
+                "reason": recovered_revalidation["reason"],
+                "state": "EXECUTING",
+                "reconciled": True,
+            }
         task = load_task(config, task_id)
         if task.get("state") != expected_state:
             raise OrchestratorError(
@@ -1466,7 +1741,7 @@ def enqueue_task(config: ProjectConfig, pool_name: str, task_id: str) -> dict[st
             issue = archive_candidate_issue(config, task)
             if issue is not None:
                 return return_archive_task_to_revalidation(
-                    config, pool_name, task, issue, existing
+                    config, pool_name, root, task, issue, existing
                 )
         if existing:
             return {"status": "Queued", "ticket": existing[1], "idempotent": True}
@@ -1540,6 +1815,25 @@ def host_lease_owner_matches(
     if owner == host_lease_owner(config, task_id):
         return True
     return allow_legacy and owner == legacy_host_lease_owner(config, task_id)
+
+
+def find_host_lease_for_task(
+    config: ProjectConfig, task_id: str
+) -> dict[str, Any] | None:
+    root = ensure_host_pool(config)
+    if root is None:
+        return None
+    with directory_lock(root / ".lock"):
+        matches = [
+            record
+            for _, record in list_records(root / "leases")
+            if host_lease_owner_matches(
+                config, task_id, record.get("owner"), allow_legacy=True
+            )
+        ]
+        if len(matches) > 1:
+            raise OrchestratorError(f"Multiple host leases exist for Task {task_id}")
+        return matches[0] if matches else None
 
 
 def acquire_host_lease(config: ProjectConfig, task_id: str) -> dict[str, Any] | None:
@@ -1625,6 +1919,24 @@ def try_acquire(config: ProjectConfig, pool_name: str, task_id: str) -> dict[str
     root = pool_root(config, pool_name)
     expected_state, acquired_state = pool_expected_state(config, pool_name)
     with directory_lock(root / ".lock"):
+        reconciled = reconcile_archive_operations(config, pool_name, root)
+        recovered_revalidation = next(
+            (
+                item
+                for item in reconciled
+                if item.get("task_id") == task_id and item.get("reason")
+            ),
+            None,
+        )
+        if recovered_revalidation is not None:
+            return {
+                "status": "NeedsRevalidation",
+                "task_id": task_id,
+                "pool": pool_name,
+                "reason": recovered_revalidation["reason"],
+                "state": "EXECUTING",
+                "reconciled": True,
+            }
         leases = list_records(root / "leases")
         existing_lease = find_owned_record(leases, task_id)
         if existing_lease:
@@ -1675,8 +1987,15 @@ def try_acquire(config: ProjectConfig, pool_name: str, task_id: str) -> dict[str
             issue = archive_candidate_issue(config, task)
             if issue is not None:
                 return return_archive_task_to_revalidation(
-                    config, pool_name, task, issue, owned_ticket
+                    config, pool_name, root, task, issue, owned_ticket
                 )
+            legacy_host_lease = find_host_lease_for_task(config, task_id)
+            if legacy_host_lease is not None:
+                return {
+                    "status": "Blocked",
+                    "reason": "legacy-host-orphan",
+                    "host_lease": legacy_host_lease,
+                }
 
         host_lease = acquire_host_lease(config, task_id) if is_tester_pool(config, pool_name) else None
         if host_lease and host_lease.get("status") == "Waiting":
@@ -1694,6 +2013,31 @@ def try_acquire(config: ProjectConfig, pool_name: str, task_id: str) -> dict[str
             "host_lease_id": host_lease.get("lease_id") if host_lease else None,
         }
         lease_path = root / "leases" / f"{lease_id}.json"
+        if is_archive_pool(config, pool_name):
+            operation_path = archive_operation_path(root, task_id)
+            atomic_write_json(
+                operation_path,
+                {
+                    "kind": "archive-acquire",
+                    "project_id": config.project_id,
+                    "pool": pool_name,
+                    "task_id": task_id,
+                    "ticket_id": owned_ticket[1].get("ticket_id"),
+                    "lease": lease,
+                    "started_at": utc_now(),
+                },
+            )
+            atomic_write_json(lease_path, lease)
+            transition_task(
+                config,
+                task_id,
+                expected_state,
+                acquired_state,
+                internal_lease=lease,
+            )
+            owned_ticket[0].unlink()
+            operation_path.unlink()
+            return {"status": "Acquired", "lease": lease, "idempotent": False}
         try:
             atomic_write_json(lease_path, lease)
             transition_task(
@@ -1742,6 +2086,7 @@ def release_lease(
     _, acquired_state = pool_expected_state(config, pool_name)
     archive_pool = is_archive_pool(config, pool_name)
     with directory_lock(root / ".lock"):
+        reconcile_archive_operations(config, pool_name, root)
         if not path.exists():
             other = find_owned_record(list_records(root / "leases"), task_id)
             if other:
@@ -1805,9 +2150,10 @@ def reclaim_lease(
     root = pool_root(config, pool_name)
     path = root / "leases" / f"{lease_id}.json"
     event_path = config.runtime_root / "events" / f"lease-reclaim-{lease_id}.json"
-    _, acquired_state = pool_expected_state(config, pool_name)
+    expected_state, acquired_state = pool_expected_state(config, pool_name)
     resolution = f"Stale lease {lease_id} reclaimed by {actor}: {reason}"
     with directory_lock(root / ".lock"):
+        reconcile_archive_operations(config, pool_name, root)
         if not path.exists():
             other = find_owned_record(list_records(root / "leases"), task_id)
             if other:
@@ -1828,7 +2174,16 @@ def reclaim_lease(
                     }.items()
                 ):
                     task = load_task(config, task_id)
-                    if task.get("state") != "BLOCKED" or task.get("latest_reason") != resolution:
+                    orphan_admission = event.get("orphan_admission") is True
+                    if orphan_admission:
+                        if task.get("state") != expected_state or task.get("active_lease"):
+                            raise OrchestratorError(
+                                f"Reclaim audit for {lease_id} does not match Task {task_id} state"
+                            )
+                    elif (
+                        task.get("state") != "BLOCKED"
+                        or task.get("latest_reason") != resolution
+                    ):
                         raise OrchestratorError(
                             f"Reclaim audit for {lease_id} does not match Task {task_id} state"
                         )
@@ -1837,7 +2192,7 @@ def reclaim_lease(
                         event["completed_at"] = utc_now()
                         atomic_write_json(event_path, event)
                     recovery_hold = None
-                    if is_archive_pool(config, pool_name):
+                    if is_archive_pool(config, pool_name) and not orphan_admission:
                         recovery_hold = write_recovery_hold(
                             config, root, pool_name, task_id, lease_id, resolution
                         )
@@ -1846,6 +2201,7 @@ def reclaim_lease(
                         "lease_id": lease_id,
                         "event": event,
                         "recovery_hold": recovery_hold,
+                        "orphan_admission": orphan_admission,
                         "idempotent": True,
                     }
             raise OrchestratorError(f"Lease does not exist and has no reclaim audit: {lease_id}")
@@ -1865,7 +2221,10 @@ def reclaim_lease(
             and task.get("latest_reason") == resolution
             and not task.get("active_lease")
         )
-        if not recovery_started and (
+        orphan_admission = (
+            task.get("state") == expected_state and not task.get("active_lease")
+        )
+        if not recovery_started and not orphan_admission and (
             task.get("state") != acquired_state
             or task.get("active_lease") != expected_active
         ):
@@ -1887,6 +2246,8 @@ def reclaim_lease(
                 }.items()
             ):
                 raise OrchestratorError(f"Reclaim audit ownership mismatch: {event_path}")
+            if event.get("orphan_admission", False) != orphan_admission:
+                raise OrchestratorError(f"Reclaim audit state mismatch: {event_path}")
         else:
             event = {
                 "event": "lease-reclaimed",
@@ -1897,17 +2258,18 @@ def reclaim_lease(
                 "lease_id": lease_id,
                 "actor": actor,
                 "reason": reason,
+                "orphan_admission": orphan_admission,
                 "started_at": utc_now(),
             }
             atomic_write_json(event_path, event)
         recovery_hold = None
-        if is_archive_pool(config, pool_name):
+        if is_archive_pool(config, pool_name) and not orphan_admission:
             recovery_hold = write_recovery_hold(
                 config, root, pool_name, task_id, lease_id, resolution
             )
         if lease.get("host_lease_id"):
             release_host_lease(config, lease["host_lease_id"], task_id)
-        if not recovery_started:
+        if not recovery_started and not orphan_admission:
             transition_task(
                 config,
                 task_id,
@@ -1924,6 +2286,7 @@ def reclaim_lease(
             "lease_id": lease_id,
             "event": event,
             "recovery_hold": recovery_hold,
+            "orphan_admission": orphan_admission,
             "idempotent": False,
         }
 
@@ -2038,6 +2401,21 @@ def stale_leases(config: ProjectConfig, pool_name: str) -> dict[str, Any]:
             for _, lease in project_leases
             if lease.get("host_lease_id")
         }
+        archive_orphan_owners: set[str] = set()
+        if is_archive_pool(config, pool_name):
+            expected_state, _ = pool_expected_state(config, pool_name)
+            leased_task_ids = {lease.get("task_id") for _, lease in project_leases}
+            for task_file in task_files(config.runtime_root):
+                task = read_json(task_file)
+                task_id = task.get("task_id")
+                if (
+                    isinstance(task_id, str)
+                    and task.get("state") == expected_state
+                    and not task.get("active_lease")
+                    and task_id not in leased_task_ids
+                ):
+                    archive_orphan_owners.add(host_lease_owner(config, task_id))
+                    archive_orphan_owners.add(legacy_host_lease_owner(config, task_id))
         with directory_lock(host_root / ".lock"):
             for _, lease in list_records(host_root / "leases"):
                 belongs_to_project = lease.get("project_instance_id") == instance_id or str(
@@ -2045,9 +2423,11 @@ def stale_leases(config: ProjectConfig, pool_name: str) -> dict[str, Any]:
                 ).startswith(legacy_owner_prefix)
                 if not belongs_to_project:
                     continue
-                if not is_tester_pool(config, pool_name) and lease.get(
-                    "lease_id"
-                ) not in legacy_archive_host_ids:
+                if (
+                    not is_tester_pool(config, pool_name)
+                    and lease.get("lease_id") not in legacy_archive_host_ids
+                    and lease.get("owner") not in archive_orphan_owners
+                ):
                     continue
                 age, timeout = lease_age_seconds(lease, now)
                 if age > timeout:
@@ -2074,6 +2454,9 @@ def project_status(config: ProjectConfig) -> dict[str, Any]:
                 "leases": [record for _, record in list_records(root / "leases")],
             }
             if is_archive_pool(config, name):
+                pool_status["operations"] = [
+                    record for _, record in list_records(root / "operations")
+                ]
                 pool_status["next_ready"] = archive_next_ready(config, name, root)
                 pool_status["recovery_hold"] = read_recovery_hold(root)
             pools[name] = pool_status
