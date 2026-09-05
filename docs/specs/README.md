@@ -48,9 +48,12 @@ Store technical contracts, integration rules, architecture constraints, and work
 
 ## Current Docs
 
-- [m-project-orchestrator.md](m-project-orchestrator.md)
 - [m-context-skill.md](m-context-skill.md)
 - [m-docs-skill.md](m-docs-skill.md)
 - [m-autoflow-skill.md](m-autoflow-skill.md)
 - [m-quick-skill.md](m-quick-skill.md)
 - [m-thesis-aigc-revision-skill.md](m-thesis-aigc-revision-skill.md)
+
+## Retired Docs
+
+- [m-project-orchestrator.md](m-project-orchestrator.md) - removed on 2026-09-05; historical reference only

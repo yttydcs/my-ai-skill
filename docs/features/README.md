@@ -26,7 +26,10 @@ Store current user-visible feature behavior as complete feature dossiers.
 
 ## Current Docs
 
-- [m-project-orchestrator.md](m-project-orchestrator.md) - persistent per-project Planner with temporary Workers and bounded Tester Pools
 - [m-context.md](m-context.md) - reusable plaintext Agent context loading and skill composition
 - [m-autoflow-workflow.md](m-autoflow-workflow.md)
 - [m-quick-fast-path.md](m-quick-fast-path.md) - guarded one-repo direct-edit path with mandatory governed-doc context
+
+## Retired Docs
+
+- [m-project-orchestrator.md](m-project-orchestrator.md) - removed on 2026-09-05; historical reference only

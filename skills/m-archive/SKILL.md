@@ -30,8 +30,6 @@ Archive may start only when:
 - changed files and Task IDs are known
 - the active plan is current
 
-When `$m-archive` is invoked through `$m-orchestrator`, it additionally requires the same Task's active project integration lease after archive-candidate revalidation. A host wakeup or `next_ready` result is not admission. Standalone `$m-archive` behavior is unchanged.
-
 If any item is false, return to `$m-test` or `$m-execute`.
 
 ## Workflow

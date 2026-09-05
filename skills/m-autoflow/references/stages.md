@@ -4,7 +4,6 @@ Use this file to coordinate the `m-autoflow` phases.
 
 ## Global Rules
 
-- `$m-orchestrator` is a project-level companion above separate task workflows. It may schedule their existing phase skills but does not become a stage or relax any per-task gate.
 - Only one stage may be active at a time.
 - `$m-quick` is a standalone docs-first fast path outside the stage chain; it may directly edit one selected repository only after its own low-risk gate passes.
 - `$m-discuss` owns discovery, brainstorming, optional web research, and early worktree setup.
@@ -15,7 +14,6 @@ Use this file to coordinate the `m-autoflow` phases.
 - `$m-test` owns optional heavy validation and review.
 - `$m-archive` owns change archive, lessons, default workflow closeout, merge, and cleanup.
 - Do not run web research by default; use it from `$m-discuss` only when current external facts or best practices matter.
-- An orchestrated Worker uses `$m-execute` for implementation and lightweight validation. It may enter a temporary `$m-test` role only after the orchestrator verifies a passing gate for the current change state.
 - A workflow may iterate or roll back, but every rollback must:
   - state the reason
   - update the affected plan or archive docs before proceeding

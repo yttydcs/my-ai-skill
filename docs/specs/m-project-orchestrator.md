@@ -1,5 +1,9 @@
 # m:orchestrator Technical Contract
 
+## Status
+
+Removed on 2026-09-05. The package and runtime described below are no longer distributed. This document is retained for historical reference; its commands and integration rules are obsolete. See the [feature status](../features/m-project-orchestrator.md).
+
 ## Package Contract
 
 ```text

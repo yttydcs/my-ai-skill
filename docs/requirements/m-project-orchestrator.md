@@ -1,5 +1,9 @@
 # m:orchestrator Project Automation
 
+## Status
+
+Removed on 2026-09-05. These requirements are retained for historical reference and no longer apply to the supported skill collection. See the [feature status](../features/m-project-orchestrator.md).
+
 ## Background
 
 The staged `m-*` workflow automates one task well but requires manual management when a user wants to plan the next task while prior approved work continues. Expensive heavyweight testing also needs bounded concurrency without sharing project environments or long-lived Tester context.

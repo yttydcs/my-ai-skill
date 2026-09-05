@@ -2,7 +2,7 @@
 
 ## Status
 
-Active.
+Removed on 2026-09-05 at the user's request because the orchestration workflow was not useful in practice. The skill package, runtime, manifest, dedicated tests, and active workflow integrations have been removed. The remaining content records historical behavior and is no longer an active workflow contract.
 
 ## Feature Goal
 

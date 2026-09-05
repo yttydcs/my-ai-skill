@@ -1,4 +1,0 @@
-interface:
-  display_name: "m:orchestrator"
-  short_description: "Coordinate project Planner, Workers, and Tester pools"
-  default_prompt: "Use $m-orchestrator to coordinate this project's persistent Planner and temporary background task workflows."

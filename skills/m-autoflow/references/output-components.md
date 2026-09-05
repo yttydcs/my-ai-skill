@@ -111,7 +111,6 @@ After an action succeeds, emit the matching directive on its own line in the fin
 ## Phase Recipes
 
 - `$m-autoflow`: show the selected route and next gate; use Mermaid only when several valid workflow branches or phase transitions need comparison.
-- `$m-orchestrator`: show project and Task state, Worker identity, pool status, and next transition in a compact table; never expose loaded context bodies or credentials.
 - `$m-context`: show loaded context names and sections in a compact table only when several were requested; never echo secret values.
 - `$m-discuss`: use an option comparison table; add Mermaid only for a real branch, dependency, or ownership model; consider the shared interactive pattern when direct option selection helps.
 - `$m-plan`: link the active `plan.md` / `todo.md`, show the task table, and add Mermaid only when task dependencies or system flow need it; consider the shared interactive pattern for bounded approval follow-up.

@@ -52,9 +52,12 @@ Store long-lived capability intent, boundaries, scenarios, and acceptance criter
 
 ## Current Docs
 
-- [m-project-orchestrator.md](m-project-orchestrator.md)
 - [m-context-skill.md](m-context-skill.md)
 - [m-docs-skill.md](m-docs-skill.md)
 - [m-autoflow-skill.md](m-autoflow-skill.md)
 - [m-quick-fast-path.md](m-quick-fast-path.md)
 - [m-thesis-aigc-revision-skill.md](m-thesis-aigc-revision-skill.md)
+
+## Retired Docs
+
+- [m-project-orchestrator.md](m-project-orchestrator.md) - removed on 2026-09-05; historical reference only
