@@ -271,7 +271,7 @@ def plan_ref(value, worktree):
     return {"path": str(path), "sections": value["sections"], "revision": revision}
 
 
-def snapshot(config, value, allow_removed=False):
+def snapshot(config, value, allow_removed=False, immutable=False):
     require(isinstance(value, dict) and value, "Repository snapshot is required")
     result = {}
     for key, item in value.items():
@@ -288,8 +288,9 @@ def snapshot(config, value, allow_removed=False):
             require(git_identity(worktree) == git_identity(repo["path"]), "Worktree belongs to another repository")
             require(path_key(git(worktree, "rev-parse", "--show-toplevel")) == path_key(worktree),
                     "Worktree must be its repository root")
-            require(git(worktree, "rev-parse", "HEAD") == item["commit"], "Worktree HEAD differs from candidate", "stale_candidate")
-            require(not git(worktree, "status", "--porcelain"), "Commit/checkpoint pending changes before handoff", "dirty_worktree")
+            if not immutable:
+                require(git(worktree, "rev-parse", "HEAD") == item["commit"], "Worktree HEAD differs from candidate", "stale_candidate")
+                require(not git(worktree, "status", "--porcelain"), "Commit/checkpoint pending changes before handoff", "dirty_worktree")
         else:
             require(allow_removed, "Missing worktree")
         result[key] = {"worktree": str(worktree), "commit": item["commit"]}

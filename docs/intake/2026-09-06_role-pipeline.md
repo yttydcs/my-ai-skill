@@ -4,7 +4,7 @@
 
 - Source: the current Codex discussion, following removal of `m-orchestrator` in commit `9f4e0ef` on 2026-09-05.
 - Requester: the user.
-- Planning requested explicitly with `$m-plan`; implementation has not been approved.
+- Planning was requested explicitly with `$m-plan`; this source brief was captured before execution approval. Subsequent `$m-execute` approved T1–T8, including the bounded fixture pilot and installation of only the new companion. See the active plan for implementation evidence.
 
 ## Original Request Evidence
 

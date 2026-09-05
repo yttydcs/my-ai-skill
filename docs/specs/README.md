@@ -54,9 +54,7 @@ Store technical contracts, integration rules, architecture constraints, and work
 - [m-quick-skill.md](m-quick-skill.md)
 - [m-thesis-aigc-revision-skill.md](m-thesis-aigc-revision-skill.md)
 
-## Planned Docs
-
-- [m-pipeline.md](m-pipeline.md) - proposed phase composition, session lifecycle and transactional coordination
+- [m-pipeline.md](m-pipeline.md) - phase composition, session lifecycle and transactional coordination
 
 ## Retired Docs
 

@@ -188,8 +188,10 @@ class Engine:
                 strings(packet["requires"], "assignment dependencies")
                 if packet["parent"] is not None:
                     label(packet["parent"], "parent assignment")
-                packet["repositories"] = snapshot(config, packet["repositories"])
-                packet["plans"] = plan_check(packet, role["skill"])
+                closed = self.archived_release(run, packet)
+                packet["repositories"] = snapshot(config, packet["repositories"], allow_removed=closed, immutable=closed)
+                if not closed:
+                    packet["plans"] = plan_check(packet, role["skill"])
                 packet["write_set"] = write_set(config, packet["write_set"], packet["repositories"])
                 strings(packet["resources"], "shared resources")
                 require(isinstance(packet["inputs"], list), "inputs must be artifact references")
@@ -215,7 +217,9 @@ class Engine:
             role = config["roles"][stage_of(run, job["packet"]["stage"])["role"]]
             require(job["packet"]["_contract"] == phase_contract(role["skill"]),
                     "Phase contract changed before acceptance; review compatibility", "skill_drift")
-            data["repositories"] = snapshot(config, data["repositories"], allow_removed=role["skill"] == "m-archive")
+            closed = self.archived_release(run, job["packet"])
+            immutable = role["skill"] == "m-archive" or closed
+            data["repositories"] = snapshot(config, data["repositories"], allow_removed=immutable, immutable=immutable)
             data["report"] = artifact(data["report"], roots(run, data["repositories"]))
             require(isinstance(data["evidence"], list) and data["evidence"], "Result requires verification evidence")
             data["evidence"] = [artifact(r, roots(run, data["repositories"])) for r in data["evidence"]]
@@ -225,7 +229,7 @@ class Engine:
             else:
                 require(data["failure_signature"] is None, "Passed results have no failure signature")
             # Archive may have removed root plans; the dispatched definition is retained as references.
-            if role["skill"] != "m-archive":
+            if role["skill"] != "m-archive" and not closed:
                 plan_check(job["packet"], role["skill"])
         elif action == "operation_result":
             fields(data, ("operation_id", "outcome", "observation_ref"), ("client_thread_id", "session", "cwd"))
@@ -253,10 +257,12 @@ class Engine:
             fields(data, ("job_id", "repositories", "plans", "review_ref"))
             require(data["job_id"] in run["jobs"], "Unknown assignment")
             packet = run["jobs"][data["job_id"]]["packet"]
-            data["repositories"] = snapshot(config, data["repositories"])
+            closed = self.archived_release(run, packet | data)
+            data["repositories"] = snapshot(config, data["repositories"], allow_removed=closed, immutable=closed)
             require(data["repositories"].keys() == packet["repositories"].keys(), "Retry cannot expand repositories")
             phase = config["roles"][stage_of(run, packet["stage"])["role"]]["skill"]
-            data["plans"] = plan_check(packet | data, phase)
+            if not closed:
+                data["plans"] = plan_check(packet | data, phase)
             string(data["review_ref"], "retry review reference")
         return data
 
@@ -268,12 +274,34 @@ class Engine:
         role = run["config"]["roles"][stage_of(run, packet["stage"])["role"]]
         require(packet["_contract"] == phase_contract(role["skill"]),
                 "Original phase contract changed; review compatibility before retrying", "skill_drift")
-        snapshot(run["config"], packet["repositories"])
-        plan_check(packet, role["skill"])
+        closed = self.archived_release(run, packet)
+        snapshot(run["config"], packet["repositories"], allow_removed=closed, immutable=closed)
+        if not closed:
+            plan_check(packet, role["skill"])
         for ref in packet["inputs"]:
             artifact(ref, roots(run, packet["repositories"]))
         if role["skill"] == "release":
             artifact(role["procedure_ref"], roots(run, packet["repositories"]))
+
+    def archived_release(self, run, packet):
+        stage = stage_of(run, packet["stage"])
+        if run["config"]["roles"][stage["role"]]["skill"] != "release":
+            return False
+        ancestors, pending = set(), list(stage["after"])
+        while pending:
+            key = pending.pop()
+            if key not in ancestors:
+                ancestors.add(key)
+                pending.extend(stage_of(run, key)["after"])
+        archived = [job for job in run["jobs"].values() if job["packet"]["stage"] in ancestors
+                    and run["config"]["roles"][stage_of(run, job["packet"]["stage"])["role"]]["skill"] == "m-archive"
+                    and job["status"] == "passed"]
+        if not archived:
+            return False
+        require(any(job["result"]["repositories"] == packet["repositories"] and job["packet"]["plans"] == packet["plans"]
+                    and job["result"]["report"] in packet["inputs"] for job in archived),
+                "Post-archive release needs the exact accepted candidate, retained plan identity and durable archive report")
+        return True
 
     def status(self, run, revision):
         with closing(self.store.connect()) as db:
@@ -487,6 +515,8 @@ class Engine:
                             "project_root": run["config"]["project_root"], "docs_root": run["config"]["docs_root"],
                             "authority_ref": run["authority"]["source_ref"], "review_mode": run["authority"]["review_mode"],
                             "packet": packet}
+                if self.archived_release(run, packet):
+                    envelope["archived_input"] = True
                 if role["skill"] == "release":
                     envelope["release"] = {k: role[k] for k in ("environment", "procedure_ref")}
                 op_id = self.new_operation(db, run, "dispatch", key, {"envelope": envelope})

@@ -58,9 +58,7 @@ Store long-lived capability intent, boundaries, scenarios, and acceptance criter
 - [m-quick-fast-path.md](m-quick-fast-path.md)
 - [m-thesis-aigc-revision-skill.md](m-thesis-aigc-revision-skill.md)
 
-## Planned Docs
-
-- [m-pipeline.md](m-pipeline.md) - proposed compatible pipeline capability and acceptance boundaries
+- [m-pipeline.md](m-pipeline.md) - compatible pipeline capability and acceptance boundaries
 
 ## Retired Docs
 

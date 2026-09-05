@@ -45,7 +45,7 @@ After the receiver stops, inspect its original phase report, tests and actual ar
 - `session`: assigned `{host_id,thread_id}`; identifies the surrendered assignment even for a manually completed takeover.
 - `outcome`: `passed`, `failed` or `blocked`.
 - `task_ids`, `plans`: the same admitted set and plan references.
-- `repositories`: final exact worktrees/commits. Execute/plan may produce new commits; test/archive/release evidence must refer to the dispatched candidate. Archive may have removed its worktrees, but commits must still resolve in declared repositories.
+- `repositories`: exact candidate worktrees/commits. Execute/plan may produce new commits; test/archive/release evidence refers to the dispatched tested candidate. For archive, this identity remains the immutable tested commit even if closeout creates a metadata/merge commit or removes the worktree; the original archive report must separately record and substantiate the actual final merge/cleanup state.
 - `report`: original phase report artifact reference.
 - `evidence`: nonempty array of verified artifact references.
 - `review_ref`: actual coordinator semantic review reference. The runtime checks structural identity, not the correctness of a test or truth of an assertion.
@@ -54,3 +54,5 @@ After the receiver stops, inspect its original phase report, tests and actual ar
 Accepting a valid result persists it before releasing claims. Duplicate matching results are harmless; conflicting or stale results fail. An old matching result can be acknowledged without changing a newer retry's state. Context/phase errors become blocked evidence, never a successful no-op.
 
 `finish` succeeds only after all configured stages have sealed and passed, and no claims or uncertain creation/delivery remain. Preserve archive paths and durable commits before cleanup makes worktree references unavailable.
+
+For release after archive, copy the accepted archive candidate and retained plan identities exactly, and include that durable archive report in `inputs`. The runtime marks the envelope `archived_input`; it verifies the immutable Git commit and accepted archive lineage instead of reopening deleted worktree plans. Resolve the original plan from the archive report's governed artifact references, or its verified Git snapshot where available. Follow only the configured procedure that consumes durable artifacts/commits. Never substitute current main HEAD for the tested candidate. Release before archive continues to verify a clean live worktree.

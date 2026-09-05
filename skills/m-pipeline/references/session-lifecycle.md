@@ -24,6 +24,8 @@ For each returned `create`:
 
 Emit the host-required created-task directive with actual real or pending identity when presenting newly created tasks. Do not override models or reasoning settings without an explicit request.
 
+Validation boundary (2026-09-06): the disposable live pilot exercised projectless task creation with separately verified Git worktrees, explicit shared bindings and fresh receivers. Saved-project worktree creation and pending-ID recovery have schema/deterministic-test coverage only. At setup, verify the actual host's project metadata, ready identity and checkout before enabling either mode for a run; unknown readiness remains pending and cannot receive code work.
+
 ## Dispatch And Waiting
 
 `next` returns a dispatch intent with operation ID and envelope. Send one readable instruction containing the role/phase, Task IDs, exact worktrees/commits, plan references, contexts, authority and reply destination. Refer to an envelope file when long; keep bodies of private contexts out of it.

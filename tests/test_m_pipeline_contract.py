@@ -81,6 +81,43 @@ class ContractTests(Fixture):
         with self.assertRaisesRegex(PipelineError, "Composite owns"):
             validate_blueprint(self.config, self.root)
 
+    def test_release_after_archive_uses_accepted_immutable_candidate(self):
+        procedure = self.docs / "release.md"
+        procedure.write_text("Read the verified immutable commit and write a local evidence marker.", encoding="utf-8")
+        self.config["roles"]["closer"] = {"skill": "m-archive", "contexts": [], "sessions": [self.worker], "create": None}
+        self.config["roles"]["publisher"] = {"skill": "release", "contexts": [], "sessions": [self.worker], "create": None,
+                                              "environment": "fixture", "procedure_ref": proof(procedure)}
+        self.config["stages"] += [{"id": "archive", "role": "closer", "after": ["execute"], "routing": "any"},
+                                  {"id": "release", "role": "publisher", "after": ["archive"], "routing": "any"}]
+        self.start()
+        for role in ("closer", "publisher"):
+            self.call("bind", {"role": role, "session": self.worker, "cwd": str(self.root), "observation_ref": "fake-host:role-binding"})
+        packet = self.packet()
+        self.admit([packet])
+        self.call("result", self.result(self.call("next")))
+        tree = Path(packet["repositories"]["code"]["worktree"])
+        archive = self.packet("archive", stage="archive", tree=tree, task="C")
+        archive["write_set"] = []
+        self.admit([archive])
+        closing = self.call("next")
+        result = self.result(closing)
+        self.assertTrue(tree.resolve().is_relative_to(self.worktrees.resolve()))
+        git(self.repo, "worktree", "remove", str(tree))
+        self.call("result", result)
+        release = dict(archive, id="release", stage="release", task_ids=["R"], inputs=[result["report"]])
+        self.admit([release])
+        dispatch = self.call("next")
+        self.assertTrue(dispatch["envelope"]["archived_input"])
+        self.call("result", self.result(dispatch, "failed"))
+        retry = {"job_id": "release", "repositories": release["repositories"], "plans": release["plans"],
+                 "review_ref": "fake-host:reviewed-local-procedure-retry"}
+        wrong = dict(retry, plans={})
+        with self.assertRaises(PipelineError):
+            self.call("retry", wrong)
+        self.call("retry", retry)
+        self.call("result", self.result(self.call("next")))
+        self.call("finish")
+
     def test_non_git_umbrella_retains_two_repository_identities(self):
         second = self.root / "second"
         git(self.root, "clone", str(self.repo), str(second))

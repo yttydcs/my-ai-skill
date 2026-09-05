@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed on 2026-09-06; acceptance is tied to explicit approval of the active implementation plan. This is a new companion design, not reinstatement of `m-orchestrator`.
+Accepted on 2026-09-06 through the user's approval of T1–T8 with `$m-execute`. Implemented as a new companion; `m-orchestrator` remains removed.
 
 ## Context
 
@@ -15,10 +15,10 @@ The original phases already define their gates, outputs, worktree ownership, doc
 | Option | Consequence | Decision |
 | --- | --- | --- |
 | Prompt-only role handoffs | Simple start; weak concurrent ownership and interrupted-delivery recovery | Reject as the reliability basis |
-| Companion skill plus small transactional runtime | Reuses phase authority and adds auditable assignment/recovery | Recommend |
+| Companion skill plus small transactional runtime | Reuses phase authority and adds auditable assignment/recovery | Accepted |
 | General recursive agent framework | Broad flexibility; large lifecycle, permission, and resource-management scope | Defer |
 
-## Proposed Decision
+## Decision
 
 1. Add `m-pipeline` as a standalone package. Existing skill packages, manifests, and shared references remain untouched in this scope.
 2. Use one coordinator per workflow and explicit role/session mappings. A role's current session can change without losing workflow identity.

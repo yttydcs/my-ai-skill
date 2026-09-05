@@ -2,11 +2,11 @@
 
 ## Status And Authority
 
-Proposed design for the next execution phase; no implementation or installed command is claimed here. The [active plan](../../plan.md) defines admitted implementation tasks. The original phase skills remain authoritative for their own prerequisites, work, evidence, and closeout.
+Implemented on 2026-09-06. The [active plan](../../plan.md) records admitted implementation tasks, validation and installation status. The original phase skills remain authoritative for their own prerequisites, work, evidence, and closeout.
 
 ## Package And Responsibilities
 
-Add a standalone `skills/m-pipeline/` package with:
+The standalone `skills/m-pipeline/` package contains:
 
 - `SKILL.md` and `agents/openai.yaml`: entry routing and coordinator duties.
 - `references/configuration.md`: explicit blueprint, launch contract, and limits.
@@ -22,7 +22,7 @@ The Python runtime uses the standard library and SQLite. It validates and record
 
 ## User Entry Points
 
-The new skill will support natural-language requests corresponding to these operations. These are proposed skill operations, not existing Codex slash commands:
+The skill supports natural-language requests corresponding to these operations. These are skill operations, not new native Codex slash commands:
 
 | Operation | Meaning |
 | --- | --- |
@@ -123,7 +123,7 @@ Persist external evidence needed for resume before a worktree is removed. After 
 
 ## Fan-Out, Integration, And Replacement
 
-`any` waits for or selects one eligible receiver. `split` distributes different admitted Task IDs with disjoint write sets into isolated validated worktrees. Every child has a parent assignment and a result destination; children cannot spawn another level in this release. Global live and total-creation limits include replacement and child sessions.
+`any` waits for or selects one eligible receiver. `split` distributes different admitted Task IDs with disjoint write sets into isolated validated worktrees. Group children have a parent assignment and a result destination; children cannot spawn another level in this release. Run-wide live and total-creation limits include replacement and child sessions. Session/worktree/resource claims are shared across cooperating runs in the same store; limits do not describe unrelated host tasks.
 
 A designated integration owner assembles all required outputs into the planned candidate, resolving conflicts within admitted scope. Candidate assembly must be explicitly planned and is not an early release merge into the base branch. The join checks the complete required set and then validates the exact integrated revision across participating repositories. If integration changes that revision, affected tests become stale. Never accept a single child pass as overall completion.
 

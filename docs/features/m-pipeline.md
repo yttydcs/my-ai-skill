@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed on 2026-09-06. Not implemented or installed. This document describes intended behavior; existing manual skill behavior remains current and unchanged.
+Implemented as an optional companion on 2026-09-06. The [active plan](../../plan.md) records validation, host-pilot evidence and installation status. Existing manual skill behavior remains unchanged.
 
 ## Feature Goal
 
@@ -21,7 +21,7 @@ Let the user define a reusable team and pipeline, interact primarily with a prod
 
 Roles describe responsibilities. A role can have several explicitly bound or automatically created sessions. Every workflow has one active coordinator owner. Phase sessions are independent user-visible tasks; in-phase subagents remain subject to the original phase and host policies.
 
-## Intended User Journey
+## User Journey
 
 1. Define a pipeline with project/docs/repository locations, roles, contexts, session bindings or creation policies, routing, and limits.
 2. Create the configured team or bind selected existing sessions. Return the actual session references and initialization results; resume partial initialization without blindly duplicating sessions.
