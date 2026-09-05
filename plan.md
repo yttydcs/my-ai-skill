@@ -3,8 +3,8 @@
 ## Status And Goal
 
 - Phase: `m-execute`.
-- Status: T1–T8 approved by the user's explicit `$m-execute` follow-up to the scope-confirmation question.
-- Blocked: no at entry; individual capability and acceptance gates still apply.
+- Status: T1–T8 completed, verified and accepted on 2026-09-06; only the new m-pipeline companion is installed.
+- Blocked: no. This implementation branch's own archive/merge/cleanup remains a later original `m-archive` phase.
 - User instruction authorizing execution: `$m-execute`, following the presented T1–T8 scope, including bounded T8 fixture-task creation and installation of only the new companion. D1–D4 remain excluded.
 - Goal: add an optional role/session pipeline that continues from an explicitly authorized product discussion through the existing planning, execution, testing, and closeout phases, while preserving the user's original manual workflow.
 
@@ -79,7 +79,7 @@ All paths in this table are relative to the active worktree. Proposed files do n
 - [x] T5 — Implement automatic phase routing; real-host scenario remains in T8.
 - [x] T6 — Integrate context, documents and manual recovery; real receiver validation remains in T8.
 - [x] T7 — Package and validate compatibility.
-- [ ] T8 — Run bounded host pilot and install only the new companion.
+- [x] T8 — Run bounded host pilot and install only the new companion.
 
 ### T1 — Verify Host And Phase Capabilities
 
@@ -246,9 +246,9 @@ Validation: `python -m unittest discover -s tests -v` ran 66 tests: 64 passed, 2
 
 Two implementation refinements were verified: dispatch invalidates prior idle observations so a fresh host observation is required for result acceptance; occupied shared resources wait without triggering unnecessary receiver creation. Plan fingerprints normalize completion checkboxes and exclude explicitly unselected progress sections while detecting changed task definitions.
 
-T8 remains in progress. Local/fake-host checks are not evidence of actual host creation, delivery or end-to-end acceptance. No installation has occurred yet.
+At the T7 checkpoint, T8 had not run and no installation had occurred. Local/fake-host checks alone were not claimed as host acceptance; final real-host and installation evidence appears below.
 
-### T8 — Real-Host Pilot In Progress, 2026-09-06
+### T8 — Real-Host Pilot Checkpoints, 2026-09-06
 
 Disposable pilot root: `C:\Users\HelloWorld\AppData\Local\Temp\m-pipeline-host-pilot-8tf9krl9`. Two independent fixture repositories use separate docs/worktree roots and one local state store. `tests/fixtures/m-pipeline/pilot.py` prepares requests and validates local artifacts; real host observations and semantic result review remain coordinator-owned.
 
@@ -270,7 +270,7 @@ Publisher A `01a07319-d53e-7213-8b18-998003f1f4f9` and publisher B `01a0731f-75a
 
 | Review item | Status | Evidence / limitation |
 | --- | --- | --- |
-| Requirement coverage | T1–T7 passed; T8 in progress | R01–R18 map to admitted tasks; final closeout/install evidence still required |
+| Requirement coverage | Passed for admitted first-release scope | R01–R18 map to T1–T8; final real-host closeout and companion-only installation passed; deferred/mode-specific limits remain explicit |
 | Architecture | Passed | Config, persistence and workflow modules separate responsibilities; original phase skills remain authoritative; host calls remain outside the runtime |
 | Performance risks: repeated I/O, lock contention | Passed for bounded scope | Filesystem/Git validation occurs before short SQLite transactions; independent-process contention and rollback tests passed; stage scans are bounded by admitted work |
 | Performance targets / thresholds | Not specified | No throughput or latency SLO was supplied; no production-scale benchmark is claimed |
@@ -280,7 +280,34 @@ Publisher A `01a07319-d53e-7213-8b18-998003f1f4f9` and publisher B `01a0731f-75a
 | Stability / recovery | Passed in deterministic tests | Unknown outcomes survive restart, no timeout-based ownership release, stale/duplicate receipts and failed non-progress are checked |
 | Security / permissions / data exposure | Passed within cooperating-host boundary | Runtime does not prove user authority; coordinator checks actual instructions and artifact evidence. No credentials or context bodies in records/reports; path and scope checks reject invalid assignments |
 | Test coverage | Passed with platform skips | Final 68-test suite: 66 passed, 2 Windows symlink-privilege skips; the latter are not claimed as passed |
-| Whole-flow validation | In progress | Two real fixture pipelines reached accepted integrated tests; final release/archive evidence remains required |
+| Whole-flow validation | Passed | Two real fixture pipelines completed original planning, split execution, integration, testing, local release and original archive/merge/cleanup; both runtime runs finished with no claims or uncertain operations |
 | Delegation governance / audit | Passed | No implementation subagents; exactly 8 explicitly authorized pilot tasks with bounded live capacity, distinct Task IDs/write sets, canonical context/docs references and coordinator result review |
 
 The real fixture is static and introduces no UI; screenshot/route/responsive checks are inapplicable. Saved-project worktree creation and pending-ID recovery remain gated by actual host metadata/readiness checks and have no live-pilot claim; deterministic/schema checks cover those paths. Native compaction, background wakeup, deeper/distributed teams and real production remain D1–D4.
+
+### T8 — Completion And Installation, 2026-09-06
+
+Both real runs finished with all seven admitted Task IDs passed. The final audit found exactly 8 created tasks, a maximum observed live count of 6, zero remaining claims and zero uncertain/pending operations. All 8 completed pilot tasks were archived through the host tool. Only each fixture's integration worktree/branch was cleaned by its original m-archive; the other fixture worktrees and durable evidence remain available for review. No production or remote effect occurred.
+
+| Run | Immutable tested/released commit | Local merge commit | Final Progress-only main commit | Original closeout evidence |
+| --- | --- | --- | --- | --- |
+| A | `35d2061eddee77be0df6881ac1d616c70c282c9f` | `d58952c8d89e7beb95346ec1f939249b3456006b` | `258df2535a4cd12d61d9cd7cd1cc34e1877c2485` | [Archive](C:/Users/HelloWorld/AppData/Local/Temp/m-pipeline-host-pilot-8tf9krl9/docs/a/change/2026-09-06_pilot-a-closeout.md), [receipt](C:/Users/HelloWorld/AppData/Local/Temp/m-pipeline-host-pilot-8tf9krl9/docs/a/plan/host-archive-report.md) |
+| B | `238bc992e43941e08a81dce6a0f942dc562f63aa` | `841ae368d74b118ad863e29f0264c4c4f839eae7` | `a82f2fdb32969c80ea6b6ed163c67939180b5fa7` | [Archive](C:/Users/HelloWorld/AppData/Local/Temp/m-pipeline-host-pilot-8tf9krl9/docs/b/change/2026-09-06_pilot-b-closeout.md), [receipt](C:/Users/HelloWorld/AppData/Local/Temp/m-pipeline-host-pilot-8tf9krl9/docs/b/plan/host-archive-report.md) |
+
+Independent coordinator checks verified exact product and release-marker bytes, candidate reachability, clean final main, expected cleanup, preserved other worktrees and metadata-only context records. Each merge tree equals its tested candidate; subsequent commits change only Progress. The runtime accepted immutable tested identities after actual worktree deletion. A report-only Windows separator mismatch was repaired without replaying a completed Git action. B then waited for the shared closer until A's report was reviewed and accepted, and completed the same closeout normally.
+
+Detailed local audit: [final-audit.json](C:/Users/HelloWorld/AppData/Local/Temp/m-pipeline-host-pilot-8tf9krl9/final-audit.json) and [final-host-tasks.json](C:/Users/HelloWorld/AppData/Local/Temp/m-pipeline-host-pilot-8tf9krl9/final-host-tasks.json). These disposable pilot paths are retained as local evidence; the runtime fixture/store is outside project and docs roots.
+
+After those gates passed, verified the exact absolute sync destinations and absence of an existing installed companion, then ran unchanged `tools/sync-skills.ps1 -Skill m-pipeline`. Installation: [m-pipeline/SKILL.md](C:/Users/HelloWorld/.codex/skills/m-pipeline/SKILL.md); generated distribution: `dist/codex/m-pipeline`. All 13 new source files match distribution and installed bytes (excluding the generated build-info file), and all 67 pre-existing installed m-* files and their file set remain byte-identical. All 31 original dependency Markdown/Python files also match source text after newline/BOM normalization; no dependency was rewritten. The installed CLI successfully validated the real fixture blueprint.
+
+| Area | Check | Status | Evidence | Notes |
+| --- | --- | --- | --- | --- |
+| Regression | Full repository suite | Passed with skips | 68 total: 66 passed, 2 skipped | Windows symlink privilege unavailable |
+| Package | Manifest/skill validation and installed CLI | Passed | Unchanged validator; installed blueprint validation | Version 0.1.0, 13 matching new files |
+| Compatibility | Original source and installed packages | Passed | Baseline Git comparison; 67 installed byte hashes; 31 dependency text comparisons | Existing manual phases untouched |
+| Host integration | Two complete role pipelines | Passed | Original phase receipts and final audit above | 8 created/8 archived; no remaining claims |
+| Recovery | Shared waiting, pause/resume, fresh receivers and uncertain outcomes | Passed within stated coverage | Real shared architect/closer/resource waiting, pause/resume and fresh receiver; deterministic fault/retry tests | Pending creation and saved-project mode lack live evidence and remain gated |
+
+Final documentation verification passed for 103 local Markdown links, whitespace and the exact new-scope file boundary. Only documentation changed after the final regression run; no broad test rerun was needed.
+
+T1–T8 are complete. The implementation is committed on `codex/role-pipeline`; the parent repository main remains at its original baseline. This turn does not perform the implementation workflow's own archive, base-branch merge, push or worktree cleanup.

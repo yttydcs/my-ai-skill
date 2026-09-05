@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented as an optional companion on 2026-09-06. The [active plan](../../plan.md) records validation, host-pilot evidence and installation status. Existing manual skill behavior remains unchanged.
+Implemented and installed as optional companion version 0.1.0 on 2026-09-06. Two disposable real-host pipelines completed planning through local release and original archive closeout. The [active plan](../../plan.md) records validation, evidence and capability limits. Existing manual skill behavior remains unchanged.
 
 ## Feature Goal
 

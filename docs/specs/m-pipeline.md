@@ -2,7 +2,7 @@
 
 ## Status And Authority
 
-Implemented on 2026-09-06. The [active plan](../../plan.md) records admitted implementation tasks, validation and installation status. The original phase skills remain authoritative for their own prerequisites, work, evidence, and closeout.
+Implemented and installed as version 0.1.0 on 2026-09-06. The [active plan](../../plan.md) records completed implementation tasks, validation and capability limits. The original phase skills remain authoritative for their own prerequisites, work, evidence, and closeout.
 
 ## Package And Responsibilities
 

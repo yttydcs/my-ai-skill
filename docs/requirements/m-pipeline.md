@@ -2,7 +2,7 @@
 
 ## Status And Purpose
 
-Implemented under the approved T1–T8 scope on 2026-09-06; validation and installation evidence are recorded in the [active plan](../../plan.md). Reduce the user's manual coordination of concurrent workflows while preserving the original skill family and its documents as authoritative contracts.
+Implemented and validated under the approved T1–T8 scope on 2026-09-06; the new companion alone is installed. The [active plan](../../plan.md) records real-host, deterministic-test, installation and deferred-mode evidence separately. Reduce the user's manual coordination of concurrent workflows while preserving the original skill family and its documents as authoritative contracts.
 
 ## Required Behavior
 
