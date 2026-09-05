@@ -1,6 +1,6 @@
 # Original Phase Adapters
 
-Read the actual named skill and its required references at stage entry. Do not copy phase rules into this companion. Runtime admission records a hash of relevant phase/shared skill files and rejects drift; review changed contracts before refreshing an affected assignment.
+Read the actual named skill at `<envelope.skills_root>/<skill>/SKILL.md` and its required references at stage entry. This is the same original skill family adjacent to the companion, not a vendored copy. Use its adjacent `m-context` loader as well. Runtime admission records a hash of those phase/shared files and rejects drift; review changed contracts before refreshing an affected assignment. For older envelopes without a root, verify that the source and invoked installed phase versions agree before acceptance.
 
 | Role | Invocation and acceptance |
 | --- | --- |

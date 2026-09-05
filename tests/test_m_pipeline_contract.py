@@ -18,6 +18,13 @@ class ContractTests(Fixture):
         self.assertFalse(json.loads(result.stdout)["ok"])
         self.assertNotIn("fixture-value", result.stdout)
 
+    def test_malformed_runtime_identifiers_fail_as_input_errors(self):
+        self.start()
+        for value in ([], {}, None, 2):
+            with self.subTest(value=value):
+                with self.assertRaises(PipelineError):
+                    self.call("bind", {"role": value, "session": self.worker, "cwd": str(self.root), "observation_ref": "fixture:lookup"})
+
     def test_manifest_entries_and_example_validate_without_old_package_changes(self):
         manifest = json.loads((REPO_ROOT / "manifests/m-pipeline.json").read_text(encoding="utf-8"))
         package = REPO_ROOT / manifest["source_dir"]
@@ -60,6 +67,9 @@ class ContractTests(Fixture):
         self.config["roles"]["release"] = {"skill": "release", "contexts": [], "sessions": [], "create": None,
                                             "environment": "production", "procedure_ref": proof(procedure)}
         self.config["stages"].append({"id": "release", "role": "release", "after": ["execute"], "routing": "any"})
+        self.config["roles"]["closer"] = {"skill": "m-archive", "contexts": [], "sessions": [], "create": None}
+        self.config["stages"].append({"id": "archive", "role": "closer", "after": ["release"], "routing": "any"})
+        validate_blueprint(self.config, self.root)
         self.start()
         with self.assertRaisesRegex(PipelineError, "environment"):
             self.admit([self.packet("release", stage="release")])

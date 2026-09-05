@@ -247,3 +247,13 @@ Validation: `python -m unittest discover -s tests -v` ran 66 tests: 64 passed, 2
 Two implementation refinements were verified: dispatch invalidates prior idle observations so a fresh host observation is required for result acceptance; occupied shared resources wait without triggering unnecessary receiver creation. Plan fingerprints normalize completion checkboxes and exclude explicitly unselected progress sections while detecting changed task definitions.
 
 T8 remains in progress. Local/fake-host checks are not evidence of actual host creation, delivery or end-to-end acceptance. No installation has occurred yet.
+
+### T8 — Real-Host Pilot In Progress, 2026-09-06
+
+Disposable pilot root: `C:\Users\HelloWorld\AppData\Local\Temp\m-pipeline-host-pilot-8tf9krl9`. Two independent fixture repositories use separate docs/worktree roots and one local state store. `tests/fixtures/m-pipeline/pilot.py` prepares requests and validates local artifacts; real host observations and semantic result review remain coordinator-owned.
+
+Five authorized bootstrap tasks were created and their real IDs/cwds verified: architect `01a072f4-76b5-70e0-8536-9e99abbf925e`, executors `01a072f5-78aa-73e1-993b-f35f58273c24` / `01a072f5-8601-7270-8336-6ae1b2639675`, tester `01a072f5-9573-7180-bd33-37355387f2e7`, closer `01a072f5-a3ed-7521-aa83-bd6250631dab`. All completed bootstrap and loaded the explicit local context through the original loader. No context values were copied into coordination records.
+
+The second run correctly waited for the shared architect while the first planning assignment owned it. Pilot A's actual `m-plan` report and root plan were reviewed and accepted at clean commit `5997de320771a66f4b69d49f03fc4bea267a3213`; its two distinct implementation assignments were then sent to separate receivers/worktrees while the architect began pilot B. This is partial evidence, not an end-to-end pass yet.
+
+Live fixture preparation caught a configuration defect: an explicitly configured release-before-archive order was incorrectly treated as a backward edge. Fixed that case while retaining graph-cycle and backward repair restrictions. Added explicit runtime identifier validation and pinned the original skill-root path in handoff envelopes. Eight focused contract checks passed after those changes. Source and installed text for the seven core original skills match; byte hashes for all 67 pre-existing installed m-* files were recorded before installation. The new installed destination was absent.

@@ -210,7 +210,8 @@ def validate_blueprint(raw, base):
         for predecessor in stage["after"]:
             require(predecessor in seen, "Stages must be topologically ordered without cycles/dangling edges")
             previous = config["roles"][seen[predecessor]["role"]]["skill"]
-            require(PHASES[previous] <= PHASES[phase], "Use runtime repair/replan, not backward stage edges")
+            require(PHASES[previous] <= PHASES[phase] or (previous, phase) == ("release", "m-archive"),
+                    "Use runtime repair/replan, not backward stage edges")
             require(not (previous in ("m-go", "m-continue") and phase == "m-test"),
                     "Composite owns its test loop; do not attach a duplicate test stage")
         seen[key] = stage

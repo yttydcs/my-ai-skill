@@ -126,6 +126,9 @@ class Engine:
         require(isinstance(payload, dict), "payload must be an object")
         data = json.loads(canonical(payload))
         config = run["config"]
+        for key in ("role", "job_id", "operation_id"):
+            if key in data:
+                label(data[key], key)
         if action == "bootstrap":
             fields(data, ("roles", "source_ref", "creation_limit"))
             strings(data["roles"], "bootstrap roles", True)
@@ -480,6 +483,7 @@ class Engine:
                 envelope = {"run_id": run["id"], "assignment": key, "generation": job["generation"],
                             "receiver": session_id, "receiver_cwd": session["cwd"], "reply_to": run["coordinator"],
                             "role": role_id, "skill": role["skill"], "contexts": role["contexts"],
+                            "skills_root": str(Path(__file__).resolve().parents[3]),
                             "project_root": run["config"]["project_root"], "docs_root": run["config"]["docs_root"],
                             "authority_ref": run["authority"]["source_ref"], "review_mode": run["authority"]["review_mode"],
                             "packet": packet}
