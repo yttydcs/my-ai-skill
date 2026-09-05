@@ -261,3 +261,26 @@ Live fixture preparation caught a configuration defect: an explicitly configured
 Further compatibility review fixed immutable tested-candidate handoff across original archive cleanup, including post-archive release retry from retained evidence. This permits archive metadata/merge changes without treating the resulting HEAD as a newly tested product version. Normal execution/test/live-release handoffs still require exact clean HEAD. The post-cleanup regression also rejects changed plan identity. Final full regression after these code fixes: 68 tests, 66 passed, 2 Windows symlink-privilege skips; new package tests alone: 28 tests, 27 passed, 1 of those skips. Package validation and 96 local Markdown links passed. All pre-existing source packages remain unchanged against the baseline.
 
 The sixth real task, fresh executor `01a0730e-3daa-73c1-864a-589d4b88e93d`, loaded the configured context and completed B1 from canonical references without a repeated user explanation. B was paused with outstanding claims; a new dispatch was rejected, completed work was reviewed without replay, and explicit resume succeeded. Both original executors were then verified idle, retired from the local pool and archived through the host after their accepted results. Two live slots remain available within the approved total-creation bound.
+
+Both original m-test passes were reviewed and accepted: A at `35d2061eddee77be0df6881ac1d616c70c282c9f` (31 fixture checks, 12 review items), B at `238bc992e43941e08a81dce6a0f942dc562f63aa` (17 fixture checks, 12 review items). Independent coordinator byte/Git checks confirm source-to-candidate identity, clean state and unchanged reviewed plans. The shared tester was reused sequentially. B's release explicitly returned `shared_resource_busy` while A's release result remained unaccepted, even though A's receiver had finished; no new receiver was created until that claim was released by reviewed acceptance.
+
+Publisher A `01a07319-d53e-7213-8b18-998003f1f4f9` and publisher B `01a0731f-75a9-7050-b472-a1244cd3ccbc` brought the pilot to exactly 8 created tasks and a maximum of 6 unarchived tasks. No further creation is admitted. A's local release marker was independently verified as its tested full commit plus LF; B release and both original archive closeouts remain pending at this checkpoint.
+
+### Implementation Review Checklist
+
+| Review item | Status | Evidence / limitation |
+| --- | --- | --- |
+| Requirement coverage | T1–T7 passed; T8 in progress | R01–R18 map to admitted tasks; final closeout/install evidence still required |
+| Architecture | Passed | Config, persistence and workflow modules separate responsibilities; original phase skills remain authoritative; host calls remain outside the runtime |
+| Performance risks: repeated I/O, lock contention | Passed for bounded scope | Filesystem/Git validation occurs before short SQLite transactions; independent-process contention and rollback tests passed; stage scans are bounded by admitted work |
+| Performance targets / thresholds | Not specified | No throughput or latency SLO was supplied; no production-scale benchmark is claimed |
+| Usability / user path | Passed for verified modes | Setup, explicit launch, wait, split/integrate, shared receiver reuse, pause/resume and fresh receiver worked on the real host; mode-specific gaps are documented |
+| Readability / consistency | Passed | Small entry skill routes to focused references; JSON actions and errors use consistent contracts; English commits follow guide.md |
+| Extensibility / configuration | Passed | Versioned blueprint, explicit repositories/roles/resources and bounded creation; no unnecessary external dependencies or recursive framework |
+| Stability / recovery | Passed in deterministic tests | Unknown outcomes survive restart, no timeout-based ownership release, stale/duplicate receipts and failed non-progress are checked |
+| Security / permissions / data exposure | Passed within cooperating-host boundary | Runtime does not prove user authority; coordinator checks actual instructions and artifact evidence. No credentials or context bodies in records/reports; path and scope checks reject invalid assignments |
+| Test coverage | Passed with platform skips | Final 68-test suite: 66 passed, 2 Windows symlink-privilege skips; the latter are not claimed as passed |
+| Whole-flow validation | In progress | Two real fixture pipelines reached accepted integrated tests; final release/archive evidence remains required |
+| Delegation governance / audit | Passed | No implementation subagents; exactly 8 explicitly authorized pilot tasks with bounded live capacity, distinct Task IDs/write sets, canonical context/docs references and coordinator result review |
+
+The real fixture is static and introduces no UI; screenshot/route/responsive checks are inapplicable. Saved-project worktree creation and pending-ID recovery remain gated by actual host metadata/readiness checks and have no live-pilot claim; deterministic/schema checks cover those paths. Native compaction, background wakeup, deeper/distributed teams and real production remain D1–D4.
