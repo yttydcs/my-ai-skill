@@ -30,6 +30,10 @@ Store current user-visible feature behavior as complete feature dossiers.
 - [m-autoflow-workflow.md](m-autoflow-workflow.md)
 - [m-quick-fast-path.md](m-quick-fast-path.md) - guarded one-repo direct-edit path with mandatory governed-doc context
 
+## Planned Docs
+
+- [m-pipeline.md](m-pipeline.md) - proposed optional role/session automation; implementation approval pending
+
 ## Retired Docs
 
 - [m-project-orchestrator.md](m-project-orchestrator.md) - removed on 2026-09-05; historical reference only

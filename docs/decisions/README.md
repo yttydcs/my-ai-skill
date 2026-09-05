@@ -22,6 +22,10 @@ Store append-only architecture decision records for choices that shape structure
 - Keep entries concise and factual.
 - Do not hide current feature truth or technical contracts only inside decisions.
 
+## Proposed Decisions
+
+- [2026-09-06_role-pipeline-composition.md](2026-09-06_role-pipeline-composition.md) - optional companion skill with local coordination; awaiting plan approval
+
 ## Current Docs
 
 - [2026-08-15_project-scoped-archive-resume.md](2026-08-15_project-scoped-archive-resume.md)

@@ -54,6 +54,10 @@ Store technical contracts, integration rules, architecture constraints, and work
 - [m-quick-skill.md](m-quick-skill.md)
 - [m-thesis-aigc-revision-skill.md](m-thesis-aigc-revision-skill.md)
 
+## Planned Docs
+
+- [m-pipeline.md](m-pipeline.md) - proposed phase composition, session lifecycle and transactional coordination
+
 ## Retired Docs
 
 - [m-project-orchestrator.md](m-project-orchestrator.md) - removed on 2026-09-05; historical reference only
