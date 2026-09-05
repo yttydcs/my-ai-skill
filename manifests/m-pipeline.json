@@ -1,0 +1,11 @@
+{
+  "name": "m-pipeline",
+  "version": "0.1.0",
+  "install_mode": "copy",
+  "source_dir": "skills/m-pipeline",
+  "dist_dir": "dist/codex/m-pipeline",
+  "codex_install_root": "%USERPROFILE%/.codex/skills",
+  "depends_on_skills": ["m-autoflow", "m-context", "m-docs", "m-discuss", "m-plan", "m-execute", "m-test", "m-archive"],
+  "reference_files": ["references/configuration.md", "references/phase-adapter.md", "references/session-lifecycle.md", "references/handoffs.md", "references/recovery.md"],
+  "script_files": ["scripts/pipeline_runtime.py", "scripts/pipeline_lib/__init__.py", "scripts/pipeline_lib/config.py", "scripts/pipeline_lib/store.py", "scripts/pipeline_lib/workflow.py"]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "m:pipeline"
+  short_description: "Coordinate role sessions through m-* phases"
+  default_prompt: "Use $m-pipeline to configure my role team and continue the authorized workflow automatically."

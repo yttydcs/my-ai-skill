@@ -1,0 +1,39 @@
+# Host Session Lifecycle
+
+Discover the current host's `list_projects`, `create_thread`, `list_threads`, `read_thread`, `send_message_to_thread` and `wait_threads` tools. Native compaction and context-usage telemetry are not assumed. Do not call a separate App Server and infer access to this desktop's live tasks.
+
+## Existing Sessions
+
+Resolve the user's named task with host metadata, then bind its actual host/thread ID and cwd. `bind` initializes unknown readiness. Use `observe` only after a real host observation. A task can be used by several configured roles/runs, but a global session claim admits only one assignment at a time. Do not dispatch to an active, needs-input, unknown or claimed task.
+
+An idle observation never releases an assignment. A phase result and coordinator review do that. External manual activity can race with the local runtime; recheck the host immediately before sending. If it became busy before any send, record known `not_delivered`. If send may have occurred, retain `uncertain` and reconcile.
+
+## One-Command Team Creation
+
+`bootstrap` uses an actual user request to create the configured initial role capacity. Loop over returned actions until each configured role is bound; no implementation is launched by setup. `next` can also request a new receiver on demand within launch bounds.
+
+For each returned `create`:
+
+1. Preserve its operation ID before calling the host. Put that exact ID in the new task's bootstrap prompt for recovery correlation, and use a short descriptive task title.
+2. For `project`, call `list_projects`, verify the target is the requested Git project, then `create_thread` with `environment: {type: "worktree", startingState: {type: "branch", branchName: <configured base_ref>}}`. Do not invent a ref or set `onMissing: create-branch` without a user request for that branch.
+3. For `projectless`, create the requested projectless task. Add a short operation suffix to its directory name to distinguish intentional fresh receivers. The later envelope gives its exact code worktree; default cwd is not permission to work elsewhere.
+4. The bootstrap prompt identifies the role, project/docs roots, source skill path, context references, operation ID and coordinator. Ask it to inspect its role/context, report its actual cwd/readiness and stop before phase work. A product-manager task can then receive the user's discussion separately.
+5. Record `operation_result`: `{operation_id,outcome:"pending",client_thread_id,observation_ref}` for queued setup, or `{operation_id,outcome:"ready",session:{host_id,thread_id},cwd,observation_ref}` only for verified real identity.
+6. When creation is pending, inspect host task listings and read the matching ready task to correlate the operation marker and cwd. Do not pass `clientThreadId` to a tool requiring `threadId`. If identity remains uncertain, preserve that state; do not create a replacement blindly.
+7. Observe bootstrap completion before marking idle. Creating a task does not mean it is ready for assignment.
+
+Emit the host-required created-task directive with actual real or pending identity when presenting newly created tasks. Do not override models or reasoning settings without an explicit request.
+
+## Dispatch And Waiting
+
+`next` returns a dispatch intent with operation ID and envelope. Send one readable instruction containing the role/phase, Task IDs, exact worktrees/commits, plan references, contexts, authority and reply destination. Refer to an envelope file when long; keep bodies of private contexts out of it.
+
+Record `{operation_id,outcome:"delivered",observation_ref}` only after a known successful send. `not_delivered` is allowed only when no send occurred or rejection proves nondelivery. Use `uncertain` for timeouts/unclear results. A delayed phase result may reconcile uncertainty, but arbitrary retries cannot.
+
+Use one bounded `wait_threads` call for up to eight assigned tasks, with each latest cursor as `afterCursor`. Wait at most 60 seconds per blocking call; communicate meaningful changes without repeating unchanged snapshots. Read the phase output when a task finishes or needs attention. Record observations before result acceptance.
+
+## Fresh Receivers
+
+At an inactive boundary, checkpoint progress in canonical artifacts and exact commits. After `reuse_after` completed assignments, the old session is no longer eligible. If live capacity is full, explicitly retire its local binding after verifying idle, then permit a new creation. Local retirement is not deletion or archival of a user task.
+
+For an unfinished assignment, use pause/takeover and accept a verified failed/checkpoint report before retrying in a fresh receiver. Preserve Task IDs and repositories; change only reviewed candidate/progress references. Forking copies completed history and is not a fresh-context reset. Do not invent occupancy percentages. Capacity exhaustion waits; it does not interrupt busy work or silently increase limits.

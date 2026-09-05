@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "project_root": ".",
+  "docs_root": "docs",
+  "repositories": {
+    "app": {"path": ".", "base_ref": "main", "worktree_root": "worktrees"}
+  },
+  "roles": {
+    "product": {"skill": "m-discuss", "contexts": [], "sessions": [], "create": {"target": {"type": "projectless", "directoryName": "pipeline-product"}}},
+    "architect": {"skill": "m-plan", "contexts": [], "sessions": [], "create": {"target": {"type": "projectless", "directoryName": "pipeline-architect"}}},
+    "executor": {"skill": "m-execute", "contexts": [], "sessions": [], "create": {"target": {"type": "projectless", "directoryName": "pipeline-executor"}}},
+    "tester": {"skill": "m-test", "contexts": [], "sessions": [], "create": {"target": {"type": "projectless", "directoryName": "pipeline-tester"}}},
+    "release": {"skill": "m-archive", "contexts": [], "sessions": [], "create": {"target": {"type": "projectless", "directoryName": "pipeline-closeout"}}}
+  },
+  "stages": [
+    {"id": "plan", "role": "architect", "after": [], "routing": "any"},
+    {"id": "execute", "role": "executor", "after": ["plan"], "routing": "split"},
+    {"id": "integrate", "role": "executor", "after": ["execute"], "routing": "join"},
+    {"id": "test", "role": "tester", "after": ["integrate"], "routing": "join"},
+    {"id": "archive", "role": "release", "after": ["test"], "routing": "any"}
+  ],
+  "limits": {"max_live": 6, "max_created": 12, "max_depth": 1, "max_nonprogress": 3, "reuse_after": 4}
+}

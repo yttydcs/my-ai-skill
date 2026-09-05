@@ -2,10 +2,10 @@
 
 ## Status And Goal
 
-- Phase: `m-plan`; planning documents only.
-- Status: plan ready for user review; implementation approval is pending.
-- Blocked: yes, at the original plan-confirmation gate. Do not enter execution or dispatch implementation agents yet.
-- User instruction authorizing this phase: `可以 $m-plan`. This authorizes planning, not implementation or the creation of runtime role sessions.
+- Phase: `m-execute`.
+- Status: T1–T8 approved by the user's explicit `$m-execute` follow-up to the scope-confirmation question.
+- Blocked: no at entry; individual capability and acceptance gates still apply.
+- User instruction authorizing execution: `$m-execute`, following the presented T1–T8 scope, including bounded T8 fixture-task creation and installation of only the new companion. D1–D4 remain excluded.
 - Goal: add an optional role/session pipeline that continues from an explicitly authorized product discussion through the existing planning, execution, testing, and closeout phases, while preserving the user's original manual workflow.
 
 ## Initialization And Ownership
@@ -72,13 +72,13 @@ All paths in this table are relative to the active worktree. Proposed files do n
 
 ## Will Execute After Approval
 
-- [ ] T1 — Verify host and phase capabilities.
-- [ ] T2 — Define companion and phase adapters.
-- [ ] T3 — Implement transactional coordination.
-- [ ] T4 — Implement session lifecycle.
-- [ ] T5 — Implement automatic phase routing.
-- [ ] T6 — Integrate context, documents and manual recovery.
-- [ ] T7 — Package and validate compatibility.
+- [x] T1 — Verify host and phase capabilities; real creation/delivery acceptance remains assigned to T8.
+- [x] T2 — Define companion and phase adapters.
+- [x] T3 — Implement transactional coordination.
+- [x] T4 — Implement session lifecycle.
+- [x] T5 — Implement automatic phase routing; real-host scenario remains in T8.
+- [x] T6 — Integrate context, documents and manual recovery; real receiver validation remains in T8.
+- [x] T7 — Package and validate compatibility.
 - [ ] T8 — Run bounded host pilot and install only the new companion.
 
 ### T1 — Verify Host And Phase Capabilities
@@ -218,8 +218,32 @@ Execution is complete only when every admitted task is accepted, the companion i
 
 Requested execution scope: T1–T8, including T8's bounded disposable-session creation and installation of only `m-pipeline`. D1–D4 remain excluded. The user may approve selected Task IDs; dependent tasks must remain blocked if their prerequisite is excluded.
 
-Current state remains **awaiting explicit execution approval**. No new pipeline runtime, source skill, manifest, test, installed package, or role session has been created by this planning turn.
+Execution approval received through the user's `$m-execute` follow-up. This does not authorize D1–D4 or changes to existing skill packages.
 
 ## Execution Evidence
 
-Not started. T1–T8 will record dated progress, actual commands/tool observations, verdicts, and artifact references here after approval. Do not change admitted scope or mark unverified host behavior as supported through a progress update.
+### T1 — Capability Inspection, 2026-09-06
+
+| Capability | Evidence / status | Implementation consequence |
+| --- | --- | --- |
+| Saved projects | `list_projects` returned the real repository path and Git flag | Resolve actual project IDs; do not invent registration records |
+| Existing task identity and working directory | `read_thread` on this task returned stable ID, host ID, status and `cwd` | Bind verified identities; send exact worktree paths in every assignment |
+| New tasks | Tool schema supports projectless and project worktree creation, explicit starting state, and pending `clientThreadId` | Persist creation intent; reconcile the ready task ID before dispatch; real pilot pending T8 |
+| Observe and send | `read_thread`, `send_message_to_thread`, cursor-based `wait_threads` exposed | Coordinator owns host calls; runtime records intents and claims; real pilot pending T8 |
+| Exact checkout | Task metadata exposes actual cwd; shell can independently verify configured Git worktrees and revisions | Explicit assignment workdir is mandatory even if task cwd differs; no default-checkout substitution |
+| Atomic host claim / exactly-once send | Not documented by exposed tools | Local SQLite coordinates cooperating runs only; ambiguous outcomes remain uncertain |
+| Native compaction / context occupancy | Not exposed in current task tools | D1 deferred; use bounded fresh-session replacement |
+| Background wakeup | No wakeup service in this scope | D2 deferred; active coordinator or explicit resume required |
+| Original phase authority | Read installed `m-execute`, shared phase/subagent rules and `m-context`; existing `m-plan` requires real approval | Preserve original skill calls and report actual launch delegation; never invent user approval |
+
+Read-only inspection passed. No role tasks were created during T1. Host creation and end-to-end evidence are not yet claimed.
+
+### T2–T7 — Implementation And Local Validation, 2026-09-06
+
+Added only `skills/m-pipeline/`, `manifests/m-pipeline.json`, new `test_m_pipeline_*` tests and their isolated fixture helper. The companion composes original phase skills; the runtime performs no host calls. It validates explicit blueprints and selected original-plan definition sections, records local SQLite claims/intents, seals stage membership, checks exact candidates and reviewed receipts, and supports bounded creation, one-level groups, manual takeover and recovery.
+
+Validation: `python -m unittest discover -s tests -v` ran 66 tests: 64 passed, 2 skipped for Windows symlink privilege (WinError 1314). New scenarios cover independent-process claim contention, all-or-none resource acquisition, uncertain delivery across restart, manual takeover, one-level joins, distinct-branch integration requirements, required-context failure, scope/environment authority, non-Git umbrellas with two repositories, non-progress bounds, and duplicate/stale results. `tools/validate-skills.ps1 -Skill m-pipeline` and the bundled skill validator passed. `git diff --check` passed. No pre-existing source skills, manifests, tools or tests changed.
+
+Two implementation refinements were verified: dispatch invalidates prior idle observations so a fresh host observation is required for result acceptance; occupied shared resources wait without triggering unnecessary receiver creation. Plan fingerprints normalize completion checkboxes and exclude explicitly unselected progress sections while detecting changed task definitions.
+
+T8 remains in progress. Local/fake-host checks are not evidence of actual host creation, delivery or end-to-end acceptance. No installation has occurred yet.
