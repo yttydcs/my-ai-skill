@@ -34,6 +34,11 @@ class ContractTests(Fixture):
             self.assertTrue((REPO_ROOT / "skills" / name / "SKILL.md").is_file())
         example = json.loads((package / "assets/pipeline.example.json").read_text(encoding="utf-8"))
         example.update(project_root=str(self.repo), docs_root=str(self.docs), repositories=self.config["repositories"])
+        with self.assertRaises(PipelineError):
+            validate_blueprint(example, self.root)
+        for role in example["roles"].values():
+            self.assertEqual(role["create"]["target"]["type"], "project")
+            role["create"]["target"]["projectId"] = "fixture-saved-project"
         validate_blueprint(example, self.root)
 
     def test_missing_required_context_blocks_phase_and_no_body_is_persisted(self):

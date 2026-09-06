@@ -2,7 +2,7 @@
 
 ## Status And Authority
 
-Implemented and installed as version 0.1.0 on 2026-09-06. The [archived implementation plan](../plan/2026-09-06_role-pipeline.md) records completed implementation tasks, validation and capability limits. The original phase skills remain authoritative for their own prerequisites, work, evidence, and closeout.
+Implemented as version 0.1.1, including the [project ownership correction](../change/2026-09-06_pipeline-project-tasks.md). The [archived implementation plan](../plan/2026-09-06_role-pipeline.md) records original implementation tasks, validation and capability limits. The original phase skills remain authoritative for their own prerequisites, work, evidence, and closeout.
 
 ## Package And Responsibilities
 
@@ -79,6 +79,10 @@ An idle host status does not prove that an assignment has completed. A clock tim
 Unknown create, send, or release outcomes become `uncertain`: inspect operation markers, host identity, and actual artifacts before deciding whether to acknowledge or retry. When observation cannot establish the outcome, expose that blocker. Do not blindly retry a potentially delivered instruction, create duplicate sessions, or promise exactly-once external effects.
 
 ## Host Capability Gate
+
+For project workflows, resolve the saved Codex project by actual path/host using `list_projects` before creation. Default role targets are `{type: "project", projectId, environment: "worktree", base_ref}` for Git projects and `{type: "project", projectId, environment: "local"}` for non-Git saved projects. Git local mode requires an explicit user choice; local mode rejects `base_ref`. Omitted environment retains version-1 worktree behavior. Multi-repository assignment does not require projectless task membership; the saved umbrella project and each assigned code worktree serve different purposes.
+
+Project `ready` receipts require `project_id` from actual host task metadata equal to the requested `projectId`. A missing/wrong membership raises `project_mismatch` before binding and leaves the outstanding creation available for reconciliation. Cwd, a prompt path or a title is not proof of project membership. The coordinator verifies host evidence; the receipt field alone is not independent proof. Existing projectless configurations and already recorded receipts remain readable, but an installed update does not move old tasks or rewrite a run's immutable blueprint. No database migration is required. See [recovery guidance](../../skills/m-pipeline/references/session-lifecycle.md#existing-projectless-teams).
 
 The initial implementation task must verify the installed host's actual tools and record supported, unsupported, and unproven capabilities. Required checks include:
 

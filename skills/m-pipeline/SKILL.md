@@ -9,7 +9,7 @@ Use one coordinator per run and the original phase skill in each receiver. This 
 
 ## Select The Entry
 
-- **Setup/team creation:** read [configuration](references/configuration.md) and [session lifecycle](references/session-lifecycle.md). Use the user's explicit existing task bindings or requested new team. Setup does not launch implementation.
+- **Setup/team creation:** read [configuration](references/configuration.md) and [session lifecycle](references/session-lifecycle.md). Resolve the actual saved Codex project and create project-owned role tasks by default. A project path in a prompt does not assign task ownership; do not copy a projectless pilot target into a project workflow. Use the user's explicit existing task bindings or requested new team. Setup does not launch implementation.
 - **Start/continue a pipeline:** read [phase adapters](references/phase-adapter.md) and [handoffs](references/handoffs.md). Reuse the actual launch authority; do not ask for routine continuation approval again.
 - **Receiver with an assignment:** read [phase adapters](references/phase-adapter.md). Load the named contexts first, verify exact worktree/plan identity, perform only the assigned original phase, and return its report and a receipt. Receivers do not claim another assignment or run their own outer scheduling loop.
 - **Status, pause, manual takeover, resume:** read [recovery](references/recovery.md).

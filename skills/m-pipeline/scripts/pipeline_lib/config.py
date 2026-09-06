@@ -179,10 +179,16 @@ def validate_blueprint(raw, base):
                 fields(target, ("type", "directoryName"))
                 label(target["directoryName"], "directory name")
             else:
-                fields(target, ("type", "projectId", "base_ref"))
+                fields(target, ("type", "projectId"), ("base_ref", "environment"))
                 require(target["type"] == "project", "Creation supports local project or projectless only")
                 label(target["projectId"], "project ID")
-                require(not string(target["base_ref"]).startswith("-"), "Invalid creation base ref")
+                environment = target.get("environment", "worktree")
+                require(environment in ("worktree", "local"), "Creation environment must be worktree or local")
+                if environment == "worktree":
+                    require(not string(target.get("base_ref"), "creation base ref").startswith("-"),
+                            "Invalid creation base ref")
+                else:
+                    require("base_ref" not in target, "Local project creation does not accept a base ref")
         if role["skill"] == "release":
             string(role.get("environment"), "release environment")
             fields(role.get("procedure_ref"), ("path", "sha256"))

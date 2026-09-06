@@ -6,7 +6,7 @@ Host task status, assignment acceptance, and tested product identity are differe
 
 ## Lookup Hints
 
-- Keywords: `shared_resource_busy`, idle receiver, unreleased claim, uncertain dispatch, duplicate merge, candidate drift, removed worktree, archive receipt, Windows separator, allowlist.
+- Keywords: `shared_resource_busy`, idle receiver, unreleased claim, uncertain dispatch, duplicate merge, candidate drift, removed worktree, archive receipt, Windows separator, allowlist, projectless, missing project membership, `project_mismatch`.
 - Quick checks: inspect the current assignment generation and operation receipt; compare actual Git history with the recorded tested commit; check whether the report alone failed after successful external work; normalize path keys before comparing allowlists.
 - Environment: cooperating pipelines sharing one local SQLite store, especially around release, original `m-archive`, or Windows report generation.
 
@@ -52,9 +52,18 @@ A host observation describes a turn, not semantic completion. Git HEAD and workt
 
 ## Related Intake / Features / Requirements / Specs / Decisions / Changes
 
+- [Project task ownership correction](../change/2026-09-06_pipeline-project-tasks.md)
 - [Intake](../intake/2026-09-06_role-pipeline.md)
 - [Feature](../features/m-pipeline.md)
 - [Requirements](../requirements/m-pipeline.md)
 - [Specification](../specs/m-pipeline.md)
 - [Decision](../decisions/2026-09-06_role-pipeline-composition.md)
 - [Change](../change/2026-09-06_m-pipeline.md)
+
+## Project Membership Is Separate From Workdir
+
+Symptom: a role knows the correct project path but appears as a projectless task. The live project setup copied the initial example's `target.type: projectless`; all five creation calls therefore lacked `projectId`. Passing absolute paths in bootstrap prompts did not change host membership. The original disposable pilot had verified code worktree continuity, not the user's intended project grouping.
+
+Quick check: inspect the actual `create_thread` target and the returned task's `projectId` in host listings before debugging filesystem paths. Match `list_projects` by the real project path/host, use a project target, and verify membership before accepting readiness. The updated runtime rejects missing/mismatched project readiness receipts and preserves their operation for reconciliation.
+
+Keep explicit standalone configurations compatible. Do not use a projectless pilot example as the default for project work or silently downgrade on pending creation. A saved non-Git umbrella can own local role tasks while individual assignments use dedicated code worktrees. Existing tasks are not moved by changing configuration or cwd; reconcile the old coordinator and use supported reassignment or explicitly authorized replacement, preserving current work and operation history.

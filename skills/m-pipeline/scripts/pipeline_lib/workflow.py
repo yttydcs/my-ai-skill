@@ -232,7 +232,7 @@ class Engine:
             if role["skill"] != "m-archive" and not closed:
                 plan_check(job["packet"], role["skill"])
         elif action == "operation_result":
-            fields(data, ("operation_id", "outcome", "observation_ref"), ("client_thread_id", "session", "cwd"))
+            fields(data, ("operation_id", "outcome", "observation_ref"), ("client_thread_id", "session", "cwd", "project_id"))
             require(data["outcome"] in ("pending", "delivered", "not_delivered", "uncertain", "ready"), "Invalid operation outcome")
             string(data["observation_ref"], "host outcome reference")
             if "session" in data:
@@ -240,6 +240,8 @@ class Engine:
                 data["cwd"] = str(path_at(data.get("cwd"), config["project_root"]))
             if "client_thread_id" in data:
                 label(data["client_thread_id"], "pending creation ID")
+            if "project_id" in data:
+                label(data["project_id"], "observed project ID")
         elif action in ("pause", "resume", "finish"):
             fields(data, ())
         elif action == "takeover":
@@ -563,6 +565,10 @@ class Engine:
                 body["client_thread_id"] = data["client_thread_id"]
             if outcome == "ready":
                 require("key" in data, "Ready creation needs verified real session identity and cwd")
+                if body["target"]["type"] == "project":
+                    require(data.get("project_id") == body["target"]["projectId"],
+                            "Creation project is missing or differs from the requested project; verify host metadata",
+                            "project_mismatch")
                 require(db.execute("SELECT 1 FROM sessions WHERE key=?", (data["key"],)).fetchone() is None,
                         "Creation resolved to an already known session; reconcile the operation")
                 self.bind_session(db, run, body["role"], data["key"], data["cwd"], data["observation_ref"], created=True)
