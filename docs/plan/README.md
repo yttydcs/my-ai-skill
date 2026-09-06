@@ -23,6 +23,7 @@ Store archived workflow planning documents when they need to be retained beyond 
 
 ## Current Docs
 
+- [2026-09-06_acceptance-review.md](2026-09-06_acceptance-review.md) - acceptance mapping, behavior slices and lightweight review handoffs
 - [2026-09-06_role-pipeline.md](2026-09-06_role-pipeline.md) - completed T1–T8 companion implementation, host validation and installation evidence
 - [2026-08-15_orchestrator-archive-queue-resume.md](2026-08-15_orchestrator-archive-queue-resume.md) - project-scoped archive FIFO continuation, crash-safe admission recovery, and cross-project parallelism
 - [2026-08-04_orchestrator-multi-repo.md](2026-08-04_orchestrator-multi-repo.md) - schema v2 non-Git umbrella runtime, explicit repository catalogs, Task manifests, and cross-project isolation

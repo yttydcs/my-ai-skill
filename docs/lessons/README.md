@@ -27,6 +27,7 @@ Store reusable incident knowledge, query-friendly troubleshooting lessons, and p
 ## Current Docs
 
 - [codex-visualization-preview-limitations.md](codex-visualization-preview-limitations.md) - keywords: `$visualize:visualize`, sandboxed iframe, synthetic keyboard activation, `MutationObserver.observe`, preview host
+- [dirty-worktree-review.md](dirty-worktree-review.md) - keywords: empty committed diff, staged-only change, untracked test, overlapping edits, stale review
 - [orchestrator-lease-recovery.md](orchestrator-lease-recovery.md) - keywords: stale lease, orphan host lease, archive operation, owner heartbeat, `pool reclaim`, `reclaim-host`, `legacy-host-orphan`, `active_lease`, premature release, two-phase audit
 - [orchestrator-multi-repository-runtime-boundaries.md](orchestrator-multi-repository-runtime-boundaries.md) - keywords: non-Git umbrella, schema v2, `[[repositories]]`, `project_instance_id`, host lease collision, manifest retry, `planning_ref`
 - [pipeline-handoff-and-closeout.md](pipeline-handoff-and-closeout.md) - keywords: `shared_resource_busy`, idle receiver, uncertain dispatch, archive receipt, removed worktree, tested candidate, Windows separator
