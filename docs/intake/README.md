@@ -25,6 +25,7 @@ Store original request evidence before it is refined into feature, requirement, 
 
 ## Current Docs
 
+- [2026-09-06_acceptance-review.md](2026-09-06_acceptance-review.md) - source: Codex chat, approved acceptance traceability, behavior slices and lightweight candidate review
 - [2026-09-06_role-pipeline.md](2026-09-06_role-pipeline.md) - source: Codex chat, manually configured role/session pipelines composed with the existing m-* workflow
 - [2026-08-15_orchestrator-archive-queue-resume.md](2026-08-15_orchestrator-archive-queue-resume.md) - source: Codex chat, project-scoped archive FIFO waiting, automatic continuation, drift revalidation, and Windows/Linux portability
 - [2026-08-04_orchestrator-multi-repo.md](2026-08-04_orchestrator-multi-repo.md) - source: Codex chat, correct `m-orchestrator` for non-Git umbrella projects with multiple child repositories
