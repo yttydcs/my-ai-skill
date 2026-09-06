@@ -71,6 +71,7 @@ Every worker must receive:
 - Task ID and title
 - Task goal
 - Acceptance criteria
+- AC IDs, original source constraints and observation boundaries
 - Test points
 - Rollback point
 - Allowed files and directories
@@ -101,6 +102,8 @@ After a worker reports completion, the main agent must:
 - run or schedule relevant lightweight validation
 - check for write-set conflicts with other worker output
 - reject the result or dispatch follow-up work if scope drift, missing validation, or failed acceptance appears
+
+Apply `../../m-autoflow/references/review.md` to the integrated candidate before acceptance. Worker self-reports do not replace requirements/standards review. Preserve the AC/Task/evidence map and refresh only affected results after repairs.
 
 If integration itself needs file edits, dispatch an integration worker with a narrow write set.
 

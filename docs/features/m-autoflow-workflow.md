@@ -24,7 +24,7 @@ Give the user one disciplined workflow family for turning an idea into discussio
 - `$m-quick`: standalone guarded direct-edit path for explicit low-risk work in one repository after mandatory `$m-docs` context reading.
 - `$m-discuss`: discovery, brainstorming, current-practice research when useful, requirement shaping, early worktree setup, and an explicit Grill Mode for one-question-at-a-time decision pressure-testing.
 - `$m-plan`: architecture and execution planning.
-- `$m-execute`: confirmed Task ID implementation and lightweight validation.
+- `$m-execute`: confirmed Task ID implementation, lightweight validation, and separate requirements and standards review.
 - `$m-go`: high-automation delegated execution and automatic `$m-test` loop for confirmed plans.
 - `$m-test`: optional heavy validation and review.
 - `$m-continue`: unattended continuation after an execute or test pass, alternating the existing `$m-execute` and `$m-test` behaviors until acceptance converges or progress is genuinely impossible.
@@ -33,19 +33,19 @@ Give the user one disciplined workflow family for turning an idea into discussio
 ## User Workflow
 
 1. The user starts with `$m-autoflow` or a specific phase command, optionally adding `$m-context <name>` to load saved context first.
-2. Discussion clarifies the request, records open questions, compares options, rejects weak directions, and recommends a path. When the user explicitly requests Grill Mode, it resolves judgment calls one at a time before producing the same discussion brief.
+2. Discussion clarifies the request, preserves confirmed, rejected, deferred, and open decisions, compares options, and recommends a path. When the user explicitly requests Grill Mode, it resolves judgment calls one at a time before producing the same discussion brief.
 3. Discussion creates or confirms the dedicated worktree when project, docs, and code-repo boundaries are clear enough.
-4. Planning turns the discussion brief into requirements, architecture, and a handoff-ready `plan.md` / `todo.md`.
+4. Planning turns the discussion brief into requirements, architecture, and a handoff-ready `plan.md` / `todo.md`, mapping confirmed constraints to acceptance IDs, Task IDs, and planned evidence.
 5. `$m-plan` shows a concise task summary table directly in the user response.
 6. The user approves execution scope.
-7. Execution implements only approved Task IDs and runs lightweight checks through `$m-execute`, or the user invokes `$m-go` for delegated implementation and an automatic `$m-test` loop.
+7. Execution implements only approved Task IDs, runs lightweight checks, and reports separate requirements and standards review results through `$m-execute`, or the user invokes `$m-go` for delegated implementation and an automatic `$m-test` loop.
 8. `$m-go` dispatches implementation edits to worker sub-agents, reviews their results, runs validation, and delegates bounded fixes until acceptance passes or a blocker is explicit.
 9. Heavy testing runs when risk justifies it, when `$m-go` automatically invokes it, or when the user requests it; the user may explicitly skip `$m-test` only outside the normal `$m-go` path and proceed to archive with residual risk recorded.
 10. When heavy testing runs for UI changes, Codex opens and operates the affected interface and provides screenshot evidence.
 11. `$m-test` reports a concise pass/fail table directly in the user response.
 12. After an execute or test pass, the user may invoke `$m-continue` once to authorize automatic execute/test iteration without further continuation questions.
 13. `$m-continue` stops successfully only after approved acceptance converges, or unsuccessfully when new authority/external state is required or three complete cycles repeat the same failure without measurable progress.
-14. Archive records the change, stable-doc impact, lessons impact, validation, rollback, and sub-agent trace.
+14. Archive verifies that review and acceptance evidence still apply, reuses valid results, and records the change, stable-doc impact, lessons impact, validation, rollback, and sub-agent trace.
 15. Archive closes the workflow by default through verified control-plane merge and worktree cleanup.
 16. The workflow stops after archive only when the user explicitly asks for archive-only handling, no merge, or no cleanup.
 
@@ -61,6 +61,16 @@ Grill Mode is an opt-in behavior inside `$m-discuss`, not a separate phase. It a
 6. Confirmation permits the normal `$m-plan` readiness check but never starts planning or implementation automatically.
 
 The interview protocol lives in `skills/m-discuss/references/grilling.md`; the standard brief and handoff rules remain owned by `references/discussion.md`.
+
+### Acceptance And Review Handoffs
+
+Confirmed requirements retain their concrete constraints through planning and verification, including prohibitions, numeric limits, defaults, and ordering. Each acceptance ID links its source requirement to the responsible Task IDs and evidence. Rejected, deferred, and open decisions stay distinguishable; they are not silently turned into approved work.
+
+Tasks normally deliver a small complete behavior that can be independently demonstrated or checked. Each task names its deliverable, genuine blockers, and verification boundary. Mechanical migrations may instead use compatibility, migration, and removal steps. When batches cannot pass independently, isolate them on an integration branch and declare the final integrate-and-verify task; intermediate completion does not mean the feature is accepted.
+
+Execution reviews both whether the candidate implements the approved requirements and whether it follows applicable project standards. Review covers workflow-owned committed, staged, unstaged, and untracked changes, preserving unrelated work. Skipping heavy testing does not remove this lightweight review or convert missing evidence or an explicit waiver into a pass.
+
+Review and verification evidence identify the plan and candidate state they cover. When requirements or code change, only affected evidence becomes stale; unchanged evidence can be reused with an impact explanation. Archive checks freshness rather than automatically repeating the review. Detailed coverage and freshness rules live in `skills/m-autoflow/references/review.md`.
 
 ## Standalone Quick Path
 
@@ -108,18 +118,18 @@ The complete current behavior is maintained in [m-quick-fast-path.md](m-quick-fa
 ## State And Validation
 
 - `$m-context` is not a workflow phase and does not change the active phase; a failed required context load blocks dependent actions.
-- A phase is blocked when unresolved questions remain or a required artifact is missing.
+- A phase is blocked when a material decision or required execution prerequisite remains unresolved. Codex researches discoverable facts and records reversible in-scope implementation choices without repeatedly asking for approval.
 - In Grill Mode, a recommendation, silence, ambiguous answer, or absence of more questions is not user confirmation; blocking open decisions prevent the `$m-plan` handoff.
 - Blocked output uses `问题清单` and `阻塞：是`.
 - Planning must include a direct task summary table that reflects the active `plan.md` / `todo.md`.
-- Execution must report lightweight validation.
+- Execution must report lightweight validation and separate requirements and standards review results, linked to the current acceptance and candidate state.
 - `$m-go` must require a confirmed plan, delegate implementation edits to sub-agents, run safe parallel task execution when write sets allow it, and automatically run `$m-test` behavior after delegated execution.
 - `$m-go` must return failing validation to delegated fixes until acceptance passes or the blocker is explicit.
 - `$m-continue` must treat one invocation as authorization for all approved-scope execute/test iterations, must not ask whether to continue between ordinary passes, and must preserve `$m-execute` delegation policy rather than requiring `$m-go` workers.
 - `$m-continue` must stop only after complete acceptance or genuine inability to progress; the default non-progress threshold is three complete repair/test cycles with the same failure signature and no Task, diff, or validation improvement.
 - `$m-quick` must read governed docs before eligibility, operate on one selected repository, reject prohibited risk, preserve existing changes, run focused validation, and report a concise direct result table.
 - `$m-quick` is the sole explicit direct-edit exception to staged worktree and confirmed-plan gates; it must not weaken those gates for other commands.
-- Heavy validation must report either passed checks or skip rationale with residual risk.
+- Heavy validation must report either passed checks or skip rationale with residual risk. A heavy-test skip does not waive lightweight review; an explicit waiver remains distinct from a pass.
 - UI-impacting changes tested through `$m-test` must include actual UI operation evidence and screenshot paths.
 - `$m-test` must include a concise direct pass/fail table so the user can understand results without opening archive markdown.
 - Archive must link related intake, feature, requirement, spec, decision, lessons, and plan artifacts.
@@ -171,7 +181,23 @@ Given one user capability is implemented by several repos, when the workflow doc
 
 ### Lightweight Change
 
-Given a low-risk small change passes execution checks, when heavy testing is unnecessary, then Codex records the skip reason and residual risk before archive.
+Given a low-risk small change passes execution checks and separate requirements and standards review, when heavy testing is unnecessary, then Codex records the skip reason and residual risk before archive.
+
+### Preserve A Concrete Constraint
+
+Given discussion confirms that failed saves must preserve input and keep the window open, when planning and execution hand off the requirement, then an acceptance ID retains both conditions, maps them to a Task ID, and records evidence for the observed failure behavior.
+
+### Verify A Complete Task
+
+Given a feature crosses storage, API, and UI layers, when the plan divides its work, then each task normally delivers an independently checkable behavior and records only genuine blockers. A mechanical migration identifies the stages that promise passing validation; batches that require integration remain isolated until the explicit integrate-and-verify task passes.
+
+### Review The Actual Candidate
+
+Given a workflow has committed changes plus staged, unstaged, and new files, when execution reviews its candidate, then review includes every workflow-owned change while preserving unrelated edits. It does not require a commit merely to make changes visible to review.
+
+### Reuse Evidence After A Change
+
+Given acceptance and review evidence exists, when a requirement or implementation changes, then affected evidence becomes stale and is refreshed before it supports acceptance. Archive reuses the remaining applicable evidence and records any gap explicitly accepted by the user as a waiver, not a pass.
 
 ### Standalone Quick Change
 
@@ -219,7 +245,7 @@ Given the official interactive capability or host bridge is unavailable, when a 
 
 ### User Skips Heavy Testing
 
-Given the user explicitly chooses to skip `$m-test`, when the workflow proceeds to `$m-archive`, then Codex records the skipped testing, missing evidence, and residual risk instead of fabricating validation.
+Given the user explicitly chooses to skip `$m-test`, when the workflow proceeds to `$m-archive`, then Codex preserves current lightweight review results and records the skipped testing, missing evidence, and residual risk instead of fabricating validation.
 
 ## Related Requirements
 

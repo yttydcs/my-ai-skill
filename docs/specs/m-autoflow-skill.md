@@ -30,6 +30,10 @@
   - `skills/m-discuss/references/grilling.md`
   - packaged by `manifests/m-discuss.json`
   - copied through the normal source -> dist -> installed flow with no external skill dependency
+- Shared review coverage and evidence freshness contract:
+  - `skills/m-autoflow/references/review.md`
+  - packaged by `manifests/m-autoflow.json`
+  - consumed by execution, testing, archive, `m-go`, and `m-continue` through the shared reference
 - Canonical standalone fast-path source package:
   - `skills/m-quick`
 - Canonical standalone fast-path install metadata:
@@ -47,7 +51,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - Invoke `$m-discuss` for discovery, requirement shaping, brainstorming, optional research, and early worktree setup.
 - Inside `$m-discuss`, activate Grill Mode only for an explicit request to be grilled, pressure-test thinking through hard questions, or resolve decisions one at a time. A vague request alone keeps the standard flow.
 - Invoke `$m-plan` for architecture, executable planning, direct task summary, and approval gating.
-- Invoke `$m-execute` for confirmed Task ID implementation plus lightweight validation.
+- Invoke `$m-execute` for confirmed Task ID implementation, lightweight validation, and separate requirements and standards review.
 - Invoke `$m-go` for confirmed Task ID implementation through worker sub-agents plus an automatic `$m-test` loop.
 - Invoke `$m-continue` after an `$m-execute` or `$m-test` pass to authorize unattended reuse of both behaviors until acceptance converges or progress is genuinely impossible.
 - Invoke `$m-test` for optional heavy validation and review, including UI operation evidence when UI changes are tested.
@@ -74,11 +78,13 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - `$m-quick` must apply its own docs-first eligibility gate before direct edits and must escalate unsuitable work before scope expands.
 - Only one phase may be active at a time.
 - Any rollback must state the reason and update the affected documents.
+- Discoverable facts are investigated before asking the user. Reversible in-scope implementation choices follow project conventions and are recorded when meaningful; material decisions or missing execution prerequisites block dependent work. This does not bypass plan approval or phase-entry gates.
 - Discussion prioritizes relevant private-docs-root intake, feature, and requirement docs when they exist.
 - Discussion may create or confirm the dedicated worktree once project boundaries are clear.
 - `skills/m-discuss/SKILL.md` owns Grill Mode trigger detection and conditionally loads `references/grilling.md`; it must not inline the complete interview protocol into the always-loaded entry file.
 - `references/grilling.md` owns the task-local decision snapshot, discoverable-fact lookup, depth-first single-question loop, recommended-answer format, early wrap-up, explicit confirmation, and prohibition on automatic next-phase actions.
 - `references/discussion.md` remains authoritative for the required brief, worktree status, blockers, and `$m-plan` handoff after either standard discussion or Grill Mode.
+- The standard brief retains confirmed, rejected, deferred, and open decisions, preserving concrete prohibitions, numeric limits, defaults, and ordering constraints for planning.
 - The decision snapshot distinguishes confirmed, rejected, deferred, and open decisions. Parent-decision changes invalidate only affected child branches.
 - Every Grill Mode turn contains exactly one judgment question plus a recommended answer and rationale, then waits for user feedback. Structured host controls are optional; a plain-text question is the portable fallback.
 - Grill Mode has no hard numeric question limit, but it must avoid redundant questions and honor natural-language stop or wrap-up requests.
@@ -95,10 +101,13 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - Active workflow control stays in the worktree root as `plan.md` or `todo.md`.
 - The active workflow-control rule applies to staged execution. Eligible `$m-quick` requests do not create a root plan or dedicated worktree by default.
 - Planning artifacts must include an execution-scope split with `Will Execute` and `Will Not Execute Now` groups. Every known Task ID must appear in exactly one group, and non-executed tasks must include the reason.
+- The active plan maps confirmed source requirements to acceptance IDs, Task IDs, and verification evidence. It preserves deferred and rejected decisions without silently approving them.
+- Tasks specify a deliverable, genuine blockers, acceptance IDs, and a verification boundary. Independently verifiable behavior slices are the default; mechanical migrations may use compatibility, migration, and removal steps. When batches cannot pass alone, isolate them on an integration branch, state where passing validation is promised, and require a final integrate-and-verify task before feature acceptance.
+- Planned behavior checks name an observable interface and an expected result from the requirement or another independent basis. Routine low-impact changes do not require a full TDD process.
 - After `$m-plan` creates or confirms the active `plan.md` / `todo.md`, the direct response must include a task summary table.
 - The task summary table must include `Task ID`, `Title`, `Scope`, `Files / Modules`, `Acceptance / Tests`, and `Risk / Notes`.
 - The task summary table must summarize the active plan artifact and preserve the `Will Execute` / `Will Not Execute Now` split.
-- Execution owns lightweight local validation such as syntax checks, type checks, focused lint, touched-file formatting checks, focused unit tests, and `git diff --check`.
+- Execution owns lightweight local validation such as syntax checks, type checks, focused lint, touched-file formatting checks, focused unit tests, and `git diff --check`, plus separate requirements and standards review under the shared review contract.
 - `$m-go` is an alternate execution entry after planning. It requires a confirmed plan, delegates all implementation edits to worker sub-agents, runs safe parallel lanes when write sets allow it, and automatically invokes `$m-test` behavior after delegated execution.
 - During `$m-go`, the main agent owns scheduling, context packaging, conflict handling, diff review, command execution, validation synthesis, external status reporting, and final acceptance. The main agent must not directly edit implementation files.
 - If `$m-go` validation fails, the main agent must delegate bounded fixes and repeat the test loop until acceptance passes or a blocker is explicit.
@@ -112,6 +121,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - `$m-continue` stops successfully only when all approved Task IDs and acceptance criteria are satisfied and `$m-test` passes or records a justified skip under its existing rules. It reports readiness for `$m-archive` but does not invoke archive, merge, cleanup, publication, or push.
 - Heavy validation is optional. It may be skipped for low-risk small changes when execution-stage validation is sufficient and the skip reason plus residual risk are recorded.
 - The user may explicitly skip `$m-test` and proceed directly to `$m-archive`; the archive must record skipped validation, missing evidence, and residual risk.
+- Skipping heavy validation does not skip execution's lightweight review. Testing checks freshness of existing review and acceptance evidence before reusing it.
 - When heavy validation runs, it must cover integration or end-to-end flow, usability, security boundaries, and performance indicators when applicable.
 - When heavy validation runs for UI-impacting changes, it must open the actual UI, operate the affected user path, and capture screenshot evidence.
 - If UI evidence cannot be gathered during a run `$m-test`, the result must be `不通过` or `阻塞`.
@@ -119,12 +129,24 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - `docs/change/YYYY-MM-DD_topic.md` is required before a workflow counts as complete.
 - The change archive belongs in the selected governed docs root when a private docs root exists.
 - Archive must record `Lessons impact`, `Related lessons`, and searchable lesson cues.
+- Archive checks evidence freshness and reuses applicable review results, refreshing only affected gaps or recording an explicit user waiver with its scope and residual risk. Waivers are not passes.
 - Archive must create or update `docs/lessons` when the workflow exposed reusable troubleshooting knowledge.
 - After archive, the workflow must close by default through repo control-plane merge and worktree cleanup.
 - If the user explicitly requests archive-only handling, no merge, no cleanup, or an equivalent pause, the workflow must stop after archive readiness and report retained branch/worktree state.
 - If archive produced lessons docs or lesson-index updates, workflow end must carry them back into the global docs tree.
 - Merge and worktree cleanup are forbidden until archive completion, status verification, and unrelated-dirt preservation checks pass.
 - `$m-quick` ends after focused validation and direct reporting; it does not create an archive, merge, clean, or push automatically.
+
+## Acceptance And Review Evidence Contract
+
+`skills/m-autoflow/references/review.md` owns the shared coverage and freshness procedure. Phase references route to it instead of defining competing candidate or evidence rules.
+
+- Requirements review checks approved acceptance coverage, wrong behavior, omissions, and unrequested additions. Standards review independently checks applicable project conventions, boundaries, safety, and maintainability.
+- Review identifies the baseline and actual workflow-owned candidate, including committed, staged, unstaged, and untracked changes. It preserves unrelated work and does not require a commit merely to obtain review coverage.
+- Evidence records the acceptance or check it supports, the relevant plan state, the candidate state, and its result or explicit gap. Snapshot metadata must not copy plaintext context secrets or unrelated file contents.
+- Changed requirements, code, or relevant dependencies make affected evidence stale. Reuse of unaffected evidence requires an impact explanation; uncertain impact requires revalidation of the affected scope.
+- Execute supplies lightweight review results; test adds risk-appropriate heavy evidence; archive checks applicability and records the accepted state. A skipped check, unavailable result, or explicitly accepted waiver remains distinct from a pass.
+- Existing `m-go` and `m-continue` delegation, continuation, and termination rules remain authoritative; shared review is part of their existing phase behavior.
 
 ## Docs Integration Contract
 
@@ -185,6 +207,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - The `$m-go` skill must pass `tools/validate-skills.ps1 -Skill m-go`.
 - The `$m-continue` skill must pass `tools/validate-skills.ps1 -Skill m-continue` and focused contract tests for unattended authorization, phase transitions, progress reset, non-progress termination, and archive exclusion.
 - The `$m-discuss` skill must pass `tools/validate-skills.ps1 -Skill m-discuss` and `tests/test_m_discuss_grill_contract.py` for explicit activation, normal-mode preservation, package inclusion, decision-state semantics, single-question sequencing, completion gates, and stable-doc alignment.
+- Acceptance/review validation must combine package and routing checks with scenario evidence for concrete constraints, behavior slices, all candidate change states, heavy-test skips, and affected-evidence invalidation. Text matching alone must not be reported as proof of agent behavior.
 - The `$m-quick` skill must pass `tools/validate-skills.ps1 -Skill m-quick`.
 - `tests/test_visual_output_contract.py` must verify shared-reference routing, supported component coverage, success guards, and the standalone thesis output contract.
 - The same test module must verify interactive-reference routing for the four initial phases, Markdown fallback, follow-up-only action boundaries, secret protection, and the absence of versioned plugin-cache paths.
@@ -208,7 +231,7 @@ The skill family supports explicit invocation and does not forbid host-side impl
 - Do not treat change docs as stable truth for intake, features, requirements, specs, or decisions.
 - Do not write governed private docs into pushable code repos unless the user selected that repo as the docs root.
 - Do not add remotes, push, or choose docs backup locations without explicit user instruction.
-- Do not silently choose among uncertain best-practice options.
+- Do not silently assume material requirements or bypass missing execution prerequisites. Investigate facts and record reversible in-scope choices without repeated approval requests.
 
 ## Performance Considerations
 

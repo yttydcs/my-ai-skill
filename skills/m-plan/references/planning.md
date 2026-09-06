@@ -56,6 +56,24 @@ Use this reference for `$m-plan`, the architecture and execution-planning phase 
 - dependencies, risks, and open questions
 - parallelism assessment and any allowed sub-agent context package
 
+## Acceptance Traceability
+
+Use the approved brief and stable docs to build a compact acceptance map in the existing plan: `AC ID | Source / exact requirement | Task IDs | Verification / evidence | Status`. Preserve existing acceptance identifiers; otherwise assign stable local IDs such as `AC-01`. Cross-repository plans may reference the same authoritative criteria rather than redefining them. Adding identifiers to an already approved plan does not require renewed approval when meaning and scope are unchanged; an admitted pipeline still follows its existing fingerprint/review rules.
+
+- Cover every material confirmed constraint, including negative requirements, numeric values and units, defaults, ordering and permissions. Record rejected, deferred and open matters with reasons; do not turn them into executable acceptance or silently discard them.
+- Check both directions: each executable requirement has an acceptance item and Task owner; each planned behavior has an approved source. A source may justify several criteria or tasks. Use `not applicable` with a reason for decisions that do not define observable behavior.
+- Specify the observation boundary and an independent expected result, using existing public interfaces/test patterns when suitable. Bug fixes should normally have a failing reproduction; important new behavior benefits from small test/implementation cycles. Do not mandate TDD for documentation, low-impact styling or every task.
+- Carry AC IDs and verification evidence through execution, test and archive. `pending`, `passed`, `failed`, `blocked`, `deferred` and `waived` are distinct; missing evidence and an explicit waiver are never a pass. A heavy-test skip changes verification obligations only under `$m-test` rules, not the required behavior.
+- When a decision or criterion changes, record its source and invalidate affected tasks and downstream evidence. Preserve unaffected results only when their inputs and dependencies remain valid. Return for approval when meaning or scope changes; status/evidence updates alone are not new scope.
+
+## Task Slicing
+
+Each Task declares a user-visible or otherwise observable deliverable, its genuine `Blocked by` Task IDs, and an independent verification path. Prefer a narrow complete behavior through the necessary layers, sized to be understood and verified in a fresh agent session. File/module and write-set ownership remain mandatory; they do not define task value by themselves. Do not invent extra tasks merely to fill layers or increase parallelism.
+
+For a wide mechanical migration that cannot land as independent behavior slices, use expand/compatibility -> migration batches -> contract/removal. State where green validation is promised. If batches require an integration branch, make the final integrate-and-verify task explicit; an intermediate batch is not standalone acceptance of the feature. Prefactoring is allowed only when directly necessary, within the approved scope and independently checked.
+
+Show blockers and delivery/verification cues in the existing task details and summary notes; do not add a second competing task list.
+
 ## Direct Task Summary Table
 
 After creating or confirming the active `plan.md` / `todo.md`, output a concise task summary table directly to the user.

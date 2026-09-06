@@ -37,7 +37,7 @@ Use this skill to convert a coherent requirement into an executable architecture
    - prefer relevant `docs/decisions` docs when architecture choices constrain the work
    - record solution, alternatives, module responsibilities, data/call flow, interfaces, errors, safety, performance, tests, and extension points
 7. Explicitly use `$m-docs` before confirming the plan.
-8. Create or confirm root `plan.md` or `todo.md` in the active worktree. Include docs root, code repos, task IDs, file/module scope, acceptance, tests, rollback points, dependencies, risks, and parallelism notes.
+8. Create or confirm root `plan.md` or `todo.md` in the active worktree. Include docs root, code repos, task IDs, file/module scope, acceptance, tests, rollback points, dependencies, risks, and parallelism notes. Apply the acceptance map and behavior-slice rules in `references/planning.md`; preserve exact constraints from the discussion brief.
 9. Explicitly separate tasks that will be executed after approval from tasks that will not be executed in the next execution phase. Every known task must appear in exactly one section, with the reason for any deferred, blocked, out-of-scope, or research-only task.
 10. After drafting or confirming the plan, output a concise task summary table directly to the user. The table summarizes the active `plan.md` / `todo.md`; it does not replace the detailed plan.
 11. Link the active plan artifact with an absolute clickable path. Add a Mermaid dependency or system-flow diagram only when it makes execution order or architecture materially easier to understand.

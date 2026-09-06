@@ -26,6 +26,8 @@ Create `docs/change/YYYY-MM-DD_topic.md` in the selected docs root with:
 - 可复用排查线索（症状 / 触发条件 / 关键词 / 快速检查）
 - 关键设计决策与权衡
 - 测试与验证方式 / 结果
+- 验收项 / Task ID / 证据与未验证事项
+- Requirements / Standards 审查结论、候选代码与计划标识；可链接保留的权威报告
 - 潜在影响与回滚方案
 - 子Agent执行轨迹
 
@@ -55,6 +57,8 @@ Do not leave reusable knowledge only in `docs/change`.
 Stop after archive only when the user explicitly asks for archive-only handling, no merge, no cleanup, or an equivalent pause.
 
 Default closeout sequence:
+
+First apply `../../m-autoflow/references/review.md` to verify current evidence and any explicit waivers. Missing lightweight review returns to execution for that review, not automatically to heavy testing. Reuse valid evidence; revalidate affected integration results when the target or resolved content changes. Keep needed evidence in durable locations before cleanup.
 
 1. verify worktree and repo status
 2. preserve unrelated dirt

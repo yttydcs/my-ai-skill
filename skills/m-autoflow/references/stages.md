@@ -17,8 +17,9 @@ Use this file to coordinate the `m-autoflow` phases.
 - A workflow may iterate or roll back, but every rollback must:
   - state the reason
   - update the affected plan or archive docs before proceeding
-- If information is unclear, missing, ambiguous, or based on an unconfirmed assumption, stop and ask the user instead of guessing.
-- Before unresolved issues are fixed, output `问题清单`, mark `阻塞：是`, and forbid advancing or coding.
+- Resolve discoverable facts from docs, code and authorized tools. Choose reversible in-scope implementation details using project conventions and record material assumptions.
+- Ask only when an unresolved choice materially affects behavior, compatibility, architecture, permissions, data, scope or acceptance, or a required prerequisite cannot be established. Existing approval remains valid within its scope.
+- For such blocking issues, output `问题清单`, mark `阻塞：是`, and stop dependent work. Record non-blocking unknowns without stopping independent authorized work.
 
 ## Standalone Fast Path - m:quick
 
@@ -68,7 +69,7 @@ Required output:
 - research 摘要与 citation（如使用）
 - worktree / branch / docs root 状态
 
-If anything is unclear, output `问题清单`, mark `阻塞：是`, and stop before planning.
+If a blocking decision prevents a coherent plan, output `问题清单`, mark `阻塞：是`, and stop dependent planning. Explicitly exclude deferred dependent work; preserve the remaining authorized scope.
 
 ## Plan - Architecture And Execution Planning
 
@@ -116,6 +117,7 @@ Plan artifact requirements:
   - task IDs
   - per-task goal, files, acceptance, tests, rollback
   - dependencies, risks, and notes
+  - acceptance-source mapping and behavior slices as defined in `../../m-plan/references/planning.md`
 - If parallel work is possible, include:
   - owner
   - worktree path
@@ -164,7 +166,7 @@ Rules:
   - extensibility: clear module boundaries, low coupling, configurability, and minimal hard-coding
   - architecture: explicit dependency direction and no avoidable circular dependencies
   - maintainability: minimum necessary change surface, rollback awareness, and code-doc consistency
-- If best practice is uncertain, present the viable alternatives and ask the user to choose before committing to one.
+- Apply the Global Rules above to uncertainty; do not ask again for reversible choices within the confirmed scope.
 - Provide runnable validation steps or tests for key and edge paths.
 - Do not introduce plan-external changes; if required, return to `3.1` and update the plan first.
 - After parallel work completes, the main agent must integrate results, resolve conflicts, and run regression verification.
@@ -178,8 +180,9 @@ Rules:
   - focused unit tests for changed logic
   - `git diff --check`
 - If a lightweight check is not practical, record why and carry the residual risk into stage `3.3` or the archive.
+- Finish with lightweight requirements/standards review under `review.md`, recording AC/Task evidence and the actual candidate/plan identity. A heavy-test skip does not waive review.
 
-## Stage 3.3 - Code Review
+## Stage 3.3 - Heavy Testing and Review
 
 First decide whether heavy testing / review is needed. This stage may be skipped when the user explicitly chooses to proceed directly to `$m-archive`, or for low-risk small changes when stage `3.2` lightweight validation is sufficient.
 
@@ -191,28 +194,7 @@ If skipped, record:
 - residual risk
 - why integration, usability, security, and performance review are not required or were explicitly accepted as unrun
 
-If not skipped, review each item and mark `通过` or `不通过`:
-
-- 需求覆盖
-- 架构合理性
-- 性能风险（N+1 / 重复计算 / 多余 I/O / 锁竞争）
-- 性能指标或可接受阈值
-- 可用性 / 用户路径
-- 可读性与一致性
-- 可扩展性与配置化
-- 稳定性与安全
-- 安全边界 / 权限 / 输入输出暴露
-- 测试覆盖情况
-- 整体流程 / 联调验证
-- 子Agent治理与审计（任务映射、上下文完整性、文件所有权、结果复核、冲突处理、记录完整性）
-
-When UI is impacted and `$m-test` runs:
-
-- open the actual application, page, preview, or story
-- operate the affected user path
-- capture screenshot evidence
-- include a concise pass/fail table in the direct user response
-- mark the test `不通过` or `阻塞` if UI evidence cannot be gathered
+Use `../../m-test/references/testing.md` as the authority for risk-based checks, UI operation/screenshot evidence, check statuses and failure handling. Use `review.md` for lightweight review freshness, including when heavy checks are skipped. Reuse current results; missing evidence, waivers and skipped checks are not passes.
 
 If any item fails, return to `3.2`.
 
@@ -225,6 +207,7 @@ In `$m-continue` flows, one invocation authorizes every iteration inside the exi
 Requirements:
 
 - explicitly use `$m-docs`
+- verify current acceptance and lightweight review under `review.md`; retain AC/Task/evidence mapping, separate axis conclusions and explicit unverified/waived dispositions
 - Create `docs/change/YYYY-MM-DD_topic.md` in the selected docs root.
 - Include:
   - 变更背景 / 目标

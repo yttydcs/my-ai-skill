@@ -92,6 +92,7 @@ Every delegated task must include:
 - 对应 Task ID / 标题
 - 任务目标
 - 验收条件
+- 对应 AC ID、来源约束和验证边界；保留否定要求、数值、默认值与顺序
 - 测试点
 - 回滚点
 - 允许修改的文件 / 目录
@@ -118,6 +119,7 @@ Every delegated result must include:
 - changed files
 - key design points
 - test and validation results
+- acceptance IDs with evidence and unresolved/waived items, plus the reviewed candidate identity when applicable
 - risks and rollback notes
 - whether the assigned Task ID is fully satisfied
 

@@ -17,8 +17,11 @@ Inspect all available reliable evidence:
 - current status and diff for every active repository worktree
 - the latest `$m-execute` changed-file and lightweight-validation result
 - the latest `$m-test` check table, evidence, failures, blockers, or justified skip
+- AC/source/Task mapping and current lightweight requirements/standards review, checked against candidate and plan identities under `../../m-autoflow/references/review.md`
 
 Never infer a pass from missing evidence. For a multi-repository Task, evidence is incomplete until every persisted repository/worktree is accounted for. If implementation appears complete but validation evidence is absent or ambiguous, enter `$m-test`. If implementation is incomplete or a failed check maps to an approved Task ID, enter `$m-execute`.
+
+A missing or stale lightweight review alone enters `$m-execute` for the affected review; it does not force a full heavy-test rerun. Changed requirements invalidate affected tasks and downstream evidence. A heavy-test skip cannot waive the lightweight review, and a waived AC/check must remain visibly waived rather than passed. Reuse unaffected evidence only after freshness checks.
 
 Classify the state as exactly one of:
 
@@ -95,9 +98,10 @@ Explain the attempts already made and the exact external change, authority, or `
 Terminate successfully only when:
 
 - all approved Task IDs are complete
-- every acceptance criterion has passed or is covered by a valid `$m-test` skip decision
+- every acceptance criterion has passed or has an explicit user-authorized disposition for that criterion; a heavy-test skip alone does not waive required behavior
 - required UI or other evidence exists when `$m-test` requires it
 - residual risk from any justified skip is explicit
+- lightweight requirements/standards review is current and passed or explicitly waived at the relevant scope; no stale evidence is counted as acceptance
 
 Report readiness for `$m-archive`. Do not invoke archive automatically.
 

@@ -48,8 +48,7 @@ Use these templates as concise defaults.
 #### Issue List
 
 ### Plan - Requirements And Architecture
-#### Discussion Summary
-#### Accepted / Rejected Requirements
+#### Discussion Brief Reference / Confirmed, Rejected, Deferred And Open Decisions
 #### Requirements Analysis
 ##### Goal
 ##### Scope
@@ -59,6 +58,9 @@ Use these templates as concise defaults.
 ##### Inputs / Outputs
 ##### Edge Cases
 ##### Acceptance Criteria
+| AC ID | Source / exact requirement | Task IDs | Verification / evidence | Status |
+| --- | --- | --- | --- | --- |
+| AC-01 | <confirmed constraint, preserving negation/values/defaults/order> | <Task IDs> | <observation boundary and independent expected result; evidence when available> | pending |
 ##### Risks
 #### Architecture Design
 ##### Overall Solution
@@ -71,8 +73,7 @@ Use these templates as concise defaults.
 ##### Extensibility Design Points
 #### Issue List
 
-### Stage 3.1 - Planning
-#### Project Goal and Current State
+### Execution Plan
 #### Docs Governance Routing Decision
 #### Related Intake / Features / Requirements / Specs / Decisions / Lessons
 #### Stable Docs Impact
@@ -102,10 +103,13 @@ Use these templates as concise defaults.
 - Worktree:
 - Plan Path:
 - Goal:
+- Deliverable:
+- Blocked by: <Task IDs or none; genuine prerequisites only>
 - Files / Modules:
 - Write Set:
-- Acceptance:
-- Test Points:
+- Acceptance: <AC IDs; definitions live in the acceptance map>
+- Verification: <independently observable behavior and how to check it>
+- Test Points: <existing interface/boundary, independent expected outcome>
 - Rollback:
 ```
 
@@ -144,6 +148,8 @@ Use this table in the direct `$m-plan` response after creating or confirming the
 ## 可复用排查线索
 ## 关键设计决策与权衡
 ## 测试与验证方式 / 结果
+## 验收项 / Task ID / 证据与未验证事项
+## Requirements / Standards 审查结论与有效性
 ## 潜在影响
 ## 回滚方案
 ## 子Agent执行轨迹

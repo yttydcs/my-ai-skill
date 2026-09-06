@@ -1,6 +1,6 @@
 {
   "name": "m-continue",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "install_mode": "copy",
   "source_dir": "skills/m-continue",
   "dist_dir": "dist/codex/m-continue",

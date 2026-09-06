@@ -1,6 +1,6 @@
 {
   "name": "m-autoflow",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "install_mode": "copy",
   "source_dir": "skills/m-autoflow",
   "dist_dir": "dist/codex/m-autoflow",
@@ -21,6 +21,7 @@
     "references/stages.md",
     "references/m-docs-integration.md",
     "references/subagents.md",
-    "references/templates.md"
+    "references/templates.md",
+    "references/review.md"
   ]
 }

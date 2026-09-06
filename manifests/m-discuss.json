@@ -1,6 +1,6 @@
 {
   "name": "m-discuss",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "install_mode": "copy",
   "source_dir": "skills/m-discuss",
   "dist_dir": "dist/codex/m-discuss",

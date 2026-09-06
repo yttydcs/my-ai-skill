@@ -26,6 +26,8 @@ Capture:
 - docs root, code repo, branch, and worktree status
 - handoff criteria for `$m-plan`
 
+Preserve confirmed, rejected, deferred, and open decisions in the durable brief after either standard discussion or Grill Mode. Keep a source reference or source-preserving statement for each material constraint, especially prohibitions, quantities, units, defaults, ordering and permissions. Do not replace a precise answer with a weaker summary. Record what a deferred decision blocks; deferral alone does not resolve that dependency. Persist the brief through `$m-docs` before a session handoff, using the existing intake/plan routing rather than a new document category.
+
 ## Product And Technical Judgment
 
 - Prefer clarifying the right problem over rushing to implementation.
@@ -33,6 +35,7 @@ Capture:
 - Challenge requests that are unsafe, internally inconsistent, not worth the complexity, or likely to fail the user's real goal.
 - When rejecting a requirement, explain the reason and offer a safer or simpler alternative.
 - Mark assumptions clearly and avoid turning guesses into requirements.
+- Resolve discoverable facts from relevant docs, code and authorized tools. Choose reversible implementation details inside the agreed scope using project conventions, and record a material assumption. Ask when an unresolved decision affects behavior, compatibility, architecture, permissions, data, scope or acceptance, or when a required prerequisite cannot be established. Do not repeat an approval already given for the same scope.
 
 ## Grill Mode Compatibility
 
@@ -54,7 +57,7 @@ Proceed to `$m-plan` only when:
 
 - the goal is coherent
 - the recommended direction is explicit
-- blocking questions are resolved or clearly deferred
+- blocking questions are resolved, or their dependent work is explicitly excluded/deferred from the next plan
 - docs root and code repo boundaries are known
 - worktree status is known
 

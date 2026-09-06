@@ -14,6 +14,7 @@ Use this skill after `$m-plan` when the user wants high-automation execution. `$
 - Read `references/go.md`.
 - Read `../m-autoflow/references/subagents.md` before dispatching workers.
 - Read `../m-test/references/testing.md` before the automatic validation loop.
+- Read `../m-autoflow/references/review.md` for integrated-candidate lightweight review and evidence freshness.
 - Read `../m-autoflow/references/output-components.md` before presenting orchestration or validation results.
 - Confirm the active worktree root has an approved `plan.md` or `todo.md`.
 - Treat `$m-go` invocation as user authorization to use worker sub-agents for the approved execution scope when host policy permits delegation.
@@ -45,7 +46,7 @@ The main agent must not directly edit implementation files. If integration, repa
 4. Give each worker the complete context package from `references/go.md`.
 5. Review every worker result, changed file list, validation output, risks, and rollback note.
 6. Reject or re-dispatch any result that drifts from the plan, touches forbidden files, or leaves acceptance incomplete.
-7. Run lightweight validation after delegated implementation converges.
+7. Run lightweight validation and separate requirements/standards review of the integrated result; retain AC/Task evidence and candidate/plan identity under the shared review contract.
 8. Automatically run `$m-test` behavior using `../m-test/references/testing.md`.
 9. If validation fails, delegate bounded fixes and repeat validation.
 10. Stop only when all acceptance checks pass, the user changes direction, or a blocker is explicit.

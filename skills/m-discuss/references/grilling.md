@@ -17,7 +17,7 @@ Maintain a task-local snapshot with:
 - discoverable facts and evidence gaps
 - dependencies between parent and child decisions
 
-Update the snapshot after every answer. Never turn a recommendation, silence, ambiguity, or an inferred preference into a confirmed decision. When a parent decision changes, invalidate only the dependent child decisions and revisit them as needed.
+Update the snapshot after every answer. Never turn a recommendation, silence, ambiguity, or an inferred preference into a confirmed decision. When a parent decision changes, invalidate only the dependent child decisions and revisit them as needed. Preserve exact negative, numeric, default, ordering and permission constraints with their source; carry the snapshot into the durable brief defined by `discussion.md` before handoff.
 
 ## Fact And Decision Boundary
 

@@ -1,0 +1,50 @@
+{
+  "instructions": "Apply the current skills to each independent packet as a fresh next turn. Treat packet records as supplied facts, do not invent observations. Produce the requested artifact or next-action decision. Do not edit real product code or invoke archive/merge. Git cases may be instantiated in an isolated temporary repository to inspect actual state.",
+  "cases": [
+    {
+      "id": "save-dialog-plan",
+      "skill": "m-plan",
+      "request": "把下面已讨论清楚的保存行为整理成可执行计划；不用再做需求访谈。",
+      "records": {
+        "confirmed": ["保存失败时保留所有输入，不能关闭窗口。", "超时阈值是 3 秒，默认不自动重试。", "成功保存后先更新列表再关闭窗口。"],
+        "rejected": ["不采用后台静默重试。"],
+        "deferred": ["离线编辑留给下一轮，不能进入本轮执行。"],
+        "environment": "项目、文档根、独立 worktree 均已确认，现有保存接口与失败模拟工具可用。项目已有同类对话框测试。布局和技术栈无变更。"
+      },
+      "output": "Draft the acceptance map and task details using the supplied facts; identify any genuinely blocking missing input separately. This packet requests a plan, not code."
+    },
+    {
+      "id": "heavy-skip-dirty-review",
+      "skill": "m-test",
+      "request": "这次不用跑重型测试，准备交给 archive。",
+      "records": {
+        "plan": "T1 implements AC-01: reject empty names without storing a record. Scope is save.py and test_save.py; implementation was approved.",
+        "execution": "Focused tests and typecheck passed. save.py is modified but uncommitted; test_save.py is new and untracked. No requirements/standards review result exists.",
+        "review_authority": "No request to waive code review."
+      },
+      "output": "Give the next action and honest check/acceptance statuses; do not run heavy tests or infer missing review findings."
+    },
+    {
+      "id": "changed-limit-resume",
+      "skill": "m-continue",
+      "request": "继续把批准的任务做完。",
+      "records": {
+        "authority": "The user approved a revised plan changing AC-01's upload limit from 10 MiB to 8 MiB and repairing T1 within its existing write set.",
+        "previous_pass": "AC-01/T1 and AC-02/T2 passed on candidate A. T1 tests exercised the old 10 MiB limit. T2 implements an unrelated help-text change in an independent package.",
+        "current": "A prior execute/test pass exists. Candidate B includes a T1 repair in the admitted scope but has no new validation. T2 code, inputs and dependencies remain identical to the reviewed state, with a verified impact note."
+      },
+      "output": "Decide what evidence can be reused, what must be refreshed, and whether another approval or archive is appropriate. Do not pretend to have run checks."
+    },
+    {
+      "id": "approved-reversible-choice",
+      "skill": "m-execute",
+      "request": "按已批准的 T1 继续实现。",
+      "records": {
+        "plan": "Approved T1/AC-01 requires case-insensitive filtering via the existing public list interface. Dedicated worktree and write set are established. No new public interface, dependency, permission or architecture choice is needed.",
+        "choice": "The agent is unsure whether the private local helper should be named matchesFilter or matchesQuery. Existing nearby helpers consistently use matchesFilter.",
+        "validation": "Existing focused interface tests can verify behavior. No evidence has yet been produced for this edit."
+      },
+      "output": "State the next implementation and verification steps, including whether the naming choice requires a user question. This is an action-decision packet; do not claim edits or results."
+    }
+  ]
+}

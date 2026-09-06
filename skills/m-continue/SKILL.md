@@ -14,6 +14,7 @@ Use this skill to resume an approved workflow after `$m-execute` or `$m-test`. T
 - Read `references/continue.md` for state recovery, progress comparison, loop transitions, and terminal rules.
 - Read `../m-execute/SKILL.md` and `../m-execute/references/execution.md` before applying execution behavior.
 - Read `../m-test/SKILL.md` and `../m-test/references/testing.md` before applying test behavior.
+- Read `../m-autoflow/references/review.md` before reusing previous review or acceptance evidence.
 - Read `../m-autoflow/references/subagents.md` before any parallelism assessment or delegation.
 - Read `../m-autoflow/references/output-components.md` before presenting progress or the terminal result.
 - Use the active `plan.md` or `todo.md` as the source of approved Task IDs, write sets, acceptance criteria, and test points.

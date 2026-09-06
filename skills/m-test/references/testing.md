@@ -9,6 +9,7 @@ Use this reference for `$m-test`, the optional heavy validation phase of `m-auto
 - This phase can be skipped for small low-risk changes when execution-stage validation is sufficient.
 - The user may also explicitly skip this phase and proceed directly to `$m-archive`.
 - If skipped, record why, who accepted the skip when relevant, and describe residual risk.
+- Lightweight requirements/standards review belongs to execution and remains required unless explicitly waived. Apply `../../m-autoflow/references/review.md` for candidate coverage, identity and evidence reuse; a heavy-test skip is not a review waiver.
 
 ## Skip Decision
 
@@ -28,7 +29,7 @@ Do not skip this phase when any are true:
 - performance-sensitive paths, large data, concurrency, background jobs, or external APIs are affected
 - prior validation was blocked or inconclusive
 
-If the user explicitly chooses to skip `$m-test`, proceed to `$m-archive` rather than running this phase. The archive must record the skip, missing evidence, and residual risk. Do not fabricate test results.
+If the user explicitly chooses to skip `$m-test`, do not run its heavy checks. Proceed to `$m-archive` when the existing acceptance and lightweight-review gates permit it; otherwise return for the missing in-scope review/repair. Record the skip, missing evidence and residual risk. Do not fabricate test results or mark an unverified AC passed.
 
 ## Heavy Validation Scope
 
@@ -39,6 +40,7 @@ If the user explicitly chooses to skip `$m-test`, proceed to `$m-archive` rather
 - Review performance indicators: latency-sensitive paths, repeated I/O, N+1 behavior, avoidable O(n^2), memory growth, contention, and configured thresholds where available.
 - If a heavy test cannot run, record why and describe residual risk.
 - Report repository-specific evidence plus the aggregate verdict when failures or skips differ between participating repositories.
+- Attach results to the plan's AC IDs and Task IDs. Recheck only evidence affected by code, dependency, source or acceptance changes; preserve current results with their identity instead of rerunning them at each stage.
 
 ## UI Validation Evidence
 
@@ -54,7 +56,7 @@ When `$m-test` runs and the change affects UI, visible layout, components, style
 
 If the UI cannot be opened or operated because of environment, auth, dependency, build, or runtime issues, mark the UI validation as `不通过` or `阻塞`. Do not count it as a skipped pass.
 
-If the user explicitly skips `$m-test`, UI screenshots are not required during this phase because the phase did not run. The missing UI evidence and residual risk must be carried into `$m-archive`.
+If the user explicitly skips `$m-test`, UI screenshots are not required during this phase because the phase did not run. The missing UI evidence and residual risk must be carried into `$m-archive`; this does not skip lightweight requirements/standards review.
 
 ## Direct Result Table
 
@@ -82,7 +84,7 @@ Example:
 
 ## Mandatory Review Checklist
 
-Mark each item `通过` or `不通过`:
+For applicable heavy checks, record `通过`, `不通过`, `阻塞` or `跳过`; explain non-applicable items instead of claiming a check ran. Reuse the separate requirements/standards results from the shared review contract rather than conflating them with heavy checks:
 
 - 需求覆盖
 - 架构合理性
@@ -110,14 +112,14 @@ If any item is `不通过`:
 禁止进入归档
 ```
 
-If all items pass:
+If all required items pass, current lightweight review permits progression, and any unrun items have an allowed explicit disposition:
 
 ```md
 阻塞：否
 进入归档
 ```
 
-If skipped:
+If heavy testing is skipped and the independent lightweight-review/acceptance gates permit archive (otherwise return for the affected review or repair):
 
 ```md
 测试阶段：跳过

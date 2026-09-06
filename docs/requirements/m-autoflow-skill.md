@@ -24,6 +24,8 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - require Grill Mode to research discoverable facts, ask only judgment calls, include a recommendation and rationale, resolve parent decisions before child branches, and wait after each question
 - require Grill Mode to preserve the standard discussion brief and block automatic planning or implementation even after shared understanding is confirmed
 - let `$m-plan` own requirements consolidation, architecture design, execution planning, and approval gating
+- preserve confirmed, rejected, deferred, and open decisions through handoffs, and map confirmed constraints to acceptance IDs, Task IDs, and verification evidence
+- prefer independently verifiable behavior tasks with explicit deliverables and genuine blockers, allowing migration batches with an explicit final integration/validation dependency when independent passing states are not possible
 - require `$m-plan` to reject unreasonable, unsafe, contradictory, or under-specified requirements and return to discussion with alternatives
 - require worktree-first staged execution before implementation, with worktree setup starting during discussion when project boundaries are clear
 - require `plan.md` or `todo.md` in the active worktree before staged implementation
@@ -31,7 +33,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - require `$m-plan` to directly output a concise task summary table after creating or confirming the active plan
 - require explicit blocker handling with `问题清单` and `阻塞：是`
 - require rollback reason recording and document synchronization
-- require no silent assumptions about business, data, interface, environment, dependency version, acceptance, or preference
+- require discoverable facts to be checked, reversible in-scope choices to be recorded, and material decisions or missing prerequisites to block dependent work instead of being silently assumed
 - require explicit `$m-docs` usage when planning or archive changes governed docs
 - require planning and archive phases to identify the private `docs_root` when governed docs should not live in code repositories
 - require behavior-changing workflows to check affected intake, feature, requirement, spec, and decision docs before implementation
@@ -39,9 +41,11 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - require docs remote, push, and backup decisions to remain user-owned
 - require archive to extract reusable experience / lessons and record searchable lookup hints
 - require archive to either update `docs/lessons` or record why `Lessons impact: none`
-- require mandatory review decision and `docs/change` archive before workflow completion
+- require separate lightweight requirements and standards review results plus `docs/change` archive before workflow completion; a heavy-test skip or explicit waiver must not be reported as a review pass
 - require controlled sub-agent usage only in allowed phases
 - keep execution responsible for implementation plus lightweight local validation such as syntax checks, type checks, focused lint, touched-file formatting checks, focused unit tests, and `git diff --check`
+- require execution review to cover the actual workflow-owned candidate across committed, staged, unstaged, and untracked changes without modifying unrelated work or requiring a commit for review
+- bind acceptance and review evidence to its plan and candidate state, refresh only affected stale evidence, and reuse applicable results at archive
 - require `$m-go` to keep plan gating, delegate all implementation edits to sub-agents, run safe parallel execution where write sets allow it, and automatically run `$m-test` after delegated execution
 - require `$m-go` to delegate bounded fixes and repeat validation until all acceptance items pass or a blocker is explicit
 - require one `$m-continue` invocation to authorize all subsequent execute/test iterations inside the already approved Task IDs and write sets
@@ -71,7 +75,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 ### Out of Scope
 
 - changing external project runtime logic
-- relaxing the user's stage gates or blocker rules
+- bypassing the user's stage approval gates or material blockers
 - duplicating `m-docs` as a separate implementation inside this skill family
 - adding docs remotes, pushing docs, or choosing backup targets
 
@@ -108,6 +112,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-discuss` must use web research only when current external facts, best practices, source-backed comparison, or the user's explicit request make research useful.
 - `$m-discuss` must verify and cite external research before feeding it into requirements, planning, or stable docs.
 - `$m-discuss` must produce a handoff-ready brief covering goal, scope, assumptions, open questions, options considered, rejected options, recommended direction, and worktree/docs-root status.
+- Both standard discussion and Grill Mode must preserve confirmed, rejected, deferred, and open decisions in the brief, including negative requirements, numeric limits, defaults, and ordering constraints.
 - `$m-discuss` must enter explicit Grill Mode only when the user asks to be grilled, requests hard-question pressure-testing, or asks to resolve decisions one at a time; ambiguity alone must not trigger it.
 - Grill Mode must track confirmed, rejected, deferred, and open decisions, and must invalidate affected child decisions when a parent decision changes.
 - Grill Mode must resolve discoverable facts through the environment or authorized research before asking the user, and must ask the user only for judgment calls or genuinely undiscoverable information.
@@ -121,15 +126,21 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-plan` must prefer private-docs-root stable docs when the user has separated docs from code repos.
 - `$m-plan` must emit requirements analysis and architecture design before the executable plan.
 - `$m-plan` must create or confirm root-level `plan.md` or `todo.md` in the active worktree.
+- `$m-plan` must map each approved acceptance ID to its source requirement, responsible Task IDs, and planned verification evidence. Deferred or rejected requirements must not silently enter the approved acceptance scope.
+- Each executable task must state its deliverable, genuine blockers, acceptance IDs, and verification boundary. Default task slices must deliver independently verifiable complete behavior; mechanical migrations may use compatibility, migration, and removal steps. Batches that cannot pass independently must remain on an integration branch and block an explicit final integrate-and-verify task; intermediate batch completion is not feature acceptance.
+- Important behavior checks must state the stable interface used to observe results and an expected result derived from the requirement or another independent basis, rather than repeating implementation logic.
 - `$m-plan` must place every known Task ID in exactly one execution-scope group: tasks to execute after approval, or tasks not to execute now with the blocking, deferral, out-of-scope, research-only, or separate-approval reason.
 - `$m-plan` must output a concise direct task summary table after creating or confirming the active plan.
 - The `$m-plan` task table must include Task ID, title, scope, files/modules, acceptance/tests, and risk/notes.
 - The `$m-plan` task table must summarize the active plan artifact and must not conflict with `plan.md` or `todo.md`.
-- `$m-plan` must ask for clarification instead of assuming missing requirements.
-- `$m-plan` must escalate uncertain best-practice choices instead of deciding silently.
+- `$m-plan` must ask for clarification when missing information materially affects behavior, compatibility, architecture, security, data, permission, or scope, or prevents a required execution prerequisite from being established.
+- The workflow must investigate discoverable facts and choose reversible in-scope implementation details using project conventions, recording meaningful choices without repeatedly requesting approval. Existing plan and phase-entry gates still apply.
 - `$m-execute` must block if the active workflow lacks confirmed `plan.md` or `todo.md`.
 - `$m-execute` must map every implementation change to a confirmed Task ID.
 - `$m-execute` must report lightweight validation that passed, skipped checks with reasons, and any heavier validation still needed.
+- `$m-execute` must separately review requirements coverage, incorrect or additional behavior, and applicable project standards before reporting execution complete. Test success alone must not imply either review passed.
+- Review must include workflow-owned committed, staged, unstaged, and untracked changes, identify the reviewed baseline and candidate, and preserve pre-existing or unrelated work.
+- Verification and review evidence must identify the acceptance items, plan state, and candidate state they cover. A changed requirement, implementation, or relevant dependency must invalidate affected evidence; unaffected evidence may be reused with a recorded impact explanation.
 - `$m-go` must block if the active workflow lacks confirmed `plan.md` or `todo.md`.
 - `$m-go` must map every delegated implementation change to a confirmed Task ID.
 - `$m-go` must require worker sub-agents for implementation edits; the main agent may coordinate, inspect, run commands, review diffs, and accept results but must not directly edit implementation files.
@@ -149,7 +160,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-quick` must run focused validation and require actual UI operation plus screenshot evidence for UI-impacting quick changes.
 - `$m-quick` must use `$m-docs` to update canonical stable docs only when stable truth changed, and must not create workflow history artifacts merely because it ran.
 - `$m-quick` must output a compact direct result table and stop without automatic archive, merge, cleanup, push, publication, or deployment.
-- `$m-test` must decide whether heavy validation is needed, record skip rationale when skipped, and review usability, security, and performance when it runs.
+- `$m-test` must decide whether heavy validation is needed, record skip rationale when skipped, and review usability, security, and performance when it runs. It must check whether existing lightweight review evidence remains applicable rather than treating a heavy-test skip as a review waiver.
 - `$m-test` must require actual UI opening, user-path operation, and screenshot evidence when it runs for UI-impacting changes.
 - `$m-test` must treat missing UI evidence during a run `$m-test` as `不通过` or `阻塞`, not as a pass.
 - `$m-test` must output a concise direct result table showing checks and pass/fail/blocked/skipped status.
@@ -166,6 +177,7 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - Inline results must not expose plaintext `$m-context` secrets, credentials, unrelated personal data, or untrusted markup.
 - The workflow must allow the user to skip `$m-test` and invoke `$m-archive`, while preserving the skipped-testing reason and residual risk in archive records.
 - `$m-archive` must record intake, feature, requirement, spec, decision, and lessons impact.
+- `$m-archive` must check acceptance and review evidence freshness, reuse current results, and require affected missing or stale evidence to be refreshed or explicitly waived by the user with its scope and residual risk recorded. Waivers must remain distinguishable from passes.
 - `$m-archive` must capture searchable lesson cues when the workflow produced reusable debugging knowledge.
 - `$m-archive` must treat normal archive invocation as a request to archive and end the workflow.
 - `$m-archive` must stop after archive only when the user explicitly requests archive-only handling, no merge, no cleanup, or an equivalent pause.
@@ -203,6 +215,8 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - Platform policy may forbid sub-agent use without explicit user authorization.
 - Current external facts may be stale or conflicting; online research must mark uncertainty instead of treating unverified findings as stable truth.
 - A lightweight execution check may be blocked by repo configuration; the workflow must record the reason and residual risk instead of hiding the gap.
+- A candidate may include uncommitted or new files; a commit-only diff must not exclude those workflow-owned changes from review.
+- A requirement or candidate may change after review; stale evidence must not continue to support affected acceptance items, while unrelated valid evidence need not be rerun.
 - Heavy testing may be unnecessary for low-risk changes; the workflow must record why it was skipped.
 - A quick request may lack matching docs; it may proceed only when local evidence keeps the work self-contained and unambiguous, and the missing context is reported.
 - A quick request may encounter conflicting docs or ambiguous repo ownership; it must escalate before implementation expands.
@@ -223,7 +237,9 @@ Provide a reusable `m-autoflow` workflow collection with focused phase skills fo
 - `$m-plan` responses include a concise direct task summary table.
 - Optional online research is controlled by discussion, supports source verification and citations, and routes stable-doc impact through `$m-docs`.
 - Explicit Grill Mode performs a depth-first, one-question-at-a-time decision interview with recommendations, fact lookup, early wrap-up, confirmation, and no automatic planning or implementation.
-- Lightweight validation is part of execution, while heavyweight integration/UI/usability/security/performance testing is optional and separately recorded.
+- Concrete discussion constraints survive acceptance/task/evidence handoffs, and task slices provide independent verification with genuine dependency blockers and explicit migration exceptions.
+- Lightweight validation and separate requirements/standards review are part of execution, while heavyweight integration/UI/usability/security/performance testing is optional and separately recorded.
+- Review includes all workflow-owned candidate states, and plan/candidate changes invalidate only affected evidence. Archive reuses current results and never labels missing evidence or waivers as passes.
 - `$m-go` performs delegated implementation and automatic `$m-test` looping for confirmed plans without making the main agent the implementer.
 - `$m-continue` resumes after execute/test with no repeated confirmation, continues through ordinary failures, and terminates only on full acceptance or proven inability to progress.
 - `$m-quick` restores governed docs context, correctly gates low-risk direct work, validates the affected behavior, and escalates prohibited requests without weakening staged commands.

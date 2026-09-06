@@ -28,6 +28,7 @@ Use this skill as the umbrella entry for the `m-*` workflow collection. It route
 - Read `references/m-docs-integration.md` before editing `plan.md`, intake, features, requirements, specs, decisions, `docs/change`, or `docs/lessons`.
 - Read `references/subagents.md` before any parallelism assessment or delegation.
 - Read `references/templates.md` when creating `plan.md`, `docs/change`, or `docs/lessons` artifacts.
+- Read `references/review.md` at execution review and before reusing review evidence in test, continuation or archive.
 - Read `references/output-components.md` before composing a user-facing phase result.
 - Read `references/interactive-output-patterns.md` only when a discuss, plan, test, or archive result may materially benefit from official inline interaction.
 
@@ -85,6 +86,8 @@ The phase and fast-path skills are companion entry points. Keep `$m-autoflow` as
   - parallelism assessment, delegation gates, and audit requirements
 - `references/templates.md`
   - compact templates for `plan.md`, blocker output, `docs/change`, and `docs/lessons`
+- `references/review.md`
+  - lightweight requirements/standards review, dirty candidate coverage, acceptance evidence and freshness
 - `references/output-components.md`
   - shared selection rules for tables, Mermaid, clickable artifacts, visual evidence, review comments, and Git components
 - `references/interactive-output-patterns.md`

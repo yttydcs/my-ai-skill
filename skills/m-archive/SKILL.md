@@ -14,6 +14,7 @@ Invoking `$m-archive` means "archive and end this workflow". Stop after archive 
 ## Quick Start
 
 - Read `references/archive.md`.
+- Read `../m-autoflow/references/review.md` to check final acceptance and evidence freshness, reusing valid results.
 - Read `../m-autoflow/references/m-docs-integration.md` before treating archive work as complete.
 - Read `../m-autoflow/references/templates.md` when creating `docs/change` or `docs/lessons` artifacts.
 - Read `../m-autoflow/references/output-components.md` before presenting archive and closeout status.
@@ -26,7 +27,7 @@ Invoking `$m-archive` means "archive and end this workflow". Stop after archive 
 Archive may start only when:
 
 - execution is complete
-- validation and code review passed or residual risks are explicitly accepted
+- validation and separate requirements/standards review passed for the current candidate/plan, or the relevant residual risks are explicitly accepted without labeling waived checks as passed
 - changed files and Task IDs are known
 - the active plan is current
 
@@ -37,6 +38,7 @@ If any item is false, return to `$m-test` or `$m-execute`.
 1. Use `$m-docs` to check stable-doc impact and docs routing.
 2. Create `docs/change/YYYY-MM-DD_topic.md` in the selected docs root.
 3. Record task mapping, decisions, tests, intake/feature/requirement/spec/decision impact, rollback, and sub-agent trace.
+   Carry or durably link the AC/Task/evidence map, review conclusions, candidate/plan identity and unverified/waived items. Reuse current evidence under the shared review contract; do not repeat review merely for archive.
 4. Promote reusable troubleshooting or workflow knowledge into `docs/lessons` when it is likely to recur.
 5. Update affected indexes.
 6. If the user explicitly requested archive-only handling, stop after archive readiness and report the retained branch/worktree state.

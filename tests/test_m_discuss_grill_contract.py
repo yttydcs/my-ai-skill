@@ -46,7 +46,7 @@ class MDiscussGrillContractTests(unittest.TestCase):
 
     def test_manifest_packages_grilling_without_external_dependency(self):
         self.assertEqual(self.manifest["name"], "m-discuss")
-        self.assertEqual(self.manifest["version"], "0.2.0")
+        self.assertRegex(self.manifest["version"], r"^\d+\.\d+\.\d+$")
         self.assertEqual(
             self.manifest["depends_on_skills"], ["m-autoflow", "m-docs"]
         )

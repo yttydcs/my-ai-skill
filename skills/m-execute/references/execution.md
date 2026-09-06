@@ -4,7 +4,7 @@ Use this reference for `$m-execute`, the implementation phase of `m-autoflow`.
 
 ## Phase Boundary
 
-- Owns code, configuration, test fixture changes, and lightweight validation required by approved Task IDs.
+- Owns code, configuration, test fixture changes, lightweight validation and lightweight requirements/standards review required by approved Task IDs.
 - May update the active plan status for the touched tasks.
 - Does not own plan creation, broad replanning, heavy integration testing, archive, merge, or worktree cleanup.
 
@@ -15,7 +15,7 @@ Use this reference for `$m-execute`, the implementation phase of `m-autoflow`.
 - Do not introduce plan-external behavior; return to planning if scope expands.
 - Do not silently swallow errors.
 - Do not revert user or other-agent changes unless explicitly requested.
-- If a best-practice choice is uncertain, present options and ask before locking one in.
+- Discover facts and choose reversible in-scope implementation details using project conventions. Ask only when an unresolved decision materially affects behavior, compatibility, architecture, permissions, data, scope or acceptance, or a required prerequisite is unavailable. Do not repeat approval for the existing scope.
 
 ## Parallelism
 
@@ -52,4 +52,10 @@ Run cheap, local checks in this phase when practical. For multi-repository work,
 - focused unit tests for changed logic
 - `git diff --check`
 
-Record any skipped lightweight check with the reason and residual risk. Reserve heavy integration, end-to-end, usability, security, and performance review for `$m-test`.
+Use the plan's observation boundaries and independent expected results. For a bug fix, normally reproduce the failure before fixing it; for important new behavior, prefer small test/implementation/validation cycles. Do not add tests that restate the implementation, or force TDD for every reversible low-impact edit.
+
+Record evidence against AC IDs and Task IDs; an already approved plan may use its existing acceptance labels. Record skipped checks with reasons and residual risk. Reserve heavy integration, end-to-end, usability, security, and performance review for `$m-test`.
+
+## Lightweight Review
+
+After focused validation, apply `../../m-autoflow/references/review.md` to the actual integrated candidate. Its scope, identity, separate requirements/standards verdicts and freshness rules are authoritative. Resolve in-scope findings before reporting readiness, or retain an explicit failed/blocked/waived disposition. Skipping heavy testing does not skip this review.
