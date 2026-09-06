@@ -2,12 +2,12 @@
 
 ## Workflow Information
 - Repo / Project Root: D:/project/my-ai-skills
-- Branch: codex/acceptance-review
+- Branch: codex/acceptance-review (merged locally and deleted at closeout)
 - Base: main at eceea63
-- Worktree: D:/project/my-ai-skills/worktrees/acceptance-review
-- Docs Root: D:/project/my-ai-skills/worktrees/acceptance-review/docs (retained in the repository docs tree after closeout)
+- Worktree: D:/project/my-ai-skills/worktrees/acceptance-review (historical; removed at closeout)
+- Docs Root: D:/project/my-ai-skills/docs (authored in the former dedicated worktree)
 - Code Repos: this repository only
-- Current Stage: implementation and validation complete; archive and local closeout in progress
+- Current Stage: complete; archived, merged locally and worktree cleaned
 - Authority: the user approved the concrete proposal with "好的请继续" on 2026-09-06. No repeated implementation approval is needed within this scope.
 - Discussion: completed in the current conversation; repository and upstream skill review established the proposal.
 
@@ -25,7 +25,7 @@ Preserve explicit one-question Grill Mode, plan approval, private docs, existing
 | AC-04 | Approved proposal: review committed, staged, unstaged and untracked workflow-owned changes without altering unrelated work | T2 | Documented Git recipe executed in temporary repositories; coverage and unchanged-state tests passed | passed |
 | AC-05 | Approved proposal: bind review/evidence to plan and candidate state; changes invalidate affected evidence and archive reuses valid results | T1, T2 | changed-limit-resume evaluation; candidate/plan identities retained in change record | passed |
 | AC-06 | Approved proposal: discover facts; decide reversible in-scope choices; block only material unknowns or missing execution prerequisites; preserve all existing entry gates | T1, T2 | approved-reversible-choice evaluation; existing Grill Mode and continuation contract tests | passed |
-| AC-07 | Approved proposal and repository packaging contract: update stable docs, package references, validate, sync installed copies and archive | T3, T4, T5 | 69 tests passed, 2 environment skips; 8 valid packages / 33 matching source-dist-install files; local closeout pending | pending |
+| AC-07 | Approved proposal and repository packaging contract: update stable docs, package references, validate, sync installed copies and archive | T3, T4, T5 | 69 tests passed, 2 environment skips; integration regression 31 passed / 1 skipped; 8 valid packages / 33 matching source-dist-install files; archived, merged and cleaned | passed |
 
 ## Execution Scope After Approval
 - Will Execute: T1, T2, T3, T4, T5.
@@ -102,10 +102,10 @@ Preserve explicit one-question Grill Mode, plan approval, private docs, existing
 | T2 | complete | Shared lightweight review and freshness rules routed through all five consumers |
 | T3 | complete | Feature, requirements and spec leaves updated; migration exception reconciled by main |
 | T4 | complete | Full suite 69 passed / 2 skipped; final affected checks 9 passed; 4 independent decision scenarios; 8 packages validated and installed with exact 33-file parity |
-| T5 | in progress | Intake and retained evidence prepared; archive, merge and cleanup status tracked below |
+| T5 | complete | Archive and retained plan committed; concurrent control-branch fix preserved and revalidated; local main integrated at 1e541a6; dedicated worktree and branch removed; no push |
 
-Requirements review: passed for AC-01 through AC-06 and the completed portions of AC-07. Standards review: passed; no open in-scope findings. The final review corrected an overstrict migration statement, a list indentation issue, and the legacy continuation rule that could confuse a heavy-test skip with acceptance disposition.
+Requirements review: passed for AC-01 through AC-07. Standards review: passed; no open in-scope findings. The final review corrected an overstrict migration statement, a list indentation issue, and the legacy continuation rule that could confuse a heavy-test skip with acceptance disposition.
 
 Implementation commit: `636e8b7cfb1f9b7d9e52a399e612c8070bfeabcb`. It has the same 33-file content identity as the dirty candidate reviewed before commit. Original approved plan: `d61dbc4d2e75c9bf9d63e3e96125e333ab674911:plan.md`. Goal, acceptance definitions, execution scope and Task definitions remain unchanged; status/evidence and the planned lessons decision were updated.
 
-The independent evaluator received raw scenario packets and current skills without expected answers or parent conversation. Its outputs are decision/plan evaluations, not live product end-to-end tests. Windows symlink tests remain visibly skipped; no skip or waiver was reported as passed. See the [change record](../change/2026-09-06_acceptance-review.md) for detailed evidence, identities, limits and final closeout status after this plan is retained in docs/plan.
+The independent evaluator received raw scenario packets and current skills without expected answers or parent conversation. Its outputs are decision/plan evaluations, not live product end-to-end tests. Windows symlink tests remain visibly skipped; no skip or waiver was reported as passed. See the [change record](../change/2026-09-06_acceptance-review.md) for detailed evidence, identities, limits and final closeout status.

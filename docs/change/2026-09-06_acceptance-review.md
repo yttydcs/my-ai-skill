@@ -35,7 +35,7 @@ The user approved the first round of improvements after comparing Matt Pocock's 
 | AC-04: full owned candidate | T2, T4 | Documented Git commands exercised against all change surfaces, including overlapping index/worktree edits; review does not mutate state |
 | AC-05: fresh evidence | T1, T2, T4 | Changed-limit scenario invalidates 10 MiB evidence for the approved 8 MiB revision and reuses independent T2 evidence with its supplied impact proof |
 | AC-06: bounded uncertainty | T1, T2, T4 | Private helper naming resolved from convention without another question; existing Grill Mode and continuation contracts pass |
-| AC-07: docs, packaging, installation and closeout | T3, T4, T5 | Stable docs, validation and exact installed parity complete; final local closeout status recorded below |
+| AC-07: docs, packaging, installation and closeout | T3, T4, T5 | Stable docs, validation, exact installed parity, local merge and cleanup complete; final status recorded below |
 
 ## 测试与验证方式 / 结果
 
@@ -49,6 +49,7 @@ The user approved the first round of improvements after comparing Matt Pocock's 
 | Independent decision scenarios | 4 satisfactory outputs | Fresh evaluator received only raw packets and relevant skills; main assessed actual outputs; these are not live product end-to-end runs |
 | Installation | Exact parity passed | Before sync, 32 prior source files matched installed text apart from line endings. After sync, all 33 source files matched distribution and installation SHA-256 bytes; build versions checked separately |
 | Whitespace / scope review | Passed | `git diff --check`; source changes restricted to approved eight packages, manifests, tests and stable docs |
+| Final archive verification | Passed | 215 local Markdown links resolve after integration; all 33 reviewed implementation files retain their recorded identity; worktree and local feature branch removed |
 
 The skipped tests are `test_rejects_symlink_escape_when_supported` in m-context and `test_candidate_dirty_wrong_repository_and_symlink_escape` in m-pipeline config. Windows rejected fixture creation with WinError 1314. Those symlink branches have no new runtime evidence here; the affected runtime files were not changed. No waiver or skipped check is labeled passed. Product UI, security/performance load tests and real application end-to-end runs are not applicable to these instruction/document changes; no such execution is claimed.
 
@@ -65,7 +66,7 @@ These samples demonstrate the evaluated decisions only. They do not establish un
 
 ## Requirements / Standards 审查结论与有效性
 
-- Requirements: passed for the implemented approved behavior and package/document obligations. AC-07 closeout is tracked separately until actual integration and cleanup finish.
+- Requirements: passed for AC-01 through AC-07, including completed local closeout.
 - Standards: passed. Shared rules have one reference owner and five phase consumers; source/package routing is valid; tests execute the documented Git commands and observe state independently. No outstanding in-scope finding remains.
 - Findings fixed: migration documentation initially implied every intermediate batch must pass independently; corrected to allow isolated batches with an explicit final integration gate. Fixed a nested-list indentation error. Replaced the legacy continuation termination sentence that could confuse a heavy-test skip with AC disposition.
 - Review base: `eceea63df4507b65f5bb18fc606ee42c62f49d1a`. Review-time HEAD: `d61dbc4d2e75c9bf9d63e3e96125e333ab674911`. At review, 30 tracked files were modified and 3 new files were untracked. No source deletion, mode change or symlink was involved; base-to-worktree, staged/unstaged views and new-file contents were inspected.
@@ -94,8 +95,10 @@ Eight installed packages now enforce the revised handoffs. Existing explicit app
 
 ## Local Closeout
 
-- Archive and retained plan: prepared; local merge and cleanup pending.
+- Archive and retained plan: complete; T1 through T5 and AC-01 through AC-07 are complete within the recorded validation limits.
 - Implementation commit: `636e8b7cfb1f9b7d9e52a399e612c8070bfeabcb`.
 - The control branch advanced to `c6805329960d29c9e4aff574aa4826586dcec251` while this work ran. Its unrelated m-pipeline project-creation fix was merged into the worktree for validation. Only docs/change/README.md conflicted; both index entries were retained. All 33 reviewed implementation files remain unchanged, and all 15 imported non-index files match the control commit; the two shared indexes combine both changes.
-- Installation is current with the worktree source. After merge, rebuild from the persistent control source and check exact source/distribution/install parity before worktree removal.
+- Integrated commit: `1e541a6c9537aee39e55c21f574ff0bd1f941c78`. Control main fast-forwarded from c680532 to this validated result. Later finalization changes only this record and retained-plan progress; source evidence remains applicable.
+- Rebuilt all eight packages from the persistent control source after merge. Exact source/distribution/install parity passed for 33 files and package versions; 41 files in other installed m-* packages, including build metadata, remained byte-identical during sync.
+- Dedicated worktree removed after clean-status, exact-path containment and integrated-commit checks; local codex/acceptance-review branch deleted safely. Only the control worktree remains. Ignored task-generated distribution, cache and scratch files in the removed worktree were disposable; authoritative evidence is retained here and in Git.
 - Remote state: local-only; no push requested or performed.
