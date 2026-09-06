@@ -1,6 +1,16 @@
-# m-pipeline Implementation Plan
+# Archived Plan - m-pipeline Implementation
 
-## Status And Goal
+This is the retained implementation plan, archived through the user's `$m-archive` invocation on 2026-09-06. Original task definitions and chronological execution checkpoints are preserved below; historical worktree paths are provenance. See the [change archive](../change/2026-09-06_m-pipeline.md) for closeout evidence.
+
+## Archive Status
+
+- Phase: `m-archive`; documentation prepared, local convergence pending final verification.
+- Docs root after convergence: `D:\project\my-ai-skills\docs`.
+- Intake impact: updated; feature impact: updated; requirements impact: updated; specs impact: updated; decision impact: updated — new companion documents are complete and their plan links now target this retained copy.
+- Lessons impact: updated — [pipeline handoff and closeout](../lessons/pipeline-handoff-and-closeout.md) captures recurring ownership, immutable-candidate and report-recovery guidance.
+- Plan/change/lessons indexes updated; the root documentation topology is unchanged. No publication target is inferred.
+
+## Execution Status And Goal At Archive Entry
 
 - Phase: `m-execute`.
 - Status: T1–T8 completed, verified and accepted on 2026-09-06; only the new m-pipeline companion is installed.
@@ -42,13 +52,13 @@ Autonomous launch must record an actual user instruction with scope, environment
 
 | Document category | Planned impact |
 | --- | --- |
-| Intake | Preserve the source discussion in [2026-09-06_role-pipeline.md](docs/intake/2026-09-06_role-pipeline.md). |
-| Feature | Add the proposed user workflow and scenarios in [m-pipeline.md](docs/features/m-pipeline.md). |
-| Requirements | Add R01–R18 and durable compatibility boundaries in [m-pipeline.md](docs/requirements/m-pipeline.md). |
-| Specification | Add composition, identity, state, host, and handoff contracts in [m-pipeline.md](docs/specs/m-pipeline.md). |
-| Decision | Record the companion/runtime choice in [2026-09-06_role-pipeline-composition.md](docs/decisions/2026-09-06_role-pipeline-composition.md). |
+| Intake | Preserve the source discussion in [2026-09-06_role-pipeline.md](../intake/2026-09-06_role-pipeline.md). |
+| Feature | Add the proposed user workflow and scenarios in [m-pipeline.md](../features/m-pipeline.md). |
+| Requirements | Add R01–R18 and durable compatibility boundaries in [m-pipeline.md](../requirements/m-pipeline.md). |
+| Specification | Add composition, identity, state, host, and handoff contracts in [m-pipeline.md](../specs/m-pipeline.md). |
+| Decision | Record the companion/runtime choice in [2026-09-06_role-pipeline-composition.md](../decisions/2026-09-06_role-pipeline-composition.md). |
 | Indexes | Add entries to the five nearest category indexes; mark unimplemented capability documents as planned. |
-| Lessons | Read existing [runtime-boundary](docs/lessons/orchestrator-multi-repository-runtime-boundaries.md) and [recovery](docs/lessons/orchestrator-lease-recovery.md) lessons as history. Add a new lesson only if implementation produces a reusable finding. |
+| Lessons | Read existing [runtime-boundary](../lessons/orchestrator-multi-repository-runtime-boundaries.md) and [recovery](../lessons/orchestrator-lease-recovery.md) lessons as history. Add a new lesson only if implementation produces a reusable finding. |
 | Change and plan archive | No implementation/change claim or archived-plan copy during planning. Leave later closeout to the original `m-archive`. |
 
 ## Task Summary

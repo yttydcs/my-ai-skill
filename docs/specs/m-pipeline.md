@@ -2,7 +2,7 @@
 
 ## Status And Authority
 
-Implemented and installed as version 0.1.0 on 2026-09-06. The [active plan](../../plan.md) records completed implementation tasks, validation and capability limits. The original phase skills remain authoritative for their own prerequisites, work, evidence, and closeout.
+Implemented and installed as version 0.1.0 on 2026-09-06. The [archived implementation plan](../plan/2026-09-06_role-pipeline.md) records completed implementation tasks, validation and capability limits. The original phase skills remain authoritative for their own prerequisites, work, evidence, and closeout.
 
 ## Package And Responsibilities
 
@@ -166,3 +166,6 @@ Host integration uses a fake adapter for deterministic faults and a bounded disp
 - [Existing phase contract](m-autoflow-skill.md)
 - [Context contract](m-context-skill.md)
 - [Documentation contract](m-docs-skill.md)
+
+- [Completed change record](../change/2026-09-06_m-pipeline.md)
+- [Handoff and closeout troubleshooting](../lessons/pipeline-handoff-and-closeout.md)

@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented and installed as optional companion version 0.1.0 on 2026-09-06. Two disposable real-host pipelines completed planning through local release and original archive closeout. The [active plan](../../plan.md) records validation, evidence and capability limits. Existing manual skill behavior remains unchanged.
+Implemented and installed as optional companion version 0.1.0 on 2026-09-06. Two disposable real-host pipelines completed planning through local release and original archive closeout. The [archived implementation plan](../plan/2026-09-06_role-pipeline.md) records validation, evidence and capability limits. Existing manual skill behavior remains unchanged.
 
 ## Feature Goal
 
@@ -73,4 +73,7 @@ Support one desktop host, local persistent state, explicit repositories includin
 - [Decision](../decisions/2026-09-06_role-pipeline-composition.md)
 - [Existing workflow](m-autoflow-workflow.md)
 - [Existing context behavior](m-context.md)
-- [Active plan](../../plan.md)
+- [Archived implementation plan](../plan/2026-09-06_role-pipeline.md)
+
+- [Completed change record](../change/2026-09-06_m-pipeline.md)
+- [Handoff and closeout troubleshooting](../lessons/pipeline-handoff-and-closeout.md)

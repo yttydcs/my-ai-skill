@@ -44,5 +44,7 @@ The original phases already define their gates, outputs, worktree ownership, doc
 - [Feature](../features/m-pipeline.md)
 - [Requirements](../requirements/m-pipeline.md)
 - [Specification](../specs/m-pipeline.md)
-- [Active plan](../../plan.md)
+- [Archived implementation plan](../plan/2026-09-06_role-pipeline.md)
 - [Existing continuation decision](2026-07-17_m-continue-loop.md)
+
+- [Completed change record](../change/2026-09-06_m-pipeline.md)

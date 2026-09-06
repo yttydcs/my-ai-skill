@@ -25,6 +25,7 @@ Store completed workflow result documents for this repository.
 
 ## Current Docs
 
+- [2026-09-06_m-pipeline.md](2026-09-06_m-pipeline.md) - optional role pipeline implementation, validation and local closeout
 - [2026-08-17_orchestrator-archive-queue-resume.md](2026-08-17_orchestrator-archive-queue-resume.md)
 - [2026-08-04_orchestrator-multi-repo.md](2026-08-04_orchestrator-multi-repo.md)
 - [2026-07-31_project-orchestrator.md](2026-07-31_project-orchestrator.md)

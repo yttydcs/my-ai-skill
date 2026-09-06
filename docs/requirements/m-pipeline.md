@@ -2,7 +2,7 @@
 
 ## Status And Purpose
 
-Implemented and validated under the approved T1–T8 scope on 2026-09-06; the new companion alone is installed. The [active plan](../../plan.md) records real-host, deterministic-test, installation and deferred-mode evidence separately. Reduce the user's manual coordination of concurrent workflows while preserving the original skill family and its documents as authoritative contracts.
+Implemented and validated under the approved T1–T8 scope on 2026-09-06; the new companion alone is installed. The [archived implementation plan](../plan/2026-09-06_role-pipeline.md) records real-host, deterministic-test, installation and deferred-mode evidence separately. Reduce the user's manual coordination of concurrent workflows while preserving the original skill family and its documents as authoritative contracts.
 
 ## Required Behavior
 
@@ -60,4 +60,6 @@ Implemented and validated under the approved T1–T8 scope on 2026-09-06; the ne
 - [Source request](../intake/2026-09-06_role-pipeline.md)
 - [Decision](../decisions/2026-09-06_role-pipeline-composition.md)
 - [Existing workflow requirements](m-autoflow-skill.md)
-- [Active plan and Task mapping](../../plan.md)
+- [Archived plan and Task mapping](../plan/2026-09-06_role-pipeline.md)
+
+- [Completed change record](../change/2026-09-06_m-pipeline.md)

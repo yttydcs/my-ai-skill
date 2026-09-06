@@ -4,7 +4,7 @@
 
 - Source: the current Codex discussion, following removal of `m-orchestrator` in commit `9f4e0ef` on 2026-09-05.
 - Requester: the user.
-- Planning was requested explicitly with `$m-plan`; this source brief was captured before execution approval. Subsequent `$m-execute` approved T1–T8, including the bounded fixture pilot and installation of only the new companion. See the active plan for implementation evidence.
+- Planning was requested explicitly with `$m-plan`; this source brief was captured before execution approval. Subsequent `$m-execute` approved T1–T8, including the bounded fixture pilot and installation of only the new companion. See the archived implementation plan for implementation evidence.
 
 ## Original Request Evidence
 
@@ -53,8 +53,10 @@ These are proposed implementation choices, not statements that the capability al
 - [Requirements](../requirements/m-pipeline.md)
 - [Technical specification](../specs/m-pipeline.md)
 - [Proposed decision](../decisions/2026-09-06_role-pipeline-composition.md)
-- [Active implementation plan](../../plan.md)
+- [Archived implementation plan](../plan/2026-09-06_role-pipeline.md)
 
 ## Publication And Phase Status
 
 Planning documents are local to the dedicated `codex/role-pipeline` worktree. No customer pipeline, role sessions, implementation, installation, publication, or change archive was created during planning.
+
+The subsequent `$m-archive` invocation authorized this implementation workflow's normal local merge and worktree cleanup. See the [completed change record](../change/2026-09-06_m-pipeline.md).
