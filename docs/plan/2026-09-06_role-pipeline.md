@@ -4,7 +4,8 @@ This is the retained implementation plan, archived through the user's `$m-archiv
 
 ## Archive Status
 
-- Phase: `m-archive`; documentation prepared, local convergence pending final verification.
+- Phase: `m-archive`; documentation, local convergence and implementation worktree/branch cleanup completed on 2026-09-06.
+- Archive/fast-forward commit: `d54adb6af2fe5552fd606358a1069f382f485e21`. The control-plane checkout is the only remaining registered worktree; installed companion and independent pilot evidence remain intact. Final receipt: [change archive](../change/2026-09-06_m-pipeline.md#closeout). No push was requested or performed.
 - Docs root after convergence: `D:\project\my-ai-skills\docs`.
 - Intake impact: updated; feature impact: updated; requirements impact: updated; specs impact: updated; decision impact: updated — new companion documents are complete and their plan links now target this retained copy.
 - Lessons impact: updated — [pipeline handoff and closeout](../lessons/pipeline-handoff-and-closeout.md) captures recurring ownership, immutable-candidate and report-recovery guidance.

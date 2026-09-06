@@ -123,7 +123,10 @@ Implementation, review and this archive were performed by the workflow owner; no
 
 ## Closeout
 
-- Archive prepared on `codex/role-pipeline` after execution commit `e840ccb6db78d6b1a8fa8193cc8b0bf03d45ca9d`.
-- Normal authorized convergence: commit the archive, fast-forward local `main` from the control-plane repository, verify preservation, remove only the clean implementation worktree and delete its merged branch.
-- Final merge/cleanup evidence will be recorded after those actions succeed.
+- Archive commit: `d54adb6af2fe5552fd606358a1069f382f485e21`, created after execution commit `e840ccb6db78d6b1a8fa8193cc8b0bf03d45ca9d`.
+- Local merge: fast-forwarded `main` from `9f4e0efc533eebbf194c3917e033a443de1fd3ef` to the archive commit from `D:\project\my-ai-skills`. The resulting tree exactly matched the reviewed branch; skills, manifests, tools and tests also matched the completed execution commit.
+- Cleanup: verified the exact resolved implementation path, clean status, branch identity, absence of reparse points and the 28 known generated ignored files. Removed only `D:\project\my-ai-skills\worktrees\role-pipeline` with `git worktree remove`, then deleted merged `codex/role-pipeline` with `git branch -d`. The control-plane checkout is the only remaining registered worktree.
+- Preservation: the installed companion, all 67 pre-existing installed files, independent pilot evidence/store and other fixture worktrees remain intact. Generated distribution and bytecode inside the removed implementation checkout were disposable.
+- Post-merge verification: 182 local documentation links pass from the durable main checkout; the source scope still contains no changes to pre-existing packages. Main checkout uses Git's CRLF conversion, so all 13 installed companion files match source text after newline normalization (1 is byte-identical in this checkout). The earlier 13-file source/dist/install byte comparison was made before cleanup; this line-ending difference does not represent a new skill change.
+- This final closeout receipt and the retained plan status are committed as a documentation-only follow-up on local `main`; Git history records that receipt commit. Main was clean after merge and cleanup.
 - Push/publication: not requested and not performed; all repository/document changes remain local.
