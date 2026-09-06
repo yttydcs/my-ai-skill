@@ -6,11 +6,11 @@
     "app": {"path": ".", "base_ref": "main", "worktree_root": "worktrees"}
   },
   "roles": {
-    "product": {"skill": "m-discuss", "contexts": [], "sessions": [], "create": {"target": {"type": "projectless", "directoryName": "pipeline-product"}}},
-    "architect": {"skill": "m-plan", "contexts": [], "sessions": [], "create": {"target": {"type": "projectless", "directoryName": "pipeline-architect"}}},
-    "executor": {"skill": "m-execute", "contexts": [], "sessions": [], "create": {"target": {"type": "projectless", "directoryName": "pipeline-executor"}}},
-    "tester": {"skill": "m-test", "contexts": [], "sessions": [], "create": {"target": {"type": "projectless", "directoryName": "pipeline-tester"}}},
-    "release": {"skill": "m-archive", "contexts": [], "sessions": [], "create": {"target": {"type": "projectless", "directoryName": "pipeline-closeout"}}}
+    "product": {"skill": "m-discuss", "contexts": [], "sessions": [], "create": {"target": {"type": "project", "projectId": "<verified-project-id>", "environment": "worktree", "base_ref": "main"}}},
+    "architect": {"skill": "m-plan", "contexts": [], "sessions": [], "create": {"target": {"type": "project", "projectId": "<verified-project-id>", "environment": "worktree", "base_ref": "main"}}},
+    "executor": {"skill": "m-execute", "contexts": [], "sessions": [], "create": {"target": {"type": "project", "projectId": "<verified-project-id>", "environment": "worktree", "base_ref": "main"}}},
+    "tester": {"skill": "m-test", "contexts": [], "sessions": [], "create": {"target": {"type": "project", "projectId": "<verified-project-id>", "environment": "worktree", "base_ref": "main"}}},
+    "release": {"skill": "m-archive", "contexts": [], "sessions": [], "create": {"target": {"type": "project", "projectId": "<verified-project-id>", "environment": "worktree", "base_ref": "main"}}}
   },
   "stages": [
     {"id": "plan", "role": "architect", "after": [], "routing": "any"},

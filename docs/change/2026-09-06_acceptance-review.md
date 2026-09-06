@@ -10,7 +10,7 @@ The user approved the first round of improvements after comparing Matt Pocock's 
 - Execution performs separate lightweight requirements and standards review. Heavy-test skips do not implicitly skip review or waive required behavior.
 - The shared review covers committed, staged, unstaged and untracked owned changes, records candidate/plan identity, and refreshes only affected stale evidence during test, continuation and archive.
 - Discoverable facts and reversible in-scope choices no longer trigger generic approval loops. Existing plan approval, explicit Grill Mode, private docs and archive closeout rules remain intact.
-- Updated eight packages: m-autoflow, m-plan, m-execute, m-test, m-archive, m-go and m-continue are version 0.2.0; m-discuss is version 0.3.0. No m-pipeline runtime change was made.
+- Updated eight packages: m-autoflow, m-plan, m-execute, m-test, m-archive, m-go and m-continue are version 0.2.0; m-discuss is version 0.3.0. This implementation does not edit the m-pipeline runtime; an unrelated control-branch fix was preserved during integration as recorded below.
 
 ## Docs Governance
 
@@ -43,6 +43,7 @@ The user approved the first round of improvements after comparing Matt Pocock's 
 | --- | --- | --- |
 | Full repository regression | 69 passed, 2 skipped (71 total) | `python -B -m unittest discover -s tests -v`; 118.765 seconds |
 | Focused final checks | 9 passed | Continuation contract 6 and acceptance/review contract 3 rerun after the final continuation wording correction; no runtime/test implementation changed after full regression |
+| Integration after control-branch advance | 31 passed, 1 skipped (32 total) | `python -B -m unittest discover -s tests -p 'test_m_pipeline_*.py' -v`; 95.374 seconds; includes the concurrent project-creation fix; same symlink-fixture limitation |
 | New review checks | 3 passed | Shared-reference packaging, executable Git coverage, and unchanged HEAD/index/worktree; included in the full-suite count |
 | Package validation | 8 passed | Existing `tools/validate-skills.ps1 -Skill <name>` run for each changed package, including after final wording fixes |
 | Independent decision scenarios | 4 satisfactory outputs | Fresh evaluator received only raw packets and relevant skills; main assessed actual outputs; these are not live product end-to-end runs |
@@ -95,6 +96,6 @@ Eight installed packages now enforce the revised handoffs. Existing explicit app
 
 - Archive and retained plan: prepared; local merge and cleanup pending.
 - Implementation commit: `636e8b7cfb1f9b7d9e52a399e612c8070bfeabcb`.
-- Control branch must still match the recorded base before fast-forward integration; otherwise inspect and revalidate affected integration changes.
+- The control branch advanced to `c6805329960d29c9e4aff574aa4826586dcec251` while this work ran. Its unrelated m-pipeline project-creation fix was merged into the worktree for validation. Only docs/change/README.md conflicted; both index entries were retained. All 33 reviewed implementation files remain unchanged, and all 15 imported non-index files match the control commit; the two shared indexes combine both changes.
 - Installation is current with the worktree source. After merge, rebuild from the persistent control source and check exact source/distribution/install parity before worktree removal.
 - Remote state: local-only; no push requested or performed.

@@ -9,7 +9,7 @@ Implemented and validated under the approved T1–T8 scope on 2026-09-06; the ne
 | ID | Requirement |
 | --- | --- |
 | R01 | Add one optional standalone companion; keep all pre-existing skill, manifest, and manual entry behavior unchanged. |
-| R02 | Support explicit pipeline definitions, existing-session bindings, and one-command creation of a configured team. |
+| R02 | Support explicit pipeline definitions, existing-session bindings, and one-command creation of a configured team under the user's saved Codex project by default. Verify actual project membership; never silently fall back to projectless creation. Preserve explicitly chosen standalone configurations. |
 | R03 | Separate role, concrete host/session identity, workflow run, plan Task ID, and dispatch attempt. |
 | R04 | Maintain one coordinator owner per run and one current admitted owner per assignment/session. |
 | R05 | Continue automatically after an explicit launch contract: approved brief/revision, scope, repositories, environments, permitted phase actions, creation bounds, and escalation conditions. |

@@ -1,6 +1,6 @@
 # Configuration And Launch
 
-Copy `assets/pipeline.example.json` beside the project's configuration and replace its paths and task bindings. Paths resolve against that file. Do not put credentials or loaded context bodies in it. A non-Git umbrella may declare several independent Git repositories.
+Copy `assets/pipeline.example.json` beside the project's configuration and replace its paths, project IDs and task bindings. Resolve the saved Codex project with `list_projects`, matching its actual path/host to the user's project. The example's `<verified-project-id>` must be replaced before validation. Paths resolve against that file. Do not put credentials or loaded context bodies in it. A non-Git umbrella may declare several independent Git repositories.
 
 ## Blueprint Version 1
 
@@ -10,7 +10,8 @@ Required top-level fields:
 - `project_root`, `docs_root`: existing explicit directories. Resolve/bootstrap governed docs through `m-docs` before validation.
 - `repositories`: keys map to `{path, base_ref, worktree_root}`. Each is a real Git repository. Every assignment has an exact dedicated worktree and full commit ID; checkpoint uncommitted progress before handoff.
 - `roles`: keys map to `{skill, contexts, sessions, create, initial?}`. `initial` defaults to one. `contexts` contains `{scope: "local"|"global", name, section?}` references. `sessions` contains verified `{host_id, thread_id}` identities; never a pending creation ID. `create` is null or `{target: ...}`.
-- Creation target: `{type: "projectless", directoryName: "short-name"}` or `{type: "project", projectId, base_ref}`. Validate saved project IDs with `list_projects`; project targets use worktrees from the explicitly configured ref. Projectless receivers must still use the assignment's verified worktree for code actions.
+- Default creation target for a project workflow: `{type: "project", projectId, environment: "worktree", base_ref}` for a Git project, or `{type: "project", projectId, environment: "local"}` for a non-Git saved project. Git projects use `local` only if the user explicitly requests the saved checkout directly; `local` takes no `base_ref`. An omitted environment retains the original `worktree` behavior and requires `base_ref`.
+- `{type: "projectless", directoryName: "short-name"}` remains supported for explicitly chosen standalone work. Do not select it just because a project contains several repositories, creation is pending, or the live pilot used it. Missing/ambiguous project identity blocks creation until resolved; never silently fall back. Project membership and assignment worktree are separate: every code action still uses its verified assigned worktree.
 - `stages`: ordered `{id, role, after: [stage IDs], routing: "any"|"split"|"join"}`. Unknown dependencies/cycles/backward phase edges fail. Repair uses runtime transitions. A split execution stage admits the complete distinct-task set at once. A join admits one integration or validation assignment.
 - `limits`: `{max_live, max_created, max_depth, max_nonprogress, reuse_after}`. Depth is zero or one; `max_created` counts all creation attempts, including setup, failed, uncertain and replacement attempts. `reuse_after` limits completed assignments per session before fresh replacement.
 

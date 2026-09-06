@@ -1,6 +1,6 @@
 {
   "name": "m-pipeline",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "install_mode": "copy",
   "source_dir": "skills/m-pipeline",
   "dist_dir": "dist/codex/m-pipeline",

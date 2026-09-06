@@ -9,6 +9,32 @@ from pipeline_lib.config import PipelineError, artifact, load_json, plan_ref, sn
 
 
 class ConfigurationTests(Fixture):
+    def test_project_creation_environments_and_legacy_target(self):
+        targets = (
+            {"type": "project", "projectId": "saved-project", "base_ref": "main"},
+            {"type": "project", "projectId": "saved-project", "environment": "worktree", "base_ref": "main"},
+            {"type": "project", "projectId": "saved-umbrella", "environment": "local"},
+            {"type": "projectless", "directoryName": "explicit-standalone"},
+        )
+        for target in targets:
+            with self.subTest(target=target):
+                self.config["roles"]["executor"]["create"] = {"target": target}
+                validated = validate_blueprint(self.config, self.root)
+                self.assertEqual(validated["roles"]["executor"]["create"]["target"], target)
+
+    def test_unresolved_project_and_inconsistent_environment_rejected(self):
+        targets = (
+            {"type": "project", "projectId": "<verified-project-id>", "base_ref": "main"},
+            {"type": "project", "projectId": "saved-project"},
+            {"type": "project", "projectId": "saved-project", "environment": "local", "base_ref": "main"},
+            {"type": "project", "projectId": "saved-project", "environment": "cloud", "base_ref": "main"},
+        )
+        for target in targets:
+            with self.subTest(target=target):
+                self.config["roles"]["executor"]["create"] = {"target": target}
+                with self.assertRaises(PipelineError):
+                    validate_blueprint(self.config, self.root)
+
     def test_relative_paths_and_unicode_project(self):
         self.config["project_root"] = "project"
         self.config["docs_root"] = "docs"

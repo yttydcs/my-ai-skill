@@ -30,7 +30,7 @@ Store reusable incident knowledge, query-friendly troubleshooting lessons, and p
 - [dirty-worktree-review.md](dirty-worktree-review.md) - keywords: empty committed diff, staged-only change, untracked test, overlapping edits, stale review
 - [orchestrator-lease-recovery.md](orchestrator-lease-recovery.md) - keywords: stale lease, orphan host lease, archive operation, owner heartbeat, `pool reclaim`, `reclaim-host`, `legacy-host-orphan`, `active_lease`, premature release, two-phase audit
 - [orchestrator-multi-repository-runtime-boundaries.md](orchestrator-multi-repository-runtime-boundaries.md) - keywords: non-Git umbrella, schema v2, `[[repositories]]`, `project_instance_id`, host lease collision, manifest retry, `planning_ref`
-- [pipeline-handoff-and-closeout.md](pipeline-handoff-and-closeout.md) - keywords: `shared_resource_busy`, idle receiver, uncertain dispatch, archive receipt, removed worktree, tested candidate, Windows separator
+- [pipeline-handoff-and-closeout.md](pipeline-handoff-and-closeout.md) - keywords: `shared_resource_busy`, idle receiver, uncertain dispatch, archive receipt, removed worktree, tested candidate, Windows separator, projectless, `project_mismatch`
 - [python-unittest-discovery-nonpackage-tests.md](python-unittest-discovery-nonpackage-tests.md) - keywords: `ModuleNotFoundError`, `tests.test_`, `unittest discover`, missing `tests/__init__.py`, non-package tests
 - [python-cache-skill-sync.md](python-cache-skill-sync.md) - keywords: `__pycache__`, `.pyc`, skill sync, extra installed file, parity mismatch, `PYTHONDONTWRITEBYTECODE`
 - [searchable-lessons-capture.md](searchable-lessons-capture.md) - keywords: archive, lessons, troubleshooting, recurring investigation

@@ -7,6 +7,48 @@ from pipeline_lib.config import PipelineError
 
 
 class WorkflowTests(Fixture):
+    def test_project_creation_checks_membership_before_binding_and_preserves_pending(self):
+        target = {"type": "project", "projectId": "saved-project", "base_ref": "main"}
+        self.config["roles"]["executor"]["create"] = {"target": target}
+        self.start(bind=False)
+        setup = {"roles": ["executor"], "source_ref": "fixture:user-create-team", "creation_limit": 8}
+        creation = self.call("bootstrap", setup)
+        self.assertEqual(creation["target"], target)
+        self.call("operation_result", {"operation_id": creation["operation_id"], "outcome": "pending",
+                                       "client_thread_id": "pending-project", "observation_ref": "fake-host:queued"})
+        receipt = {"operation_id": creation["operation_id"], "outcome": "ready", "session": self.worker,
+                   "cwd": str(self.repo), "observation_ref": "fake-host:task-metadata"}
+        for extra in ({}, {"project_id": "wrong-project"}):
+            with self.subTest(extra=extra):
+                with self.assertRaises(PipelineError) as failure:
+                    self.call("operation_result", {**receipt, **extra})
+                self.assertEqual(failure.exception.code, "project_mismatch")
+                self.assertFalse(self.call("status")["bindings"])
+                self.assertEqual(self.call("bootstrap", setup)["action"], "wait")
+                self.assertEqual(self.call("status")["created"], 1)
+        receipt["project_id"] = "saved-project"
+        self.call("operation_result", receipt)
+        self.assertTrue(self.call("operation_result", receipt)["duplicate"])
+        self.assertEqual(self.call("bootstrap", setup)["action"], "ready")
+        with self.assertRaisesRegex(PipelineError, "Conflicting duplicate"):
+            self.call("operation_result", {**receipt, "project_id": "wrong-project"})
+
+    def test_on_demand_local_project_creation_keeps_target_and_assignment_worktree(self):
+        target = {"type": "project", "projectId": "saved-umbrella", "environment": "local"}
+        self.config["roles"]["executor"]["create"] = {"target": target}
+        self.start(bind=False)
+        packet = self.packet()
+        self.admit([packet])
+        creation = self.call("next")
+        self.assertEqual(creation["target"], target)
+        self.call("operation_result", {"operation_id": creation["operation_id"], "outcome": "ready",
+                                       "session": self.worker, "cwd": str(self.root), "project_id": "saved-umbrella",
+                                       "observation_ref": "fake-host:project-metadata"})
+        self.call("observe", {"session": self.worker, "status": "idle", "observation_ref": "fake-host:ready"})
+        dispatch = self.call("next")
+        self.assertEqual(dispatch["action"], "dispatch")
+        self.assertEqual(dispatch["envelope"]["packet"]["repositories"], packet["repositories"])
+
     def test_pass_requires_inactive_receiver_exact_tasks_and_evidence(self):
         self.start()
         self.admit([self.packet()])

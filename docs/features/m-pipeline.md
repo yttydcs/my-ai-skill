@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented and installed as optional companion version 0.1.0 on 2026-09-06. Two disposable real-host pipelines completed planning through local release and original archive closeout. The [archived implementation plan](../plan/2026-09-06_role-pipeline.md) records validation, evidence and capability limits. Existing manual skill behavior remains unchanged.
+Implemented and installed as optional companion version 0.1.1. Project workflows now create role tasks under the selected saved Codex project by default; see the [project ownership correction](../change/2026-09-06_pipeline-project-tasks.md). The original 0.1.0 disposable real-host pilot completed two pipelines through local release and archive closeout. The [archived implementation plan](../plan/2026-09-06_role-pipeline.md) records that validation, evidence and capability limits. Existing manual skill behavior remains unchanged.
 
 ## Feature Goal
 
@@ -24,7 +24,7 @@ Roles describe responsibilities. A role can have several explicitly bound or aut
 ## User Journey
 
 1. Define a pipeline with project/docs/repository locations, roles, contexts, session bindings or creation policies, routing, and limits.
-2. Create the configured team or bind selected existing sessions. Return the actual session references and initialization results; resume partial initialization without blindly duplicating sessions.
+2. Create the configured team under the actual saved Codex project or bind selected existing sessions. Git projects default to worktree tasks; non-Git saved umbrella projects use local tasks, with code still assigned to explicit repository worktrees. Verify actual task project membership as well as readiness. Return the actual session references and initialization results; resume partial initialization without blindly duplicating sessions. Projectless tasks require an explicit standalone choice and are never a fallback for delayed or failed project creation.
 3. Discuss a requirement with the product manager using the original `m-discuss`.
 4. Explicitly launch a run with the confirmed brief and a bounded authorization contract. Starting this implementation plan does not authorize a customer run.
 5. The coordinator requests architecture through `m-plan`, validates the resulting plan against the launch contract, and dispatches only admitted Task IDs.
