@@ -9,6 +9,7 @@
 | Skill | 用途 | 来源 | 安装命令 |
 | --- | --- | --- | --- |
 | `show-me` | 用简洁图示、伪代码或 HTML 帮助解释复杂内容 | [humanlayer/skills](https://github.com/humanlayer/skills) | `npx skills add humanlayer/skills --skill show-me -g -y` |
+| `huashu-design` | 用 HTML 制作高保真原型、幻灯片、动画、可视化并进行设计评审 | [alchaincyf/huashu-design](https://github.com/alchaincyf/huashu-design) | `npx skills add alchaincyf/huashu-design --skill huashu-design -g -y` |
 | `teach` | 在工作区内以持续、分阶段的方式学习新概念 | [mattpocock/skills](https://github.com/mattpocock/skills) | `npx skills add mattpocock/skills --skill teach -g -y` |
 | `vercel-react-best-practices` | React 和 Next.js 性能优化与代码审查 | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | `npx skills add vercel-labs/agent-skills --skill vercel-react-best-practices -g -y` |
 | `typescript-advanced-types` | TypeScript 高级类型设计 | [wshobson/agents](https://github.com/wshobson/agents) | `npx skills add wshobson/agents --skill typescript-advanced-types -g -y` |
