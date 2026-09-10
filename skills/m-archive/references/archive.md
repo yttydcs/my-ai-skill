@@ -4,7 +4,9 @@ Use this reference for `$m-archive`, the archive phase of `m-autoflow`.
 
 ## Required Archive Content
 
-Create `docs/change/YYYY-MM-DD_topic.md` in the selected docs root with:
+Create `docs/change/YYYY-MM-DD_topic.md` in the selected docs root. Use the compact archive in `../../m-autoflow/references/templates.md` by default. The following are coverage requirements, not mandatory separate headings: group unaffected categories in one explicit `none` statement; link durable plan/evidence instead of copying them. Include lesson details only when reusable knowledge exists, and sub-agent trace only when delegation occurred. Record why no lesson is needed in the impact summary.
+
+Cover:
 
 - 变更背景 / 目标
 - 具体变更内容

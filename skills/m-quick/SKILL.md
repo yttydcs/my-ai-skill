@@ -11,6 +11,8 @@ Use this skill for small, uncontroversial changes whose expected result, write s
 
 ## Quick Start
 
+- Apply `../m-autoflow/references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
+
 - Read `references/quick.md` completely before deciding eligibility or editing.
 - Read project-local instructions such as `AGENTS.md` and `guide.md`.
 - Read `../m-autoflow/references/output-components.md` before presenting the quick-path result.

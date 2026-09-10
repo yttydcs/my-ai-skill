@@ -22,6 +22,7 @@
     "references/m-docs-integration.md",
     "references/subagents.md",
     "references/templates.md",
-    "references/review.md"
+    "references/review.md",
+    "references/context-budget.md"
   ]
 }

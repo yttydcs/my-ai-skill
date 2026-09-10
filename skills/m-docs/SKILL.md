@@ -11,6 +11,8 @@ Use this skill to treat project documentation as a governed system with private 
 
 ## Quick Start
 
+- Apply `../m-autoflow/references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
+
 - For docs tree creation or repair, run `scripts/bootstrap_docs_tree.py` and review the generated `README.md` files.
 - For "where should this doc go?" questions, read `references/taxonomy.md` and `references/routing-rules.md`.
 - For plan or change work, read `references/requirement-impact.md` before editing.

@@ -11,6 +11,8 @@ Use this skill as the umbrella entry for the `m-*` workflow collection. It route
 
 ## Quick Start
 
+- Apply `references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
+
 - Invoke `$m-autoflow` when the user wants the full workflow.
 - Route to companion skills:
   - `$m-context` to load reusable user-local plaintext context before another skill acts; it is a companion loader, not a phase.
@@ -44,20 +46,6 @@ Use this skill as the umbrella entry for the `m-*` workflow collection. It route
 8. Use `$m-continue` after an execute or test pass when the user wants one invocation to keep alternating both existing behaviors without continuation questions until acceptance converges or progress is genuinely impossible.
 9. Use `$m-archive` after validation to write governed archives and close the staged workflow by default.
 10. Stop after archive only when the user explicitly requested archive-only handling, no merge, or no cleanup.
-
-## Split Phase Mapping
-
-- Context: use `$m-context` as a companion loader before any selected phase or fast path.
-- Quick: use `$m-quick` as a standalone fast path outside the staged phase chain.
-- Discuss: use `$m-discuss` for discovery, optional research, and early workflow setup.
-- Plan: use `$m-plan` for architecture and executable planning.
-- Execute: use `$m-execute` for implementation and lightweight validation.
-- Go: use `$m-go` for delegated implementation and automatic `$m-test` looping.
-- Continue: use `$m-continue` to resume an existing execute/test workflow unattended without adopting `$m-go` mandatory delegation.
-- Test: use `$m-test` for optional heavy validation and review.
-- Archive: use `$m-archive` for archive and workflow-end closeout.
-
-The phase and fast-path skills are companion entry points. Keep `$m-autoflow` as the collection and whole-workflow command.
 
 ## Guardrails
 

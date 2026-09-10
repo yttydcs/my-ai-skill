@@ -13,6 +13,8 @@ Invoking `$m-archive` means "archive and end this workflow". Stop after archive 
 
 ## Quick Start
 
+- Apply `../m-autoflow/references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
+
 - Read `references/archive.md`.
 - Read `../m-autoflow/references/review.md` to check final acceptance and evidence freshness, reusing valid results.
 - Read `../m-autoflow/references/m-docs-integration.md` before treating archive work as complete.

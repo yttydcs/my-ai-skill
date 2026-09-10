@@ -4,6 +4,8 @@ Use this file whenever the workflow touches planning, intake, features, requirem
 
 ## Explicit Invocation Rule
 
+Invocation means applying `$m-docs`, not reloading its unchanged instructions on every phase. Reuse confirmed routing and still-current source content under `context-budget.md`; reassess affected categories against the current change. Required impact fields may share one table or sentence (for example, `Intake / Requirements / Specs / Decisions: none`) as long as every category has an explicit disposition. Write searchable lesson cues only when a lesson is needed.
+
 Do not rely on implicit skill triggering. State the invocation explicitly, for example:
 
 ```text

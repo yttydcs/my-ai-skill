@@ -11,6 +11,8 @@ Use this skill to resume an approved workflow after `$m-execute` or `$m-test`. T
 
 ## Quick Start
 
+- Apply `../m-autoflow/references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
+
 - Read `references/continue.md` for state recovery, progress comparison, loop transitions, and terminal rules.
 - Read `../m-execute/SKILL.md` and `../m-execute/references/execution.md` before applying execution behavior.
 - Read `../m-test/SKILL.md` and `../m-test/references/testing.md` before applying test behavior.

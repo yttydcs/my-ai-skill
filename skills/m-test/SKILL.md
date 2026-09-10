@@ -13,6 +13,8 @@ When this phase runs for UI-impacting changes, the UI must be opened, the affect
 
 ## Quick Start
 
+- Apply `../m-autoflow/references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
+
 - Read `references/testing.md`.
 - Read `../m-autoflow/references/review.md` to verify candidate/plan freshness and reuse current lightweight review evidence.
 - Read `../m-autoflow/references/subagents.md` before parallel validation or delegated review.

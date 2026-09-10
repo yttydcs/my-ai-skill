@@ -11,6 +11,8 @@ Use this skill after `$m-plan` when the user wants high-automation execution. `$
 
 ## Quick Start
 
+- Apply `../m-autoflow/references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
+
 - Read `references/go.md`.
 - Read `../m-autoflow/references/subagents.md` before dispatching workers.
 - Read `../m-test/references/testing.md` before the automatic validation loop.

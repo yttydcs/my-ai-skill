@@ -11,6 +11,8 @@ Use this skill before `$m-plan` when the work needs product discovery, technical
 
 ## Quick Start
 
+- Apply `../m-autoflow/references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
+
 - Read `references/discussion.md`.
 - Read `references/grilling.md` only when the user explicitly asks to be grilled, pressure-test a plan through hard questions, or resolve decisions one at a time. Do not enter Grill Mode merely because a request is vague.
 - Read `references/research.md` when current external evidence, web search, vendor/library comparison, security/regulatory facts, or best-practice research would materially improve the discussion.

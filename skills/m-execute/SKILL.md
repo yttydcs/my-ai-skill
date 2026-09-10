@@ -11,6 +11,8 @@ Use this skill to implement confirmed plan tasks inside the active repository wo
 
 ## Quick Start
 
+- Apply `../m-autoflow/references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
+
 - Read `references/execution.md`.
 - Read `../m-autoflow/references/review.md` before reviewing the execution result.
 - Read `../m-autoflow/references/subagents.md` before any parallelism assessment or delegation.

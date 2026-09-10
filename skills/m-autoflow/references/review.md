@@ -4,6 +4,8 @@ Use at the end of execution, and when test, continuation or archive checks wheth
 
 ## Ownership
 
+Keep one authoritative record in the existing plan/result artifact: candidate/plan identity, AC/Task/check rows, the two review conclusions, and unresolved or waived items. Execution creates it; test updates only new or invalidated evidence; archive links its durable location and summarizes the final outcome. Do not create a second competing acceptance report. Preserve historical evidence when updating a verdict, and relocate needed records before deleting their worktree.
+
 - `$m-execute` produces the lightweight review after focused validation; `$m-go` applies it to the integrated worker result.
 - `$m-test` consumes a current review and investigates affected gaps alongside its risk-based heavy checks. It does not repeat an unchanged review merely because a new phase started.
 - `$m-continue` checks freshness before reusing a prior pass. `$m-archive` verifies the final evidence and dispositions; it does not perform a second full review when inputs remain valid.

@@ -15,85 +15,35 @@ Use these templates as concise defaults.
 
 ## plan.md Skeleton
 
+Use this compact default for bounded work. Fill the information required by `../../m-plan/references/planning.md`, not empty headings. Add architecture, alternative analysis, cross-repo ordering or per-task rollback details where the work needs them. Existing project formats and pipeline admission/identity fields take precedence.
+
 ```md
 # Plan - <workflow-name>
 
-## Workflow Information
-- Repo:
-- Branch:
-- Base:
-- Project Root:
-- Docs Root:
-- Code Repos:
-- Worktree:
-- Current Stage:
+## Context
+- Goal / existing capability / gap / scope:
+- Repo(s), branch, base, worktree, project root, docs root, phase:
+- guide.md and discussion/source links (or discussion skipped with reason):
+- Confirmed, rejected, deferred and open decisions:
+- Approach, affected interfaces and material constraints:
 
-## Stage Records
+## Tasks and Acceptance
+| Task ID | Deliverable | Scope / reason if deferred | Files / write set | Blocked by | AC IDs / verification |
+| --- | --- | --- | --- | --- | --- |
+| T1 | <observable outcome> | Will execute | <paths> | none | AC-01 / <check> |
 
-### Initialization
-- guide.md:
-- project/docs/code repo confirmation:
-- base/worktree confirmation:
-
-### Discuss - Discovery And Requirements Shaping
-#### Goal
-#### Scope
-#### Assumptions
-#### Open Questions
-#### Options Considered
-#### Rejected Options
-#### Recommended Direction
-#### Research Summary
-#### Worktree / Branch / Docs Root Status
-#### Issue List
-
-### Plan - Requirements And Architecture
-#### Discussion Brief Reference / Confirmed, Rejected, Deferred And Open Decisions
-#### Requirements Analysis
-##### Goal
-##### Scope
-##### Use Cases
-##### Functional Requirements
-##### Non-functional Requirements
-##### Inputs / Outputs
-##### Edge Cases
-##### Acceptance Criteria
 | AC ID | Source / exact requirement | Task IDs | Verification / evidence | Status |
 | --- | --- | --- | --- | --- |
-| AC-01 | <confirmed constraint, preserving negation/values/defaults/order> | <Task IDs> | <observation boundary and independent expected result; evidence when available> | pending |
-##### Risks
-#### Architecture Design
-##### Overall Solution
-##### Alternatives Considered
-##### Module Responsibilities
-##### Data / Call Flow
-##### Interface Drafts
-##### Error Handling and Safety
-##### Performance and Testing Strategy
-##### Extensibility Design Points
-#### Issue List
+| AC-01 | <preserve negation, values, defaults, order, permissions> | T1 | <boundary, independent expected result> | pending |
 
-### Execution Plan
-#### Docs Governance Routing Decision
-#### Related Intake / Features / Requirements / Specs / Decisions / Lessons
-#### Stable Docs Impact
-- Intake impact:
-- Feature impact:
-- Requirements impact:
-- Specs impact:
-- Decision impact:
-#### Executable Task List
-#### Execution Scope After Approval
-##### Will Execute
-- <Task IDs approved for the next execution phase>
-##### Will Not Execute Now
-- <Task IDs plus reason: blocked / out of scope / deferred / research-only / separate approval required>
-#### Task Details
-#### Dependencies
-#### Risks and Notes
-#### Parallelism Assessment
-#### Issue List
+## Shared Controls
+- Risks, rollback and task-specific exceptions:
+- Parallelism assessment; context package only if delegating:
+- Stable-doc impact and related paths; explicitly group unaffected categories:
+- Approval status / executable Task IDs / blockers:
 ```
+
+Task rows are the executable checklist; update their state rather than maintaining a second list. Shared fields need not be repeated in each Task Block. Keep acceptance definitions here and reference their IDs elsewhere.
 
 ## Task Block
 
@@ -125,34 +75,30 @@ Use this table in the direct `$m-plan` response after creating or confirming the
 
 ## docs/change Skeleton
 
+Cover `../../m-archive/references/archive.md` using these compact sections. Link the durable authoritative acceptance record; do not copy its complete map/logs. Omit sub-agent details when no delegation occurred. Create a lesson only when reusable knowledge warrants one.
+
 ```md
 # YYYY-MM-DD_<topic>
 
-## 变更背景 / 目标
-## 具体变更内容
-## Docs root
-## Intake impact
-## Feature impact
-## Requirements impact
-## Specs impact
-## Decision impact
-## Lessons impact
-## Related intake
-## Related features
-## Related requirements
-## Related specs
-## Related decisions
-## Related lessons
-## 对应 plan.md 任务映射
-## 经验 / 教训摘要
-## 可复用排查线索
-## 关键设计决策与权衡
-## 测试与验证方式 / 结果
-## 验收项 / Task ID / 证据与未验证事项
-## Requirements / Standards 审查结论与有效性
-## 潜在影响
-## 回滚方案
-## 子Agent执行轨迹
+## Result
+- Goal, completed Task IDs, behavior changes and deviations from plan:
+- Durable plan link / docs root:
+- Material decisions, impact and rollback:
+
+## Evidence
+- Durable authoritative acceptance/review record:
+- Validation summary, Requirements / Standards verdicts, candidate/plan identity reference:
+- Unverified or waived items, authority and residual risks:
+
+## Documentation
+- Changed categories and related paths / index updates:
+- Unaffected categories: <explicit category names>: none
+- Lessons: <link, or none with reason>
+- Sub-agent trace: <only if delegated; durable trace link is sufficient>
+
+## Closeout
+- Per-repo commit / merge / cleanup status:
+- Remaining local state, unpushed changes and unresolved items:
 ```
 
 ## docs/lessons Skeleton

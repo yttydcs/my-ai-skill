@@ -36,6 +36,8 @@ Use this reference for `$m-plan`, the architecture and execution-planning phase 
 
 ## Required Plan Contents
 
+For bounded work, use the compact plan in `../../m-autoflow/references/templates.md`. The requirements below are information requirements, not mandatory separate headings: combine related fields, record shared risk/rollback once, and link confirmed source material. Expand architecture alternatives, cross-repo dependencies and delegation packages only when relevant. Keep the parallelism decision and every material acceptance constraint; never invent extra tasks to populate the template.
+
 - workflow goal and current state
 - discussion summary or a note that discussion was skipped / not needed
 - repo, branch, base, project root, docs root, code repos, worktree absolute path, and phase

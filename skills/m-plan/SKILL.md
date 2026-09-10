@@ -11,6 +11,8 @@ Use this skill to convert a coherent requirement into an executable architecture
 
 ## Quick Start
 
+- Apply `../m-autoflow/references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
+
 - Read `references/planning.md`.
 - If invoking as part of the full workflow, keep `$m-autoflow` as the umbrella context and use this skill after `$m-discuss`.
 - Do not perform broad discovery here. If the requirement is unclear, unreasonable, or needs current external research, return to `$m-discuss`.
@@ -38,7 +40,7 @@ Use this skill to convert a coherent requirement into an executable architecture
    - record solution, alternatives, module responsibilities, data/call flow, interfaces, errors, safety, performance, tests, and extension points
 7. Explicitly use `$m-docs` before confirming the plan.
 8. Create or confirm root `plan.md` or `todo.md` in the active worktree. Include docs root, code repos, task IDs, file/module scope, acceptance, tests, rollback points, dependencies, risks, and parallelism notes. Apply the acceptance map and behavior-slice rules in `references/planning.md`; preserve exact constraints from the discussion brief.
-9. Explicitly separate tasks that will be executed after approval from tasks that will not be executed in the next execution phase. Every known task must appear in exactly one section, with the reason for any deferred, blocked, out-of-scope, or research-only task.
+9. Explicitly separate tasks that will be executed after approval from tasks that will not be executed in the next execution phase. Every known task must appear in exactly one group (separate sections or the compact table's Scope column), with the reason for any deferred, blocked, out-of-scope, or research-only task.
 10. After drafting or confirming the plan, output a concise task summary table directly to the user. The table summarizes the active `plan.md` / `todo.md`; it does not replace the detailed plan.
 11. Link the active plan artifact with an absolute clickable path. Add a Mermaid dependency or system-flow diagram only when it makes execution order or architecture materially easier to understand.
 12. When the interactive trigger passes, invoke `$visualize:visualize` only after the exact Markdown task table is complete. Any approval control must send the exact Task IDs in a follow-up request and must not directly enter execution.
@@ -68,19 +70,6 @@ Do not enter execution
 Do not dispatch implementation sub-agents
 ```
 
-After the user confirms the plan:
-
-```md
-| Task ID | Title | Scope | Files / Modules | Acceptance / Tests | Risk / Notes |
-| --- | --- | --- | --- | --- | --- |
-| <id> | <title> | Will execute / Will not execute now | <paths/modules> | <short acceptance or test cue> | <risk or reason> |
-
-Execution scope after approval:
-- Will execute: <Task IDs>
-- Will not execute now: <Task IDs and reasons>
-
-Blocked: no
-Enter execution
-```
+After confirmation, report `Blocked: no`, the approved Task IDs and the plan link, then enter execution within that authorization. Reprint the task table only when scope changed or its prior presentation is unavailable.
 
 Do not edit business logic, runtime behavior, or tests before the plan is confirmed.
