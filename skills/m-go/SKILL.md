@@ -38,19 +38,19 @@ If any item is false, return to `$m-plan` or `$m-execute` with a blocker instead
 
 During `$m-go`, the main agent may schedule, package context, inspect files, run commands, review diffs, resolve coordination, synthesize validation, and accept or reject results.
 
-The main agent must not directly edit implementation files. If integration, repair, docs, plan-status, or validation-fix edits are required, dispatch a worker with a bounded Task ID and write set.
+The main agent must not directly edit implementation files. Delegate implementation, integration, repair, product documentation and validation-fix edits to a worker with a bounded Task ID and write set. The main agent may update progress-only plan checkboxes, evidence links, observed results and orchestration notes within existing control artifacts. This exception never changes requirements, AC definitions, write sets or approval/fingerprint rules; avoid concurrent writes and preserve candidate identity freshness.
 
 ## Workflow
 
 1. Restate the approved Task IDs, write sets, acceptance criteria, and automatic test obligations.
 2. Assess parallelism by Task ID, write set, dependency order, and risk.
-3. Dispatch worker sub-agents for every implementation edit; use parallel workers for independent non-conflicting write sets.
+3. Dispatch worker sub-agents for every implementation edit; use parallel workers when independent non-conflicting work justifies the coordination cost; otherwise use one worker.
 4. Give each worker the complete context package from `references/go.md`.
 5. Review every worker result, changed file list, validation output, risks, and rollback note.
 6. Reject or re-dispatch any result that drifts from the plan, touches forbidden files, or leaves acceptance incomplete.
 7. Run lightweight validation and separate requirements/standards review of the integrated result; retain AC/Task evidence and candidate/plan identity under the shared review contract.
 8. Automatically run `$m-test` behavior using `../m-test/references/testing.md`.
-9. If validation fails, delegate bounded fixes and repeat validation.
+9. If validation fails, delegate bounded fixes and repeat affected validation, applying the convergence rule linked from `references/go.md`.
 10. Stop only when all acceptance checks pass, the user changes direction, or a blocker is explicit.
 
 ## Exit Gate

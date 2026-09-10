@@ -27,6 +27,7 @@ Use sub-agents only when:
 - the delegated Task ID is bounded
 - write sets do not conflict
 - context can be packaged completely
+- the delegation benefit assessment in `../../m-autoflow/references/subagents.md` justifies coordination cost
 - host policy and user authorization allow it
 
 If sub-agents are skipped, state the concrete reason.
@@ -55,6 +56,8 @@ Run cheap, local checks in this phase when practical. For multi-repository work,
 Use the plan's observation boundaries and independent expected results. For a bug fix, normally reproduce the failure before fixing it; for important new behavior, prefer small test/implementation/validation cycles. Do not add tests that restate the implementation, or force TDD for every reversible low-impact edit.
 
 Record evidence against AC IDs and Task IDs; an already approved plan may use its existing acceptance labels. Record skipped checks with reasons and residual risk. Reserve heavy integration, end-to-end, usability, security, and performance review for `$m-test`.
+
+For UI changes, apply the UI risk levels in `../../m-test/references/testing.md`. Local presentation changes may complete with focused operation and screenshot evidence here; UI presence alone does not require heavy testing. Block missing required evidence rather than treating an unavailable environment as a pass.
 
 ## Lightweight Review
 

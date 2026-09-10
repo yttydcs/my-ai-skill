@@ -200,7 +200,7 @@ If any item fails, return to `3.2`.
 
 In `$m-go` flows, failed review or test items return to delegated fixes, then the review loop runs again until all acceptance checks pass or a blocker is explicit.
 
-In `$m-continue` flows, one invocation authorizes every iteration inside the existing approved Task IDs and write sets. Any measurable Task, diff, validation, or evidence improvement resets the non-progress count. Stop only after acceptance converges, a hard out-of-scope/external blocker is proven, or three complete repair/test cycles repeat the same failure signature without measurable progress. `$m-continue` stops before archive and reports readiness for `$m-archive` on success.
+In `$m-continue` flows, one invocation authorizes every iteration inside the existing approved Task IDs and write sets. Apply `../../m-continue/references/continue.md` for evidence-based progress, oscillation detection and the three-cycle non-progress stop; a diff or changed error signature alone is not progress. `$m-go` reuses that convergence rule while retaining worker-only implementation. `$m-continue` stops before archive and reports readiness for `$m-archive` on success.
 
 ## Stage 4 - Change Archive
 

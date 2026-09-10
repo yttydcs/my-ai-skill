@@ -19,7 +19,7 @@ Use this reference for `$m-go`, the delegated execution and automatic test-loop 
 - Do not silently swallow worker failures, validation gaps, or unavailable tooling.
 - Do not fabricate `$m-test` success.
 - Do not allow the main agent to directly edit implementation files during `$m-go`.
-- If an edit is needed after review, delegate that edit to a worker with a bounded write set.
+- If an implementation or product-documentation edit is needed after review, delegate it to a worker with a bounded write set. Progress-only control updates follow the main-agent exception in `../SKILL.md`; they do not require a worker.
 - If the user wants to skip heavy validation, route to `$m-execute` plus explicit `$m-test` skip handling instead of using normal `$m-go`.
 
 ## Main Agent Responsibilities
@@ -52,10 +52,11 @@ Use parallel workers when all are true:
 - two or more Task IDs are independently acceptable
 - write sets do not conflict
 - context packages can be complete
+- the independent work justifies added context and coordination under `../../m-autoflow/references/subagents.md`
 - host policy permits delegation
 - user authorization exists through `$m-go` invocation or another explicit statement
 
-When only one Task ID can execute, dispatch one worker. Do not fall back to main-agent implementation.
+When only one Task ID can execute or parallelism adds no benefit, dispatch one worker and sequence approved tasks as needed. Do not fall back to main-agent implementation.
 
 ## Required Worker Context Package
 
@@ -112,12 +113,12 @@ If integration itself needs file edits, dispatch an integration worker with a na
 After delegated implementation converges:
 
 1. Run lightweight implementation checks when practical.
-2. Run `$m-test` behavior using `../m-test/references/testing.md`.
+2. Run `$m-test` behavior using `../../m-test/references/testing.md`.
 3. Produce the direct `$m-test` result table.
 4. If every check passes, report that the workflow may proceed to `$m-archive`.
 5. If any item fails, map each failure to a Task ID or create a planning blocker.
 6. Delegate bounded fixes for mapped failures.
-7. Repeat validation until checks pass or a blocker is explicit.
+7. Repeat only affected validation until checks pass or a blocker is explicit. Apply `../../m-autoflow/references/loop-progress.md` to complete worker repair/test cycles; reuse that convergence rule without invoking `$m-continue` or changing worker-only implementation authority.
 
 ## Blocking Conditions
 

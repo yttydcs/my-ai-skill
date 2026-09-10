@@ -23,7 +23,7 @@ Skip this phase when all are true:
 Do not skip this phase when any are true:
 
 - the change affects end-to-end user workflows
-- the change affects UI and the user did not explicitly choose to skip `$m-test`
+- UI changes affect routes, shared/global layout, critical interaction, permissions, persisted state, or other behavior beyond a bounded local presentation change
 - the change crosses frontend/backend/service boundaries
 - permissions, authentication, authorization, secrets, storage, billing, or data exposure are affected
 - performance-sensitive paths, large data, concurrency, background jobs, or external APIs are affected
@@ -41,6 +41,20 @@ If the user explicitly chooses to skip `$m-test`, do not run its heavy checks. P
 - If a heavy test cannot run, record why and describe residual risk.
 - Report repository-specific evidence plus the aggregate verdict when failures or skips differ between participating repositories.
 - Attach results to the plan's AC IDs and Task IDs. Recheck only evidence affected by code, dependency, source or acceptance changes; preserve current results with their identity instead of rerunning them at each stage.
+
+## Performance Check Boundaries
+
+Before an expensive run, record the affected operation, dataset/workload, environment, correctness checks, metric/threshold and stop condition in the existing evidence record. Use confirmed requirements or a measured baseline; do not invent a product target. Start with a smoke sample, then scale only when the acceptance or observed bottleneck requires it. Reuse comparable runs, retain job/checkpoint IDs, and use bounded waits or state-change results. If credentials or infrastructure prevent a meaningful run, record the blocker instead of repeatedly restarting the experiment. Never weaken the threshold to claim a pass.
+
+## UI Risk Levels
+
+Use this classification in execute, quick and test; classify by affected behavior, not file extension or line count.
+
+- **Local presentation**: bounded text, spacing, color or isolated component styling with unchanged interaction, routes, data contracts and shared layout. Execute/quick may validate the affected real page, preview or story, exercise the relevant operation/state, inspect legibility/focus/overflow where affected, and capture a representative screenshot. Check mobile when responsive behavior may change. With this evidence and current lightweight review, record a justified heavy-test skip.
+- **Workflow or shared behavior**: routing, forms, state transitions, shared design-system/global CSS changes, cross-layer data flow or critical user journeys require the relevant heavy checks. Include keyboard/accessibility, loading/error/recovery and viewport states where affected, rather than replaying unrelated journeys.
+- **High impact**: authentication, permissions, destructive operations, billing, data exposure, concurrency and performance-sensitive paths require their applicable integration/security/performance evidence, even for a tiny visual diff.
+
+If the changed surface cannot be exercised, required visual/interaction evidence stays blocked. An existing representative preview/story is acceptable when it covers the actual acceptance boundary; a synthetic mock that omits affected integration is not. Reuse current screenshots and operation evidence under `../../m-autoflow/references/review.md` instead of recapturing unchanged states at phase boundaries. Explicit user skips retain their existing waiver and residual-risk rules.
 
 ## UI Validation Evidence
 

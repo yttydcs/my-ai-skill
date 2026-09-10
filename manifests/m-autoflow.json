@@ -23,6 +23,7 @@
     "references/subagents.md",
     "references/templates.md",
     "references/review.md",
-    "references/context-budget.md"
+    "references/context-budget.md",
+    "references/loop-progress.md"
   ]
 }

@@ -66,17 +66,20 @@ class MContinueContractTests(unittest.TestCase):
             with self.subTest(contract=contract):
                 self.assertIn(contract, combined)
 
-    def test_non_progress_requires_same_signature_and_no_improvement(self):
-        required_contracts = (
-            "same normalized failure signature",
-            "no measurable Task, diff, validation, or evidence improvement",
-            "three consecutive complete cycles",
-            "Any measurable improvement resets",
-            "Do not impose a separate small total-iteration limit",
+    def test_loop_progress_reference_is_packaged_for_both_consumers(self):
+        reference = "../../m-autoflow/references/loop-progress.md"
+        shared_path = REPO_ROOT / "skills/m-autoflow/references/loop-progress.md"
+        manifest = json.loads(
+            (REPO_ROOT / "manifests/m-autoflow.json").read_text(encoding="utf-8")
         )
-        for contract in required_contracts:
-            with self.subTest(contract=contract):
-                self.assertIn(contract, self.rules_text)
+        self.assertIn("references/loop-progress.md", manifest["reference_files"])
+        for name in ("m-continue", "m-go"):
+            folder = REPO_ROOT / "skills" / name / "references"
+            rules = folder / ("continue.md" if name == "m-continue" else "go.md")
+            with self.subTest(skill=name):
+                self.assertIn(f"`{reference}`", rules.read_text(encoding="utf-8"))
+                self.assertEqual((folder / reference).resolve(), shared_path.resolve())
+                self.assertTrue(shared_path.is_file())
 
     def test_terminal_boundaries_preserve_scope_and_archive_ownership(self):
         required_contracts = (

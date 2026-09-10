@@ -10,7 +10,7 @@ Use this file only in stages `3.2` and `3.3`.
 - `$m-go` is a strict delegated execution entry for stages `3.2` and `3.3`: implementation edits must be done by worker sub-agents, while the main agent coordinates and audits.
 - `$m-continue` preserves the delegation policy of the `$m-execute` and `$m-test` behavior it applies. Invoking `$m-continue` authorizes repeated in-scope iterations, not mandatory sub-agent use.
 
-## Mandatory Parallelism Assessment
+## Delegation Benefit Assessment
 
 On entry to `3.2` or `3.3`, assess whether:
 
@@ -19,10 +19,11 @@ On entry to `3.2` or `3.3`, assess whether:
 - implementation, tests, review, or verification can run in parallel
 - there is non-critical validation work that can proceed independently
 
-If host policy permits delegation, user authorization exists when required, and any of those conditions are true, the main agent must create sub-agents unless a concrete write-set or coupling conflict makes delegation unsafe.
+Parallelizable work is a candidate for delegation, not a requirement to delegate. For normal execute/test work, use the main agent when a bounded task can be completed and checked with less context transfer and coordination. Delegate when independent work is substantial enough to reduce elapsed work, or independent investigation/review materially reduces a concrete risk. Record the decision in one sentence; reuse it until task boundaries, risk or dependencies change. Start with the smallest useful number of workers, usually one or two; add lanes only for a demonstrated benefit. Explicit user-selected delegation or team/pipeline roles take precedence.
 
 If sub-agents are not used, state why, such as:
 
+- small task or coordination/context cost exceeds the benefit
 - write-set conflict
 - unsafe coupling
 - insufficient context separation
@@ -32,7 +33,7 @@ For `$m-discuss` research, assess whether the research can be split into indepen
 
 For `$m-go`, do not skip sub-agents for implementation edits. If delegation is unavailable or unsafe, block `$m-go` instead of falling back to main-agent implementation.
 
-For `$m-continue`, reassess parallelism when returning to execution or review, but do not infer `$m-go` worker-only authorization. Continue directly when delegation is not authorized and the applied `$m-execute` or `$m-test` rules permit main-agent work.
+For `$m-continue`, reuse the last assessment unless task boundaries, risk or dependencies changed, but do not infer `$m-go` worker-only authorization. Continue directly when delegation is not authorized and the applied `$m-execute` or `$m-test` rules permit main-agent work.
 
 ## Hard Preconditions
 
@@ -75,8 +76,8 @@ For `$m-go`, if integration requires file edits, those edits must be delegated t
 
 ## Inheritance Rule
 
-- Sub-agents must inherit the main agent's model and reasoning configuration.
-- Do not manually downgrade or override them unless the host platform requires an exact inherited value.
+- Respect explicit user model/reasoning choices and configured role requirements. Otherwise use the host's configured worker defaults; matching the main agent's model and highest reasoning level is not a skill requirement.
+- Where the host permits task-specific selection, choose capability proportional to the delegated task and concrete uncertainty; raise it when observed failures justify doing so. Do not alter account/global settings or invent unsupported model parameters. Omit overrides when selection is unavailable.
 
 ## Required Context Package
 

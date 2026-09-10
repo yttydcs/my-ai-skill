@@ -91,7 +91,7 @@ Run the fastest checks that directly exercise the change:
 - a narrow runtime smoke test
 - `git diff --check` when Git is available
 
-For UI-impacting changes:
+For UI-impacting changes, apply the UI risk levels in `../../m-test/references/testing.md`. Only bounded local presentation work with a focused validation path stays in quick; workflow/shared/high-impact changes escalate under the existing gate. Reuse current representative evidence rather than setting up unrelated integration checks:
 
 - start or open the actual affected application, page, preview, or story
 - operate the affected user path rather than checking only initial render

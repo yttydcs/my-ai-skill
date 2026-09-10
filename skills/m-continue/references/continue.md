@@ -47,39 +47,9 @@ A complete cycle consists of:
 
 When the recovered state is `validation-needed`, the first test may establish the initial signature without a preceding repair. Count non-progress only after a subsequent complete repair/test cycle has had a real opportunity to improve that signature.
 
-## Failure Signature
+## Progress and Non-progress
 
-Normalize the unresolved result using stable identifiers where available:
-
-- failing Task IDs and acceptance-criterion IDs
-- failing test/check names and command names
-- blocker category and relevant error class
-- missing evidence category, such as UI operation or screenshot evidence
-
-Ignore volatile timestamps, temporary paths, random IDs, and harmless output ordering. Preserve enough detail to distinguish a changed failure from the same failure recurring.
-
-## Progress Evidence
-
-Compare at least:
-
-- newly completed approved Task IDs or acceptance criteria
-- an in-scope diff that directly addresses a failing item
-- fewer failing checks or a lower-severity failure
-- new valid validation or UI evidence
-- removal of a blocker prerequisite within existing authority
-
-Any measurable improvement resets the consecutive non-progress count to zero, even when the overall cycle still fails. A changed failure signature also resets the count because the workflow reached a new state.
-
-## Non-progress Rule
-
-Increment the consecutive non-progress count only when a complete repair/test cycle produces:
-
-- the same normalized failure signature as the prior comparable cycle, and
-- no measurable Task, diff, validation, or evidence improvement
-
-Stop as a non-progress loop after **three consecutive complete cycles** meet both conditions. Do not impose a separate small total-iteration limit. Report the repeated signature, the three attempted cycles, why each lacked progress, and the safest required handoff.
-
-Do not run empty or cosmetic edits merely to reset the counter. They are not progress.
+Apply `../../m-autoflow/references/loop-progress.md` for normalized signatures, comparable evidence, oscillation detection and the stop after three consecutive complete cycles without new durable progress. A changed signature or attempted diff alone is not progress. Retain cycle history in the existing result record.
 
 ## Hard Blockers
 
@@ -117,5 +87,5 @@ Include:
 - Task IDs and changed files by iteration
 - validation results and evidence
 - final progress vector
-- `Passed` with archive readiness, or `Blocked` with the repeated signature/hard blocker and required handoff
+- `Passed` with archive readiness, or `Blocked` with the non-progress signature history/hard blocker and required handoff
 - risks and rollback notes

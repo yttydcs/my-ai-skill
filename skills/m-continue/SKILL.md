@@ -57,7 +57,7 @@ Report:
 - terminal status: `Passed` or `Blocked`
 - Task IDs and iterations executed
 - final test result or justified skip
-- progress evidence or repeated failure signature
+- progress evidence or non-progress signature history
 - remaining risks and rollback notes
 - decision: ready for `$m-archive`, or exact blocker and required handoff
 
