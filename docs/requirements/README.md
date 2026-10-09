@@ -52,6 +52,8 @@ Store long-lived capability intent, boundaries, scenarios, and acceptance criter
 
 ## Current Docs
 
+- [m-memory-migrate.md](m-memory-migrate.md) - source integrity, resumability and migration boundaries
+
 - [m-context-skill.md](m-context-skill.md)
 - [m-docs-skill.md](m-docs-skill.md)
 - [m-autoflow-skill.md](m-autoflow-skill.md)

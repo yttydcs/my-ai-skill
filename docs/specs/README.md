@@ -48,6 +48,8 @@ Store technical contracts, integration rules, architecture constraints, and work
 
 ## Current Docs
 
+- [m-memory-migrate.md](m-memory-migrate.md) - manifest, journal and current-source verification protocol
+
 - [m-context-skill.md](m-context-skill.md)
 - [m-docs-skill.md](m-docs-skill.md)
 - [m-autoflow-skill.md](m-autoflow-skill.md)

@@ -1,0 +1,8 @@
+{
+  "name": "m-memory-migrate",
+  "version": "0.1.0",
+  "install_mode": "copy",
+  "source_dir": "skills/m-memory-migrate",
+  "dist_dir": "dist/codex/m-memory-migrate",
+  "codex_install_root": "%USERPROFILE%/.codex/skills"
+}

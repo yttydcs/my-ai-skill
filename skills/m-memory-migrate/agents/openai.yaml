@@ -1,0 +1,4 @@
+interface:
+  display_name: "Memory Migration"
+  short_description: "Preview, migrate and verify selected project knowledge"
+  default_prompt: "Use $m-memory-migrate to preview and migrate this project's selected documents into its chosen memory library."
