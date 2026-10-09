@@ -14,6 +14,10 @@ The local/global scoped behavior is implemented and active.
 
 ## Scope
 
+### Explicit service mode
+
+The project may select an Agent Memory binding instead of files. Context libraries map local/global explicitly; auto selects the configured local scope, otherwise global, and never falls through after missing context or service errors. Exact-name reads and Markdown section extraction remain available. Discovery is bounded and reports continuation rather than silently claiming completeness. Saves use object CAS, and no local copy is created. Existing contexts, especially credentials, are not migrated automatically. The file roots and fallback rules below apply only without a service binding.
+
 ### Must
 
 - provide a discoverable `$m-context` skill

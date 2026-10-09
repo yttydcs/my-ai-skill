@@ -2,6 +2,8 @@
 
 Use this reference for `$m-archive`, the archive phase of `m-autoflow`.
 
+For an explicitly service-bound project, apply `../../m-memory/references/m-archive.md` before the file-specific instructions below. Changed durable facts live in selected service objects, not a local docs/change mirror. Plan/todo and routine validation traces stay local; do not archive their bodies to memory during worktree cleanup. Keep needed local evidence outside a worktree before removing it. Zero durable change permits zero memory commits; failures or uncertain commits must be resolved before closeout. Git authorization and evidence requirements remain unchanged.
+
 ## Required Archive Content
 
 Create `docs/change/YYYY-MM-DD_topic.md` in the selected docs root. Use the compact archive in `../../m-autoflow/references/templates.md` by default. The following are coverage requirements, not mandatory separate headings: group unaffected categories in one explicit `none` statement; link durable plan/evidence instead of copying them. Include lesson details only when reusable knowledge exists, and sub-agent trace only when delegation occurred. Record why no lesson is needed in the impact summary.

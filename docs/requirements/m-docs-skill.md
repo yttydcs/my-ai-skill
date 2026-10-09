@@ -6,6 +6,10 @@ This repository needs a reusable documentation-governance skill named `m-docs` t
 
 ## Goal
 
+### Selected Agent Memory authority
+
+A project may explicitly select an Agent Memory binding instead of a filesystem docs root. In that mode the selected libraries are the sole authority for durable requirements, specs, facts and editable summaries. The file-specific obligations below apply to unbound/file-backed projects. Preserve category and stable-document impact checks in either mode; service mode uses object metadata and bounded retrieval instead of creating a docs tree or local mirror. An unavailable service fails explicitly. Local plan/todo and execution traces are not uploaded or summarized into memory. A fix that restores existing behavior does not revise unchanged requirements; no durable change permits zero writes. Related source/summary changes use CAS, and archive coordination uses a fenced lease without bypassing CAS. Project choice persists across phases and worktrees; no implicit migration or all-library lookup.
+
 Provide a reusable skill that routes documentation into the correct category, supports private docs roots outside pushable code repositories, keeps feature-level truth complete, and keeps recurring troubleshooting knowledge directly discoverable.
 
 ## Documentation Boundary Goal

@@ -1,0 +1,13 @@
+# m-docs with Agent Memory
+
+Keep m-docs' distinction among intake, feature truth, requirements, specs, decisions, change records and lessons. Represent stable logical documents as source objects with durable IDs and category metadata in the user-selected project library. A current feature or requirement document is updated in place with its expected revision; a fix does not create a new full requirement unless behavior changed.
+
+At task entry, query the chosen current requirement/spec objects with an explicit method and budget. Read complete sections only after identifying a relevant object. Do not load all fix records or archives into context. Use trace or history only when the source of a claim or a previous revision matters.
+
+When a durable requirement needs a navigable origin, store an explicit typed `references` entry to the selected source revision in the same CAS commit. Keep required summary `dependencies` separate: navigation targets can change without invalidating the requirement or summary. Use the bounded `/references` endpoint, with selected libraries and direction, to answer provenance questions; follow with an object/history read only for the evidence needed. Do not append every implementation fix to the requirement's references. See [retrieval](retrieval.md) for the version and truncation contract.
+
+At a stable documentation change, perform the existing impact classification before committing. Submit changed source objects and any summary objects together where feasible. A no-op impact check produces no knowledge write. New facts that only exist in the Agent's session need a durable source object before they can support a formal summary. Do not copy local plans into the service.
+
+For atomic source and summary updates, order operations by dependency: source first, then its summary, then any summary of that summary. Include every existing object's `expected_revision` from the read that informed the edit. A dependency may omit `source_revision` only when its explicit same-library target was created or successfully CAS-checked by an earlier patch/restore in this commit (including a verified no-op). Navigation `target_revision` follows the same rule. The service binds the resolved revision atomically; untouched, later, deleted and cross-library targets require explicit revisions. Omission never means “whatever is current.” If the source changes without a refreshed summary, leave the old summary stale; do not label it current or fabricate a refresh.
+
+Until a project explicitly switches its docs root, existing local m-docs rules still apply. The adapter must not silently mirror or delete those files.

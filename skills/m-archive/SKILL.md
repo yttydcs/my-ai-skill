@@ -13,6 +13,8 @@ Invoking `$m-archive` means "archive and end this workflow". Stop after archive 
 
 ## Quick Start
 
+- Resolve the same storage authority used during execution. For a project bound to Agent Memory, apply `../m-memory/references/m-archive.md` and `references/workflow.md` in that companion skill. Service objects replace docs/change files and file indexes; do not upload local plans or write a record merely because a phase ended. A no-durable-change closeout may have zero knowledge writes. Use a fenced lease plus CAS for actual archive commits; record any receipt in local workflow state. Remaining acceptance and authorized Git closeout rules still apply. The file archive rules below apply to file-backed projects.
+
 - Apply `../m-autoflow/references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
 
 - Read `references/archive.md`.

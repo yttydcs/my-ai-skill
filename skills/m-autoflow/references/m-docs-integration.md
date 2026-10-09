@@ -2,6 +2,10 @@
 
 Use this file whenever the workflow touches planning, intake, features, requirements, specs, decisions, change archives, lessons, docs roots, or docs indexes.
 
+## Storage authority
+
+Resolve the project's explicit Agent Memory binding before applying file paths below. A binding declared in AGENTS or project-scoped M_MEMORY_BINDING selects `../../m-memory/SKILL.md` and its relevant adapter. Record the binding path and library IDs once in local workflow state and carry them across worktrees; never infer a library from a directory name. With that authority, current specs/requirements and durable archive facts are service objects, and the category/impact checks below still apply. File bootstrap, README indexes and docs/plan archival do not apply: local plan/todo, execution traces and routine tests remain local and are not summarized into memory. Commit only actual durable changes at phase boundaries. No service connection means an explicit memory failure, not permission to read/write old docs. Without a binding, the existing file workflow remains in force.
+
 ## Explicit Invocation Rule
 
 Invocation means applying `$m-docs`, not reloading its unchanged instructions on every phase. Reuse confirmed routing and still-current source content under `context-budget.md`; reassess affected categories against the current change. Required impact fields may share one table or sentence (for example, `Intake / Requirements / Specs / Decisions: none`) as long as every category has an explicit disposition. Write searchable lesson cues only when a lesson is needed.

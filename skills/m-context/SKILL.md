@@ -1,6 +1,6 @@
 ---
 name: m-context
-description: Load reusable plaintext Agent context from project-local and user-global Markdown stores. Use when the user invokes $m-context, asks to reuse saved environment or operational details, selects local or global scope, wants to list or find saved contexts, requests one Markdown section, or combines context with another skill such as `$m-test $m-context nas配置`. Contexts may contain passwords, tokens, private keys, and other secrets that the Agent is explicitly allowed to read and use.
+description: Load named Agent context from explicitly selected local/global files or Agent Memory libraries, including section reads, discovery and context-first skill composition. Use for $m-context or reuse of saved environment details. Selected plaintext secrets may be read and used by the Agent.
 ---
 
 # m:context
@@ -10,6 +10,8 @@ description: Load reusable plaintext Agent context from project-local and user-g
 Load named Markdown as user-provided task context. Project-local contexts live under the active docs root; user-global contexts remain outside this skill package. Both may contain plaintext secrets.
 
 ## Quick Start
+
+- If the project declares an Agent Memory binding, read `../m-memory/references/binding.md` and `../m-memory/references/m-context.md`. Pass `--memory-binding <path>` to this skill's loader (or project-scoped `M_MEMORY_BINDING`), without `--docs-root`. The binding's context_libraries selects local/global; auto uses local if configured, otherwise global, with no missing/error fallback. This branch replaces the file-root and create/update steps below. Saves use the selected service object's CAS commit; plans remain local. Existing file contexts are not imported. Without a binding, retain the file behavior below.
 
 - Read `references/context-format.md` before creating or updating a context.
 - Run `scripts/context_loader.py` for deterministic root resolution, discovery, and loading.

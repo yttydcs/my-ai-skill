@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Memory"
+  short_description: "Read and update explicitly selected private memory libraries"
+  default_prompt: "Use $m-memory with the project's selected binding to retrieve or update durable knowledge."

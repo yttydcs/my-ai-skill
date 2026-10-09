@@ -1,0 +1,7 @@
+# m-archive with Agent Memory
+
+Keep m-archive's closeout and acceptance checks. The memory write happens after the durable effect is known: compare the final feature, requirement, spec and decision state to their current service objects, then commit only the actual changes. Archive/change facts may be separate source objects when they are useful evidence, but routine readers should retrieve current requirements and summaries first.
+
+For concurrent archival edits, acquire a library-scoped fenced lease for the selected archive resource and re-read the relevant object revisions under the lease. Every protected commit must include `lease_guard: {"name": "<resource>", "token": "<returned token>", "fence": <returned integer>}`, as well as expected revisions and an idempotency key. Acquiring a lease alone does not guard an unannotated commit. Release after the durable write. If the lease expires, its old token cannot authorize renewal or a new protected write; reacquire and recheck revisions. A retry of an already successful idempotent commit may return its existing receipt after expiry: that confirms the earlier write, not a fresh mutation. Never remove the guard to work around a rejected lease. The skill decides what an archive resource means and whether closeout succeeded; the service only provides the lock primitive.
+
+Do not write each execution step or local plan to memory. If no durable knowledge changed, perform no knowledge commit. Existing local archives are not bulk migrated before the benchmark.

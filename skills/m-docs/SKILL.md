@@ -11,6 +11,8 @@ Use this skill to treat project documentation as a governed system with private 
 
 ## Quick Start
 
+- Resolve storage authority before file routing: when project AGENTS or the current project environment declares an Agent Memory binding, use `../m-memory/SKILL.md` and its `references/m-docs.md`. That service is the sole authority for governed knowledge; the filesystem paths, bootstrap and file-index rules below apply only to file-backed projects. Keep active plan/todo local, do not mirror service objects into docs, and do not fall back after a service failure. No binding means the existing file workflow. User/project selection persists across phases without repeated confirmation.
+
 - Apply `../m-autoflow/references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
 
 - For docs tree creation or repair, run `scripts/bootstrap_docs_tree.py` and review the generated `README.md` files.

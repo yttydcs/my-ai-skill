@@ -14,6 +14,8 @@ The skill is packaged as `skills/m-docs` and keeps the routing logic in small re
 
 ## Workflow Contract
 
+The service branch is selected before file routing by project-declared binding or project-scoped `M_MEMORY_BINDING`. Apply the [m-memory binding contract](../../skills/m-memory/references/binding.md) and phase adapter. The filesystem instructions below apply only when file authority is selected. `memory_client.py` is a standalone Python standard-library client with explicit read libraries, write target, source scope, versioned search index/method and response budget. It does not run models, refresh summaries or retry automatically. Source/derived objects keep stable IDs and category metadata; references are provenance navigation, dependencies enforce summary validity. CAS updates preserve manually edited summaries. The original file workflow remains available to unbound projects. Installation includes the companion m-memory package with the participating m-* skills.
+
 - The skill must classify the request before writing docs.
 - The skill must identify the active `docs_root` before writing governed docs.
 - The skill must read `docs/README.md` and the nearest category README before editing leaf docs when those indexes exist.

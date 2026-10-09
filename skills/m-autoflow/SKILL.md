@@ -11,6 +11,8 @@ Use this skill as the umbrella entry for the `m-*` workflow collection. It route
 
 ## Quick Start
 
+- Resolve the project's documentation authority once through `references/m-docs-integration.md`. A declared Agent Memory binding carries through all phases; use its selected libraries and write boundaries, keeping plan/todo local. Unbound projects retain file-backed docs.
+
 - Apply `references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
 
 - Invoke `$m-autoflow` when the user wants the full workflow.

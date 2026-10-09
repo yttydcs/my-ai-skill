@@ -28,6 +28,10 @@ skills/m-context/
 
 ## Context Root Resolution
 
+### Service selection precedes file resolution
+
+`--memory-binding` or project-scoped `M_MEMORY_BINDING` selects the companion m-memory client; combining it with `--docs-root` is an error. See [binding contract](../../skills/m-memory/references/binding.md). Scope mapping chooses a selected read library, with no filesystem fallback. Context source IDs are UUIDv5 of the library UUID and `m-context:<exact_name>`; title/category/name metadata must agree on load. Sections reuse the existing Markdown parser. Metadata discovery reads one bounded page and reports the next offset; normal loads fetch one selected context, not all context bodies. Errors leave stdout empty. Save/update is a generic explicit CAS commit; it does not automatically write loaded information. File-root rules below remain unchanged in file mode.
+
 ### Local Root
 
 - Accept `docs_root` explicitly from the Agent or active workflow.

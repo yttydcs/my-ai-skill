@@ -17,6 +17,7 @@ Use this skill to convert a coherent requirement into an executable architecture
 - If invoking as part of the full workflow, keep `$m-autoflow` as the umbrella context and use this skill after `$m-discuss`.
 - Do not perform broad discovery here. If the requirement is unclear, unreasonable, or needs current external research, return to `$m-discuss`.
 - When private docs are expected, identify `project_root`, `docs_root`, `code_repos`, and `active_worktree` before planning writes stable docs.
+- A project-declared Agent Memory binding replaces docs_root as the governed knowledge authority; apply `../m-autoflow/references/m-docs-integration.md`. Keep plan/todo local and retrieve relevant current service requirements/specs before planning. Do not bootstrap docs or upload the execution plan in service mode.
 - Read `../m-autoflow/references/output-components.md` before presenting the plan result.
 - Read `../m-autoflow/references/interactive-output-patterns.md` when Task ID review or an approval follow-up may materially benefit from official inline interaction.
 - Read the original canonical references only when needed:

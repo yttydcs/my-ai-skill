@@ -5,13 +5,13 @@ from __future__ import annotations
 
 import argparse
 import difflib
-from enum import Enum
 import os
-from pathlib import Path
 import re
 import sys
-from typing import Mapping, NamedTuple, Sequence
-
+from collections.abc import Mapping, Sequence
+from enum import Enum
+from pathlib import Path
+from typing import NamedTuple
 
 HEADING_RE = re.compile(r"^(#{1,6})[ \t]+(.+?)[ \t]*$")
 FENCE_RE = re.compile(r"^[ ]{0,3}(`{3,}|~{3,})")
@@ -92,7 +92,9 @@ def parse_context_scope(scope: ContextScope | str) -> ContextScope:
         return ContextScope(scope.strip().casefold())
     except (AttributeError, ValueError) as exc:
         allowed = ", ".join(item.value for item in ContextScope)
-        raise ContextError(f"Invalid context scope {scope!r}; expected one of: {allowed}.") from exc
+        raise ContextError(
+            f"Invalid context scope {scope!r}; expected one of: {allowed}."
+        ) from exc
 
 
 def _require_root(root: Path) -> Path:
@@ -100,7 +102,9 @@ def _require_root(root: Path) -> Path:
         resolved = root.resolve(strict=True)
     except FileNotFoundError as exc:
         if os.path.lexists(root):
-            raise ContextError(f"Cannot resolve existing context root {root}: {exc}") from exc
+            raise ContextError(
+                f"Cannot resolve existing context root {root}: {exc}"
+            ) from exc
         raise ContextNotFoundError(
             f"Context root does not exist: {root}. Create it or configure the intended scope."
         ) from exc
@@ -119,7 +123,9 @@ def validate_context_name(name: str) -> str:
     if value in {".", ".."} or "/" in value or "\\" in value or "\x00" in value:
         raise ContextError(f"Unsafe context name: {name!r}")
     if any(character in value for character in '<>:"|?*'):
-        raise ContextError(f"Context name contains a Windows-reserved character: {name!r}")
+        raise ContextError(
+            f"Context name contains a Windows-reserved character: {name!r}"
+        )
     if value != value.rstrip(" ."):
         raise ContextError(f"Context name must not end with a space or dot: {name!r}")
     if value.casefold().endswith(".md"):
@@ -127,7 +133,9 @@ def validate_context_name(name: str) -> str:
     if value.split(".", 1)[0].upper() in WINDOWS_RESERVED_NAMES:
         raise ContextError(f"Context name is reserved by Windows: {name!r}")
     if Path(value).is_absolute() or os.path.splitdrive(value)[0]:
-        raise ContextError(f"Context name must not be an absolute or drive-qualified path: {name!r}")
+        raise ContextError(
+            f"Context name must not be an absolute or drive-qualified path: {name!r}"
+        )
     return value
 
 
@@ -163,7 +171,9 @@ def resolve_context_file(root: Path, name: str) -> Path:
         raise ContextError(f"Cannot resolve context {safe_name!r}: {exc}") from exc
 
     if not _is_within(resolved, resolved_root):
-        raise ContextError(f"Context resolves outside the configured root: {safe_name!r}")
+        raise ContextError(
+            f"Context resolves outside the configured root: {safe_name!r}"
+        )
     if not resolved.is_file():
         raise ContextError(f"Context is not a regular file: {resolved}")
     return resolved
@@ -245,10 +255,14 @@ def extract_section(content: str, section: str) -> str:
     matches = [heading for heading in headings if heading[2] == wanted]
     if not matches:
         available = ", ".join(dict.fromkeys(text for _, _, text in headings)) or "none"
-        raise ContextError(f"Section not found: {wanted!r}. Available headings: {available}.")
+        raise ContextError(
+            f"Section not found: {wanted!r}. Available headings: {available}."
+        )
     if len(matches) > 1:
         locations = ", ".join(str(index + 1) for index, _, _ in matches)
-        raise ContextError(f"Section is ambiguous: {wanted!r}; matching lines: {locations}.")
+        raise ContextError(
+            f"Section is ambiguous: {wanted!r}; matching lines: {locations}."
+        )
 
     start, level, _ = matches[0]
     end = len(lines)
@@ -282,7 +296,9 @@ def _location_for_scope(
     elif scope is ContextScope.GLOBAL:
         root = _global_root(global_root)
     else:  # pragma: no cover - callers resolve auto before selecting a root
-        raise ContextError("Auto scope must be resolved before selecting a context root.")
+        raise ContextError(
+            "Auto scope must be resolved before selecting a context root."
+        )
     return ContextLocation(scope, root, resolve_context_file(root, name))
 
 
@@ -433,6 +449,91 @@ def _add_scope_arguments(
         choices.insert(0, ContextScope.AUTO.value)
     parser.add_argument("--scope", choices=choices, default=default.value)
     parser.add_argument("--docs-root")
+    parser.add_argument("--memory-binding", default=os.environ.get("M_MEMORY_BINDING"))
+    parser.add_argument(
+        "--offset", type=int, default=0, help="Service discovery page offset"
+    )
+
+
+def memory_context(args) -> int:
+    """Service selection is explicit; never fall back to a local knowledge copy."""
+    import importlib.util
+    from uuid import UUID, uuid5
+
+    script = Path(__file__).resolve().parents[2] / "m-memory/scripts/memory_client.py"
+    if not script.is_file():
+        raise ContextError(
+            "Service context requires the installed m-memory companion skill."
+        )
+    spec = importlib.util.spec_from_file_location("m_memory_client", script)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    try:
+        if args.docs_root:
+            raise ContextError(
+                "Select either --memory-binding or --docs-root, not two authorities."
+            )
+        client = module.MemoryClient(args.memory_binding)
+        scopes = client.config.get("context_libraries", {})
+        scope = args.scope
+        if scope == "auto":
+            scope = "local" if "local" in scopes else "global"
+        if scope not in scopes:
+            raise ContextError(
+                f"No service library selected for context scope {scope}."
+            )
+        library = client.library(scopes[scope])
+        if args.command == "root":
+            print(f"memory://{library}/context")
+        elif args.command == "load":
+            name = validate_context_name(args.name)
+            object_id = str(uuid5(UUID(library), "m-context:" + name))
+            result = client.read(object_id, library=library)
+            if (
+                result.get("kind") != "source"
+                or result.get("title") != "context:" + name
+                or result.get("metadata", {}).get("category") != "context"
+                or result.get("metadata", {}).get("name") != name
+            ):
+                raise ContextError("Named context identity or category mismatch.")
+            body = result["content"]
+            if args.section:
+                body = extract_section(body, args.section)
+            sys.stdout.write(body)
+            if body and not body.endswith(("\n", "\r")):
+                sys.stdout.write("\n")
+            print(
+                f"m-context: loaded {scope}:{name} from memory://{library}/{object_id} "
+                f"revision={result['revision']}",
+                file=sys.stderr,
+            )
+        else:
+            if args.offset < 0:
+                raise ContextError("Discovery offset must be nonnegative.")
+            page = client.request(
+                "GET",
+                "objects",
+                library=library,
+                params={"offset": args.offset, "limit": 100},
+            )
+            names = [
+                row["title"][8:]
+                for row in page["results"]
+                if row["kind"] == "source" and row["title"].startswith("context:")
+            ]
+            if args.command == "find":
+                names = [
+                    name for name in names if args.query.casefold() in name.casefold()
+                ]
+            print("\n".join(f"{scope}:{name}" for name in names))
+            if page.get("truncated") or page.get("next_offset") is not None:
+                print(
+                    f"m-context: partial discovery; next --offset {page.get('next_offset')}",
+                    file=sys.stderr,
+                )
+    except module.MemoryError as exc:
+        raise ContextError(str(exc)) from None
+    return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -445,14 +546,18 @@ def build_parser() -> argparse.ArgumentParser:
         allow_auto=False,
     )
 
-    list_parser = subparsers.add_parser("list", help="List exact context names and scopes.")
+    list_parser = subparsers.add_parser(
+        "list", help="List exact context names and scopes."
+    )
     _add_scope_arguments(list_parser, default=ContextScope.AUTO)
 
     find_parser = subparsers.add_parser("find", help="Find context names by substring.")
     find_parser.add_argument("query")
     _add_scope_arguments(find_parser, default=ContextScope.AUTO)
 
-    load_parser = subparsers.add_parser("load", help="Load a complete context or one section.")
+    load_parser = subparsers.add_parser(
+        "load", help="Load a complete context or one section."
+    )
     load_parser.add_argument("name")
     load_parser.add_argument("--section")
     _add_scope_arguments(load_parser, default=ContextScope.AUTO)
@@ -464,6 +569,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
+        if args.memory_binding:
+            return memory_context(args)
         if args.command == "root":
             if args.scope == ContextScope.LOCAL.value:
                 print(resolve_local_context_root(args.docs_root))

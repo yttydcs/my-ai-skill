@@ -2,7 +2,7 @@
 
 ## Status
 
-Active with project-local and user-global scopes.
+Active with project-local and user-global scopes. Projects can explicitly bind named contexts to Agent Memory libraries through `context_loader.py --memory-binding`, preserving section reads without local fallback. Select the binding once for the project; existing contexts are not automatically migrated. See [service contract](../specs/m-context-skill.md).
 
 ## Goal
 
