@@ -80,7 +80,7 @@ class MemoryClient:
                 raise MemoryError("budget_bytes must be between 256 and 65536")
             self.token_path = self.resolve_file(c["token_file"])
             self.ca_path = self.resolve_file(c["ca_file"]) if c.get("ca_file") else None
-        except (OSError, ValueError, KeyError, TypeError):
+        except (OSError, ValueError, KeyError, TypeError, AttributeError):
             raise MemoryError(
                 "invalid or unreadable memory binding; no local fallback"
             ) from None

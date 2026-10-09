@@ -270,3 +270,13 @@ def test_unsafe_origin_rejected_before_reading_credentials(service, url):
     with pytest.raises(module.MemoryError, match="HTTPS origin"):
         module.MemoryClient(path)
     assert not calls
+
+
+@pytest.mark.parametrize(
+    "value", [[], None, {"version": 1, "backend": "agent-memory", "url": 42}]
+)
+def test_malformed_binding_is_an_explicit_error(tmp_path, value):
+    path = tmp_path / "binding.json"
+    path.write_text(json.dumps(value), encoding="utf-8")
+    with pytest.raises(module.MemoryError, match="invalid or unreadable"):
+        module.MemoryClient(path)
