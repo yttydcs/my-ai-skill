@@ -78,18 +78,58 @@ def linked(path):
     )
 
 
-def inventory(root):
+def inventory(root, files=None):
     root = Path(root).resolve(strict=True)
     if not root.is_dir():
         raise MigrationError("source root must be a directory")
     entries, deferred = [], []
+
+    if files is not None:
+        if not isinstance(files, list) or not files:
+            raise MigrationError("explicit file scope must be a nonempty list")
+        seen = set()
+        for name in files:
+            if not isinstance(name, str):
+                raise MigrationError("explicit file paths must be strings")
+            relative = Path(name)
+            if (
+                relative.is_absolute()
+                or relative.drive
+                or ".." in relative.parts
+                or relative.as_posix() != name
+                or ":" in name
+            ):
+                raise MigrationError(
+                    "explicit files must use normalized root-relative paths"
+                )
+            if name.casefold() in seen:
+                raise MigrationError("duplicate explicit file")
+            seen.add(name.casefold())
+            path = root / relative
+            if (
+                not path.is_file()
+                or path.suffix.casefold() != ".md"
+                or path.name.casefold() in LOCAL_NAMES
+                or any(p.startswith(".") for p in relative.parts)
+                or any(p.casefold() in TRANSIENT for p in relative.parts[:-1])
+            ):
+                raise MigrationError("explicit file is missing or excluded")
+            cursor = path
+            while cursor != root:
+                if linked(cursor):
+                    raise MigrationError("linked source paths are excluded")
+                cursor = cursor.parent
+            entries.append(
+                {"path": name, "sha256": file_hash(path), "bytes": path.stat().st_size}
+            )
+        return sorted(entries, key=lambda x: x["path"]), deferred
 
     def walk_error(error):
         raise MigrationError(
             "source directory cannot be enumerated completely"
         ) from error
 
-    for parent, dirs, files in os.walk(root, followlinks=False, onerror=walk_error):
+    for parent, dirs, filenames in os.walk(root, followlinks=False, onerror=walk_error):
         for name in list(dirs):
             path = Path(parent) / name
             if name.startswith(".") or name.casefold() in TRANSIENT or linked(path):
@@ -100,7 +140,7 @@ def inventory(root):
                         "reason": "excluded_directory",
                     }
                 )
-        for name in files:
+        for name in filenames:
             path = Path(parent) / name
             rel = path.relative_to(root).as_posix()
             if name.startswith(".") or name.casefold() in LOCAL_NAMES or linked(path):
@@ -143,7 +183,7 @@ def save(path, value):
             temporary.unlink()
 
 
-def preview(root, client, collection, manifest):
+def preview(root, client, collection, manifest, files=None):
     root = Path(root).resolve(strict=True)
     target = outside(manifest, root)
     if target.exists():
@@ -152,7 +192,7 @@ def preview(root, client, collection, manifest):
         raise MigrationError("collection must be a stable nonempty project label")
     library = client.library(write=True)
     client.library(library)
-    rows, deferred = inventory(root)
+    rows, deferred = inventory(root, files)
     entries = []
     for row in rows:
         categories = [
@@ -178,6 +218,8 @@ def preview(root, client, collection, manifest):
         "entries": entries,
         "deferred": deferred,
     }
+    if files is not None:
+        data["files"] = sorted(files)
     save(target, data)
     return {
         "status": "preview",
@@ -188,12 +230,12 @@ def preview(root, client, collection, manifest):
     }
 
 
-def scan(root, manifest):
+def scan(root, manifest, files=None):
     root = Path(root).resolve(strict=True)
     target = outside(manifest, root)
     if target.exists():
         raise MigrationError("inventory output already exists")
-    rows, deferred = inventory(root)
+    rows, deferred = inventory(root, files)
     save(
         target,
         {
@@ -201,6 +243,7 @@ def scan(root, manifest):
             "root": str(root),
             "inventory": rows,
             "deferred": deferred,
+            "files": files,
         },
     )
     return {
@@ -223,7 +266,7 @@ def preflight(data, client):
         )
     client.library(data["library"])
     root = Path(data["root"]).resolve(strict=True)
-    current, deferred = inventory(root)
+    current, deferred = inventory(root, data.get("files"))
     if current != data["inventory"] or deferred != data["deferred"]:
         raise MigrationError(
             "source inventory changed; review a new manifest before continuing"
@@ -421,6 +464,11 @@ def main(argv=None):
     first = sub.add_parser("preview")
     first.add_argument("--root", required=True)
     first.add_argument("--collection", required=True)
+    first.add_argument(
+        "--file",
+        action="append",
+        help="Exact root-relative Markdown path; repeat to limit scope without traversing other directories",
+    )
     for name in ("apply", "verify"):
         command = sub.add_parser(name)
         command.add_argument("--journal", required=True)
@@ -432,14 +480,21 @@ def main(argv=None):
     )
     local.add_argument("--root", required=True)
     local.add_argument("--manifest", required=True)
+    local.add_argument("--file", action="append")
     args = parser.parse_args(argv)
     try:
         if args.command == "scan":
-            print(json.dumps(scan(args.root, args.manifest), ensure_ascii=False))
+            print(
+                json.dumps(
+                    scan(args.root, args.manifest, args.file), ensure_ascii=False
+                )
+            )
             return 0
         client = memory.MemoryClient(args.binding)
         if args.command == "preview":
-            result = preview(args.root, client, args.collection, args.manifest)
+            result = preview(
+                args.root, client, args.collection, args.manifest, args.file
+            )
         else:
             result = execute(
                 args.manifest,

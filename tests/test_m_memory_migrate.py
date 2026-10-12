@@ -14,6 +14,53 @@ spec.loader.exec_module(migrate)
 LIBRARY = "55555555-5555-4555-8555-555555555555"
 
 
+def test_explicit_scope_does_not_walk_unselected_trees(tmp_path, monkeypatch):
+    root = tmp_path / "mixed"
+    root.mkdir()
+    (root / "REQUIREMENTS.md").write_text("approved source", encoding="utf-8")
+    (root / "runtime").mkdir()
+    (root / "runtime/private.md").write_text("unselected", encoding="utf-8")
+
+    def no_walk(*args, **kwargs):
+        raise AssertionError("explicit selection must not walk the root")
+
+    monkeypatch.setattr(migrate.os, "walk", no_walk)
+    manifest, journal = tmp_path / "manifest.json", tmp_path / "journal.json"
+    server = Server()
+    migrate.preview(root, server, "mixed", manifest, ["REQUIREMENTS.md"])
+    data = json.loads(manifest.read_text(encoding="utf-8"))
+    data["entries"][0].update(selected=True, category="requirements")
+    manifest.write_text(json.dumps(data), encoding="utf-8")
+    (root / "runtime/new.md").write_text("out of scope")
+    assert migrate.execute(manifest, server, journal)["verified"] == 1
+    (root / "REQUIREMENTS.md").write_text("changed")
+    with pytest.raises(migrate.MigrationError, match="inventory changed"):
+        migrate.execute(manifest, server, journal, verify_only=True)
+    assert server.writes == 1
+
+
+@pytest.mark.parametrize(
+    "files",
+    [
+        [],
+        ["../escape.md"],
+        ["C:/outside.md"],
+        ["plan.md"],
+        ["context/private.md"],
+        ["missing.md"],
+        ["REQUIREMENTS.md", "REQUIREMENTS.md"],
+        ["./REQUIREMENTS.md"],
+    ],
+)
+def test_explicit_scope_rejects_unsafe_or_excluded_files(tmp_path, files):
+    (tmp_path / "REQUIREMENTS.md").write_text("source")
+    (tmp_path / "plan.md").write_text("local")
+    (tmp_path / "context").mkdir()
+    (tmp_path / "context/private.md").write_text("private")
+    with pytest.raises(migrate.MigrationError):
+        migrate.inventory(tmp_path, files)
+
+
 class Server:
     url = "https://fixture.invalid"
 

@@ -18,6 +18,8 @@ The manifest binds the source root, service origin and library, without storing 
 
 ## Import and resume
 
+For a mixed project root, pass repeated `--file REQUIREMENTS.md --file specs/design.md` to `scan` or `preview`. These exact normalized root-relative Markdown paths form the entire frozen inventory; other directories are never traversed. Known transient/context paths, links, duplicates and paths outside the root remain rejected. Missing or changed selected files stop apply/verify; changes outside this explicit scope do not. Without `--file`, the original recursive inventory and added-file detection apply.
+
 ```text
 python <m-memory-migrate>/scripts/migrate.py apply --manifest <private-manifest.json> --binding <binding.json> --journal <private-journal.json>
 python <m-memory-migrate>/scripts/migrate.py verify --manifest <private-manifest.json> --binding <binding.json> --journal <private-journal.json>
