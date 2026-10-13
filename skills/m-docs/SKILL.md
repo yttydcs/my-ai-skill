@@ -15,6 +15,8 @@ Use this skill to treat project documentation as a governed system with private 
 
 - Apply `../m-autoflow/references/context-budget.md` for selective reading, same-task reuse and concise reports; load it once while its contents remain available and unchanged.
 
+- In service mode, use the task-directed strategy in `../m-memory/references/retrieval.md`: select the relevant category, use short domain/corpus-language terms, and inspect a few candidates before reading source sections. Check decision-relevant exceptions and later amendments in the selected source before treating a first snippet as the full rule. The file-mode index traversal below is not a reason to fan out across service categories or preload historical records.
+
 - For docs tree creation or repair, run `scripts/bootstrap_docs_tree.py` and review the generated `README.md` files.
 - For "where should this doc go?" questions, read `references/taxonomy.md` and `references/routing-rules.md`.
 - For plan or change work, read `references/requirement-impact.md` before editing.

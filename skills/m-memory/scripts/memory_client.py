@@ -160,6 +160,15 @@ class MemoryClient:
             body = dict(body or {})
             body.setdefault("allowed_source_libraries", self.sources)
             body.setdefault("budget_bytes", self.budget)
+        return self._send(
+            method, f"/v1/libraries/{selected}/{suffix}", body=body, params=query
+        )
+
+    def capabilities(self):
+        # Fixed read-only endpoint: no arbitrary root paths or library discovery.
+        return self._send("GET", "/v1/capabilities")
+
+    def _send(self, method, path, *, body=None, params=None):
         try:
             token = self.token_path.read_text(encoding="utf-8").strip()
             if not token:
@@ -170,9 +179,9 @@ class MemoryClient:
             opener = build_opener(
                 ProxyHandler({}), HTTPSHandler(context=context), NoRedirect()
             )
-            url = f"{self.url}/v1/libraries/{selected}/{suffix}"
-            if query:
-                url += "?" + urlencode(query, doseq=True)
+            url = f"{self.url}{path}"
+            if params:
+                url += "?" + urlencode(params, doseq=True)
             data = (
                 None
                 if body is None
@@ -209,12 +218,19 @@ class MemoryClient:
                 f"memory operation unavailable ({type(exc).__name__}); no local fallback; a write may have committed, reconcile before retrying"
             ) from None
 
-    def search(self, query, *, library=None, target="both", category=None, extra=None):
+    def search(
+        self, query, *, library=None, target="both", category=None,
+        method=None, limit=None, extra=None,
+    ):
         selected = self.library(library)
         index = self.config.get("indexes", {}).get(selected)
         if not index:
             raise MemoryError("selected library has no configured search index")
-        method = index["method"]
+        method = index["method"] if method is None else method
+        if method not in ("bm25", "fts", "vector_exact", "hybrid", "bm25_vector"):
+            raise MemoryError("select a supported search method explicitly")
+        if limit is not None and (type(limit) is not int or not 1 <= limit <= 50):
+            raise MemoryError("search limit must be an integer between 1 and 50")
         endpoint = "document-search" if method in {"bm25", "bm25_vector"} else "search"
         body = dict(extra or {})
         # Explicit options may add vectors/filters, but cannot replace binding identity.
@@ -223,6 +239,10 @@ class MemoryClient:
             raise MemoryError(
                 "search options cannot override method, index revision, query or target"
             )
+        if limit is not None:
+            if "limit" in body and body["limit"] != limit:
+                raise MemoryError("search limit conflicts with extra options")
+            body["limit"] = limit
         body.update(
             method=method,
             expected_index_revision=uuid(index["revision"]),
@@ -268,6 +288,9 @@ def main(argv=None):
     parser.add_argument("--library")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser(
+        "capabilities", help="Read protocol capabilities from the bound origin"
+    )
+    commands.add_parser(
         "check", help="Verify selected library access; prints no credentials"
     )
     search = commands.add_parser("search")
@@ -276,6 +299,11 @@ def main(argv=None):
         "--target", choices=["source", "derived", "both"], default="both"
     )
     search.add_argument("--category")
+    search.add_argument(
+        "--method", choices=["bm25", "fts", "vector_exact", "hybrid", "bm25_vector"],
+        help="Explicit method for this request; otherwise use the binding default",
+    )
+    search.add_argument("--limit", type=int, help="Maximum candidate objects (1..50)")
     search.add_argument(
         "--body-stdin",
         action="store_true",
@@ -302,7 +330,9 @@ def main(argv=None):
                 "select --binding or project M_MEMORY_BINDING; no implicit library"
             )
         client = MemoryClient(args.binding)
-        if args.command == "check":
+        if args.command == "capabilities":
+            result = client.capabilities()
+        elif args.command == "check":
             # Metadata only; this does not load all documents or build any index.
             result = client.request("GET", "section-indexes", library=args.library)
         elif args.command == "search":
@@ -311,6 +341,8 @@ def main(argv=None):
                 library=args.library,
                 target=args.target,
                 category=args.category,
+                method=args.method,
+                limit=args.limit,
                 extra=json.load(sys.stdin) if args.body_stdin else None,
             )
         elif args.command == "read":

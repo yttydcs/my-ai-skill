@@ -1,8 +1,10 @@
 # m-docs with Agent Memory
 
+Before using a stable rule, check its task-relevant conditions, exceptions and later amendments within the selected current source. A first snippet or current object status does not establish the complete rule. Prefer one bounded read for a short contract; otherwise reserve budget for relevant follow-up sections. Unverified coverage remains explicit, with no broad history preload.
+
 Keep m-docs' distinction among intake, feature truth, requirements, specs, decisions, change records and lessons. Represent stable logical documents as source objects with durable IDs and category metadata in the user-selected project library. A current feature or requirement document is updated in place with its expected revision; a fix does not create a new full requirement unless behavior changed.
 
-At task entry, query the chosen current requirement/spec objects with an explicit method and budget. Read complete sections only after identifying a relevant object. Do not load all fix records or archives into context. Use trace or history only when the source of a claim or a previous revision matters.
+At task entry, choose the relevant category from the task: features for behavior, requirements/specs for intent or contracts, decisions for rationale, and lessons for symptoms. Follow the [task-directed retrieval strategy](retrieval.md#task-directed-lexical-retrieval): use concise domain/corpus-language keywords, one explicit method and a small candidate set, then read the relevant source sections. Consult intake/change or provenance only for a concrete historical question or remaining evidence gap. Do not load all fix records, fan out over every category, or assume an arbitrary metadata value means current truth.
 
 When a durable requirement needs a navigable origin, store an explicit typed `references` entry to the selected source revision in the same CAS commit. Keep required summary `dependencies` separate: navigation targets can change without invalidating the requirement or summary. Use the bounded `/references` endpoint, with selected libraries and direction, to answer provenance questions; follow with an object/history read only for the evidence needed. Do not append every implementation fix to the requirement's references. See [retrieval](retrieval.md) for the version and truncation contract.
 

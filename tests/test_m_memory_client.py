@@ -103,6 +103,107 @@ def test_search_carries_selected_scope_and_index_without_writes(service):
     assert len(calls) == 1
 
 
+def test_capabilities_fixed_read_only_endpoint_without_library_discovery(service):
+    client, state, calls, path, _ = service
+    config = json.loads(path.read_text())
+    config.update(read_libraries=[LIB, OTHER], write_library=None)
+    path.write_text(json.dumps(config), encoding="utf-8")
+    client = module.MemoryClient(path)
+    state["body"] = {"document_search": {"object_revisions": {"response_echo": True}}}
+    original = path.read_bytes()
+    result = client.capabilities()
+    assert result == state["body"]
+    assert calls == [("GET", "/v1/capabilities", None)]
+    assert path.read_bytes() == original
+
+
+@pytest.mark.parametrize("status,body", [
+    (302, {"redirect": True}), (403, {"detail": "forbidden"}),
+    (200, {"oversized": "x" * 5000}),
+])
+def test_capabilities_preserves_budget_no_redirect_and_no_retry(service, status, body):
+    client, state, calls, _, _ = service
+    state.update(status=status, body=body)
+    with pytest.raises(module.MemoryError):
+        client.capabilities()
+    assert calls == [("GET", "/v1/capabilities", None)]
+
+
+def test_cli_capabilities_uses_bound_endpoint(service):
+    _, state, calls, path, _ = service
+    state["body"] = {"section_search": {"methods": ["fts"]}}
+    p = subprocess.run(
+        [sys.executable, str(SCRIPT), "--binding", str(path), "capabilities"],
+        capture_output=True, text=True, encoding="utf-8", timeout=15,
+    )
+    assert p.returncode == 0, p.stderr
+    assert json.loads(p.stdout) == state["body"]
+    assert calls == [("GET", "/v1/capabilities", None)]
+
+
+@pytest.mark.parametrize(
+    "method,endpoint",
+    [("fts", "search"), ("bm25", "document-search"),
+     ("vector_exact", "search"), ("hybrid", "search"),
+     ("bm25_vector", "document-search")],
+)
+def test_explicit_method_keeps_binding_scope_revision_and_budget(service, method, endpoint):
+    client, _, calls, path, _ = service
+    original = path.read_bytes()
+    extra = {"metadata_filter": {"lifecycle": "current"}, "object_revisions": {OTHER: REV}}
+    if method in {"vector_exact", "hybrid", "bm25_vector"}:
+        extra.update(model_id="caller-selected", preprocessing_id="fixture-v1", query_vector=[1, 0])
+    client.search("boundary", category="specs", method=method, limit=3, extra=extra)
+    _, url, body = calls[0]
+    assert url == f"/v1/libraries/{LIB}/section-indexes/{OTHER}/{endpoint}"
+    assert body["method"] == method and body["expected_index_revision"] == REV
+    assert body["limit"] == 3 and body["budget_bytes"] == 4096
+    assert body["allowed_source_libraries"] == [LIB]
+    assert body["metadata_filter"] == {"lifecycle": "current", "category": "specs"}
+    assert body["object_revisions"] == {OTHER: REV}
+    assert ("query" in body) == (method != "vector_exact")
+    assert len(calls) == 1 and path.read_bytes() == original
+    assert client.config["indexes"][LIB]["method"] == "bm25"
+
+
+@pytest.mark.parametrize("options", [
+    {"method": "auto"}, {"method": ""}, {"method": []},
+    {"limit": 0}, {"limit": 51}, {"limit": True}, {"limit": "3"},
+    {"limit": 3, "extra": {"limit": 10}},
+    {"method": "fts", "extra": {"method": "bm25"}},
+    {"method": "fts", "extra": {"budget_bytes": 9000}},
+    {"method": "fts", "extra": {"allowed_source_libraries": [OTHER]}},
+])
+def test_explicit_search_rejects_invalid_or_conflicting_options_before_network(service, options):
+    client, _, calls, _, _ = service
+    with pytest.raises(module.MemoryError):
+        client.search("boundary", **options)
+    assert not calls
+
+
+def test_selected_method_failure_never_retries_binding_default(service):
+    client, state, calls, _, _ = service
+    state.update(status=422, body={"detail": "unsupported_profile"})
+    with pytest.raises(module.MemoryError) as caught:
+        client.search("boundary", method="fts", limit=3)
+    assert caught.value.status == 422
+    assert len(calls) == 1 and calls[0][2]["method"] == "fts"
+
+
+def test_cli_explicit_method_and_limit_with_selected_object(service):
+    _, _, calls, path, _ = service
+    p = subprocess.run(
+        [sys.executable, str(SCRIPT), "--binding", str(path), "search", "身份 scope",
+         "--method", "fts", "--limit", "3", "--category", "specs", "--body-stdin"],
+        input=json.dumps({"object_revisions": {OTHER: REV}, "limit": 3}),
+        capture_output=True, text=True, encoding="utf-8", timeout=15,
+    )
+    assert p.returncode == 0, p.stderr
+    assert len(calls) == 1
+    assert calls[0][2]["query"] == "身份 scope" and calls[0][2]["method"] == "fts"
+    assert calls[0][2]["limit"] == 3 and calls[0][2]["object_revisions"] == {OTHER: REV}
+
+
 @pytest.mark.parametrize(
     "path",
     [

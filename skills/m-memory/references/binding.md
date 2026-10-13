@@ -30,7 +30,9 @@ The standalone helper requires Python 3.10+ and only its standard library:
 
 ```text
 python <m-memory>/scripts/memory_client.py --binding <binding.json> check
+python <m-memory>/scripts/memory_client.py --binding <binding.json> capabilities
 python <m-memory>/scripts/memory_client.py --binding <binding.json> search "export timeout" --category requirements
+python <m-memory>/scripts/memory_client.py --binding <binding.json> search "EXPORT_TIMEOUT" --category specs --method fts --limit 3
 python <m-memory>/scripts/memory_client.py --binding <binding.json> read <object-uuid> --revision <observed-revision>
 python <m-memory>/scripts/memory_client.py --binding <binding.json> commit
 ```
@@ -49,6 +51,8 @@ python <m-memory>/scripts/memory_client.py --binding <binding.json> commit
 
 New source creation uses `action:create`, a client UUID, `kind:source`, title, content and metadata such as `{"category":"specs"}`. New summaries use `kind:derived` and explicit dependencies. No current-document update solely because a fix finished. Indexes are separately configured maintenance, not side effects of search.
 
+`capabilities` reads only `/v1/capabilities` on the bound origin with the same credential, TLS, no-redirect and response-budget protections. It does not enumerate libraries or change selected scope. Use it when a retrieval feature requires advertised protocol support; `check` remains selected-library index discovery.
+
 For bounded source sections, provenance, history and leases use the JSON `request` command with a library-relative suffix. It cannot select a different service origin:
 
 ```text
@@ -58,7 +62,7 @@ For bounded source sections, provenance, history and leases use the JSON `reques
 ... request POST locks/archive/acquire --body-stdin
 ```
 
-Supply the server's lease TTL payload, then include its token/fence/name in each protected commit; renew/release via the documented runtime API. Do not remove the guard after a failure. `request --body-stdin` accepts full search payloads for advanced strategies. `search --body-stdin` accepts extra fields such as caller-computed vectors and object_revisions, but the binding retains method and index identity. The API's method/profile/coverage validation remains authoritative; no fallback to a different search method.
+Supply the server's lease TTL payload, then include its token/fence/name in each protected commit; renew/release via the documented runtime API. Do not remove the guard after a failure. `request --body-stdin` accepts full search payloads for advanced strategies. `search` uses the binding's method by default; `--method` explicitly selects a method for this call without changing the binding, index, scope or byte budget. All five section/document methods are supported, but their required vectors/model fields and server capabilities must already be satisfied; the client never generates embeddings or falls back. `--limit` bounds candidates from 1 to 50; a conflicting limit in stdin is rejected. `search --body-stdin` accepts extra fields such as metadata filters, caller-computed vectors and object_revisions; it cannot override method, index revision, query or target. The API's method/profile/coverage validation remains authoritative.
 
 The client enforces configured library/source/response-budget boundaries, disables proxy environment inheritance and redirects, verifies TLS, and never caches knowledge. An oversized response fails explicitly; narrow the read to sections or deliberately change the configured budget. A failed or lost write response can have committed: inspect current state/receipt or replay the identical still-live idempotency key, never blindly issue a fresh key. For attachments use the existing `agent-memory request --binary-file/--output` transport with the same explicit binding URL/CA/device and selected library; do not use downloaded attachments as a text knowledge mirror.
 
